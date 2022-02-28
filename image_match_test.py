@@ -7,6 +7,8 @@ import image_struct_test as test
 
 def BFMatches(des1, des2):
     bf = cv.BFMatcher_create()
+
+    
     matches = bf.match(des1, des2)
     matches = sorted(matches, key=lambda x: x.distance)
     return matches
