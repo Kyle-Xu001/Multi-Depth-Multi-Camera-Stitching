@@ -44,12 +44,14 @@ class Image(object):
         self.des = des_filtered
         print("Total features: ", len(self.kps_histequal))
         print("Filtered features: ", len(self.kps))
+        
+        return kps_filtered, des_filtered
     
 
     
 if __name__ == '__main__':
     # Load exmaple image
-    img = cv.imread("lamp_15.JPG")
+    img = cv.imread("lamp_19.JPG")
     img = np.rot90(img,1) # Rotate the image to get better visualization
     
     Img = Image(img)
@@ -114,6 +116,13 @@ if __name__ == '__main__':
     num_sift_origin = len(kps_sift_origin)
     num_sift_yuv = len(kps_sift)
     num_sift_rgb = len(kps_sift_old)
+    
+    kps_brisk_origin, dps_brisk_origin = Img_copy.findFeatures('brisk')
+    kps_brisk_old, dps_brisk_old = Img_.findFeatures('brisk')
+    
+    num_brisk_origin = len(kps_brisk_origin)
+    num_brisk_yuv = len(kps_brisk)
+    num_brisk_rgb = len(kps_brisk_old)
         
     plt.subplot(2, 3, 1)
     img_kps_sift_origin = cv.drawKeypoints(Img_copy.img, kps_sift_origin, None,(0,255,0), flags=cv.DRAW_MATCHES_FLAGS_DEFAULT)
@@ -131,13 +140,6 @@ if __name__ == '__main__':
     plt.imshow(cv.cvtColor(img_kps_sift, cv.COLOR_BGR2RGB))
     plt.title("(c) SIFT Features for YUV Equalize (#: %d)" %(num_sift_yuv))
     plt.axis('off')
-    
-    kps_brisk_origin, dps_brisk_origin = Img_copy.findFeatures('brisk')
-    kps_brisk_old, dps_brisk_old = Img_.findFeatures('brisk')
-    
-    num_brisk_origin = len(kps_brisk_origin)
-    num_brisk_yuv = len(kps_brisk)
-    num_brisk_rgb = len(kps_brisk_old)
         
     plt.subplot(2, 3, 4)
     img_kps_brisk_origin = cv.drawKeypoints(Img_copy.img, kps_brisk_origin, None,(0,255,0), flags=cv.DRAW_MATCHES_FLAGS_DEFAULT)
@@ -156,46 +158,3 @@ if __name__ == '__main__':
     plt.title("(f) BRISK Features for YUV Equalize (#: %d)" %(num_brisk_yuv))
     plt.axis('off')
     plt.show()
-    
-    
-    plt.suptitle('SIFT Features Comparison')
-    plt.subplot(1, 4, 1)
-    plt.imshow(cv.cvtColor(img_kps, cv.COLOR_BGR2RGB))
-    plt.axis('off')
-
-    plt.subplot(1, 4, 2)
-    plt.imshow(cv.cvtColor(img_hist_kps, cv.COLOR_BGR2RGB))
-    plt.axis('off')   
-
-    # Manual Set
-    ROIs = np.array([[250,400,800,1000]])
-    pts_hist = cv.KeyPoint_convert(kps_hist)
-    final_mask = getMaskPointsInROIs(pts_hist,ROIs)
-    pts_hist = pts_hist[final_mask]
-    #kps_hist = cv.KeyPoint_convert(kps_hist)
-    print("Number of Features: ",len(pts_hist))
-
-    
-    # Filter the selected features with information
-    kps_filter,_= SIFT_filter(kps_hist, dps_hist,final_mask)
-    print('The features filtered: ',len(kps_filter))
-    img_hist_kps_filter = cv.drawKeypoints(img_histequal,kps_filter,None,flags=cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-    
-    plt.subplot(1,4,3)
-    plt.imshow(cv.cvtColor(img_hist_kps_filter, cv.COLOR_BGR2RGB))
-    plt.axis('off')
-
-    # Select the features lose information
-    img_hist_ROI = drawPoints(img_histequal,pts_hist.astype(int))
-
-    plt.subplot(1, 4, 4)
-    plt.imshow(cv.cvtColor(img_hist_ROI, cv.COLOR_BGR2RGB))
-    plt.axis('off')
-
-
-
-    plt.show()
-
-
-
-

@@ -3,49 +3,32 @@ import numpy as np
 import cv2 as cv
 import itertools
 
-import image_struct_test as test
+from image_feature_extraction_test import Image
+import utils
 
-def BFMatches(des1, des2):
-    bf = cv.BFMatcher_create()
-
+def featureMatch(des1, des2, method, knn=False):
+    if method == 'sift' and knn == False:
+        bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
+    elif method == 'sift' and knn == True:
+        bf = cv.BFMatcher()
+    elif method == 'brisk'and knn == False:
+        bf = cv.BFMatcher(cv.NORM_HAMMING,crossCheck=True)
+    elif method == 'brisk'and knn == True:
+        bf = cv.BFMatcher()
     
-    matches = bf.match(des1, des2)
-    matches = sorted(matches, key=lambda x: x.distance)
-    return matches
-
-
-def BFMatches_orb(des1, des2):
-    bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
-    matches = bf.match(des1, des2)
-    matches = sorted(matches, key=lambda x: x.distance)
-    return matches
-
-
-def BFMatches_knn(des1, des2):
-    bf = cv.BFMatcher()
-    matches = bf.knnMatch(des1, des2, k=2)
-
-    matches_good = []
-    for m, n in matches:
-        if m.distance < 0.75*n.distance:
-            matches_good.append(m)
+    
+    if knn == False:
+        matches = bf.match(des1, des2)
+        matches_good = sorted(matches, key=lambda x: x.distance)
+    else:
+        matches = bf.knnMatch(des1, des2, k=2)
+        
+        matches_good = []
+        for m, n in matches:
+            if m.distance < 0.75*n.distance:
+                matches_good.append(m)
+                
     return matches_good
-
-
-def FLANNMatches(des1, des2):
-    # FLANN parameters
-    FLANN_INDEX_KDTREE = 1
-    index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
-    search_params = dict(checks=50)   # or pass empty dictionary
-    flann = cv.FlannBasedMatcher(index_params, search_params)
-    matches = flann.knnMatch(des1, des2, k=2)
-    #  Need to draw only good matches, so create a mask
-    good = []
-    # ratio test as per Lowe's paper
-    for i, (m, n) in enumerate(matches):
-        if m.distance < 0.6*n.distance:
-            good.append(m)
-    return good
 
 
 def findHomography(matches, kps1, kps2):
@@ -90,84 +73,128 @@ def transformVerts(img_size,homo_mat):
     return X_transform.round().astype(np.int32).reshape(4,2)
 
 if __name__ == '__main__':
-    # load the matching images
-    img1 = cv.imread("lamp_19_distorted.JPG")
-    img2 = cv.imread("lamp_18_distorted.JPG")
-
-    #img1 = img1[:,550:,:]
-    #img2 = img2[:,550:,:]
-    # Equalize histogram of images
-    img1_hist = test.equalizeHist(img1)
-    img2_hist = test.equalizeHist(img2)
-
-    # Find SIFT features of matching images
-    kps1_hist, dps1_hist = test.findFeatures(img1_hist)
-    kps2_hist, dps2_hist = test.findFeatures(img2_hist)
-
-    # Manual Set
-    ROIs2 = np.array([[160,0,1250,400]])
-    ROIs1 = np.array([[160,350,1250,760]])
-    pts1_hist = cv.KeyPoint_convert(kps1_hist)
-    final_mask1 = test.getMaskPointsInROIs(pts1_hist,ROIs1)
-    kps1_filter, des1_filter = test.SIFT_filter(kps1_hist,dps1_hist,final_mask1)
-
-    pts2_hist = cv.KeyPoint_convert(kps2_hist)
-    final_mask2 = test.getMaskPointsInROIs(pts2_hist,ROIs2)
-    kps2_filter, des2_filter = test.SIFT_filter(kps2_hist,dps2_hist,final_mask2)
-
+    
     draw_params = dict(matchColor = (0,255,0),
                    singlePointColor = (255,0,0),
                    flags = cv.DrawMatchesFlags_DEFAULT)
     
+    # load the matching images
+    img1 = cv.imread("lamp_16.JPG")
+    img2 = cv.imread("lamp_15.JPG")
+
+    img1 = np.rot90(img1,1) 
+    img2 = np.rot90(img2,1)
+    
+    img1 = utils.equalizeHist_old(img1)
+    img2 = utils.equalizeHist_old(img2)
+    
+    # Equalize histogram of images
+    Img1 = Image(img1)
+    Img2 = Image(img2)
+    
+    # Img1.equalizeHist()
+    # Img2.equalizeHist()
+
+
+
+    # Find SIFT features of matching images
+    kps1_sift, dps1_sift = Img1.findFeatures('sift')
+    kps2_sift, dps2_sift = Img2.findFeatures('sift')
+
+    # Manual Set
+    # ROIs1 = np.array([[160,350,1250,760]])
+    # ROIs2 = np.array([[160,0,1250,400]])
+    ROIs1 = np.array([[350,150,760,1250]])
+    ROIs2 = np.array([[0,150,400,1250]])
+    
+    pts1_sift = cv.KeyPoint_convert(kps1_sift)
+    final_mask1 = utils.getMaskPointsInROIs(pts1_sift,ROIs1)
+    kps1_filter, des1_filter = Img1.featureFilter(final_mask1)
+
+    pts2_sift = cv.KeyPoint_convert(kps2_sift)
+    final_mask2 = utils.getMaskPointsInROIs(pts2_sift,ROIs2)
+    kps2_filter, des2_filter = Img2.featureFilter(final_mask2)
+    
+    
     # BFMatches(des1_filter, des2_filter)
-
-    bf_matches = BFMatches_knn(des1_filter, des2_filter)
+    matches_sift = featureMatch(des1_filter, des2_filter, 'sift')
+    matches_sift_knn = featureMatch(des1_filter, des2_filter, 'sift', knn=True)
     #bf_matches = FLANNMatches(des1_filter,des2_filter)
-    print('The number of matches: ', len(bf_matches))
 
-    img3 = cv.drawMatches(img1_hist,kps1_filter,img2_hist,kps2_filter,bf_matches,None,**draw_params)
+    img_sift = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches_sift[:50],None,**draw_params)
+    img_sift_knn = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches_sift_knn,None,**draw_params)
+  
+  
+  
+    kps1_brisk, dps1_brisk = Img1.findFeatures('brisk')
+    kps2_brisk, dps2_brisk = Img2.findFeatures('brisk')
+    
+    pts1_brisk = cv.KeyPoint_convert(kps1_brisk)
+    final_mask1_brisk = utils.getMaskPointsInROIs(pts1_brisk,ROIs1)
+    kps1_filter_, des1_filter_ = Img1.featureFilter(final_mask1_brisk)
+
+    pts2_brisk = cv.KeyPoint_convert(kps2_brisk)
+    final_mask2_brisk = utils.getMaskPointsInROIs(pts2_brisk,ROIs2)
+    kps2_filter_, des2_filter_ = Img2.featureFilter(final_mask2_brisk)
     
     
+    matches_brisk = featureMatch(des1_filter_, des2_filter_, 'brisk')
+    matches_brisk_knn = featureMatch(des1_filter_, des2_filter_, 'brisk',knn=True)
+    #bf_matches = FLANNMatches(des1_filter,des2_filter)
+    print('The number of BRISK matches: ', len(matches_brisk))
+    print('The number of BRISK Knn matches: ', len(matches_brisk_knn))
+
+    img_brisk = cv.drawMatches(Img1.img,kps1_filter_,Img2.img,kps2_filter_,matches_brisk[:50],None,**draw_params)
+    img_brisk_knn = cv.drawMatches(Img1.img,kps1_filter_,Img2.img,kps2_filter_,matches_brisk_knn,None,**draw_params)
     
-    kps1_hist_orb, dps1_hist_orb = test.findFeatures_orb(img1_hist)
-    kps2_hist_orb, dps2_hist_orb = test.findFeatures_orb(img2_hist)
-
-    pts1_hist_orb = cv.KeyPoint_convert(kps1_hist_orb)
-    final_mask1_orb = test.getMaskPointsInROIs(pts1_hist_orb,ROIs1)
-    kps1_filter_orb, des1_filter_orb = test.SIFT_filter(kps1_hist_orb,dps1_hist_orb,final_mask1_orb)
-
-    pts2_hist_orb = cv.KeyPoint_convert(kps2_hist_orb)
-    final_mask2_orb = test.getMaskPointsInROIs(pts2_hist_orb,ROIs2)
-    kps2_filter_orb, des2_filter_orb = test.SIFT_filter(kps2_hist_orb,dps2_hist_orb,final_mask2_orb)
-
-    bf_matches_orb = BFMatches_orb(des1_filter_orb, des2_filter_orb)
-    print('The number of matches: ', len(bf_matches_orb))
-
-    img3_orb = cv.drawMatches(img1_hist,kps1_filter_orb,img2_hist,kps2_filter_orb,bf_matches_orb[:10],None,**draw_params)
     
     plt.figure(1)
-    #plt.subplot(1,2,1)
-    plt.title("Brute Force Knn Matching on SIFT Features")
-    plt.imshow(cv.cvtColor(img3, cv.COLOR_BGR2RGB))
+    plt.subplot(2,2,1)
+    plt.title("Brute Force Matching on SIFT Features\n(# of Matches: %d)" %(len(matches_sift)))
+    plt.imshow(cv.cvtColor(img_sift, cv.COLOR_BGR2RGB))
     plt.axis('off')
+    
+    plt.subplot(2,2,2)
+    plt.title("Brute Force KNN Matching on SIFT Features\n(# of Matches: %d)" %(len(matches_sift_knn)))
+    plt.imshow(cv.cvtColor(img_sift_knn, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    
+    plt.subplot(2,2,3)
+    plt.title("Brute Force Matching on BRISK Features\n(# of Matches: %d)" %(len(matches_brisk)))
+    plt.imshow(cv.cvtColor(img_brisk, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    
+    plt.subplot(2,2,4)
+    plt.title("Brute Force KNN Matching on BRISK Features\n(# of Matches: %d)" %(len(matches_brisk_knn)))
+    plt.imshow(cv.cvtColor(img_brisk_knn, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    
 
-    # plt.subplot(1,3,3)
-    # plt.title("Brute-Force Matching on ORB Features")
-    # plt.imshow(cv.cvtColor(img3_orb, cv.COLOR_BGR2RGB))
-    # plt.axis('off')
+    
 
-    homo_mat, inliers_mask = findHomography(bf_matches,kps1_filter,kps2_filter)
-    np.set_printoptions(suppress=True)
-    print(homo_mat.astype(float))
-    matches_inliers = list(itertools.compress(bf_matches, inliers_mask))
-    img_inliners = cv.drawMatches(img1_hist,kps1_filter,img2_hist,kps2_filter,matches_inliers,None,**draw_params)
-    #plt.subplot(1,2,2)
+    homo_mat_sift, inliers_mask_sift = findHomography(matches_sift,kps1_filter,kps2_filter)
+    homo_mat_sift_knn, inliers_mask_sift_knn = findHomography(matches_sift_knn,kps1_filter,kps2_filter)
+    homo_mat_brisk, inliers_mask_brisk = findHomography(matches_brisk,kps1_filter_,kps2_filter_)
+    homo_mat_brisk_knn, inliers_mask_brisk_knn = findHomography(matches_sift,kps1_filter_,kps2_filter_)
+    
+    
+    matches_inliers_sift = list(itertools.compress(matches_sift, inliers_mask))
+    matches_inliers = list(itertools.compress(matches_sift, inliers_mask))
+    matches_inliers = list(itertools.compress(matches_sift, inliers_mask))
+    matches_inliers = list(itertools.compress(matches_sift, inliers_mask))
+    
+    
+    img_inliners = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches_inliers,None,**draw_params)
+    plt.figure(2)
+    # plt.subplot(1,2,2)
     plt.title("Brute-Force Knn Matching on SIFT Features")
     plt.imshow(cv.cvtColor(img_inliners, cv.COLOR_BGR2RGB))
     plt.axis('off')
+    
+    plt.show()
 
 
-    plt.figure(2)
+
 
 
     #img_transform = cv.warpPerspective(img1_hist, homo_mat,(img2_hist.shape[1],int(max(left_bottom[0],right_bottom[0]))))
