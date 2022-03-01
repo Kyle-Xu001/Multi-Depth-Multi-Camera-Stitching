@@ -25,7 +25,7 @@ def featureMatch(des1, des2, method, knn=False):
         
         matches_good = []
         for m, n in matches:
-            if m.distance < 0.75*n.distance:
+            if m.distance < 0.8*n.distance:
                 matches_good.append(m)
                 
     return matches_good
@@ -85,15 +85,15 @@ if __name__ == '__main__':
     img1 = np.rot90(img1,1) 
     img2 = np.rot90(img2,1)
     
-    img1 = utils.equalizeHist_old(img1)
-    img2 = utils.equalizeHist_old(img2)
+    #img1 = utils.equalizeHist_old(img1)
+    #img2 = utils.equalizeHist_old(img2)
     
     # Equalize histogram of images
     Img1 = Image(img1)
     Img2 = Image(img2)
     
-    # Img1.equalizeHist()
-    # Img2.equalizeHist()
+    Img1.equalizeHist()
+    Img2.equalizeHist()
 
 
 
@@ -140,9 +140,8 @@ if __name__ == '__main__':
     
     matches_brisk = featureMatch(des1_filter_, des2_filter_, 'brisk')
     matches_brisk_knn = featureMatch(des1_filter_, des2_filter_, 'brisk',knn=True)
-    #bf_matches = FLANNMatches(des1_filter,des2_filter)
-    print('The number of BRISK matches: ', len(matches_brisk))
-    print('The number of BRISK Knn matches: ', len(matches_brisk_knn))
+
+
 
     img_brisk = cv.drawMatches(Img1.img,kps1_filter_,Img2.img,kps2_filter_,matches_brisk[:50],None,**draw_params)
     img_brisk_knn = cv.drawMatches(Img1.img,kps1_filter_,Img2.img,kps2_filter_,matches_brisk_knn,None,**draw_params)
@@ -170,73 +169,77 @@ if __name__ == '__main__':
     plt.axis('off')
     
 
-    
-
     homo_mat_sift, inliers_mask_sift = findHomography(matches_sift,kps1_filter,kps2_filter)
     homo_mat_sift_knn, inliers_mask_sift_knn = findHomography(matches_sift_knn,kps1_filter,kps2_filter)
     homo_mat_brisk, inliers_mask_brisk = findHomography(matches_brisk,kps1_filter_,kps2_filter_)
-    homo_mat_brisk_knn, inliers_mask_brisk_knn = findHomography(matches_sift,kps1_filter_,kps2_filter_)
+    homo_mat_brisk_knn, inliers_mask_brisk_knn = findHomography(matches_brisk_knn,kps1_filter_,kps2_filter_)
     
     
-    matches_inliers_sift = list(itertools.compress(matches_sift, inliers_mask))
-    matches_inliers = list(itertools.compress(matches_sift, inliers_mask))
-    matches_inliers = list(itertools.compress(matches_sift, inliers_mask))
-    matches_inliers = list(itertools.compress(matches_sift, inliers_mask))
+    matches_inliers_sift = list(itertools.compress(matches_sift, inliers_mask_sift))
+    matches_inliers_sift_knn = list(itertools.compress(matches_sift_knn, inliers_mask_sift_knn))
+    matches_inliers_brisk = list(itertools.compress(matches_brisk, inliers_mask_brisk))
+    matches_inliers_brisk_knn = list(itertools.compress(matches_brisk_knn, inliers_mask_brisk_knn))
     
     
-    img_inliners = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches_inliers,None,**draw_params)
+    img_inliners_sift = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches_inliers_sift,None,**draw_params)
+    img_inliners_sift_knn = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches_inliers_sift_knn,None,**draw_params)
+    img_inliners_brisk = cv.drawMatches(Img1.img,kps1_filter_,Img2.img,kps2_filter_,matches_inliers_brisk,None,**draw_params)
+    img_inliners_brisk_knn = cv.drawMatches(Img1.img,kps1_filter_,Img2.img,kps2_filter_,matches_inliers_brisk_knn,None,**draw_params)    
+    
     plt.figure(2)
-    # plt.subplot(1,2,2)
-    plt.title("Brute-Force Knn Matching on SIFT Features")
-    plt.imshow(cv.cvtColor(img_inliners, cv.COLOR_BGR2RGB))
+    plt.subplot(2,2,1)
+    plt.title("Brute Force Matching on SIFT Features\n(# of Inliners: %d)" %(len(matches_inliers_sift)))
+    plt.imshow(cv.cvtColor(img_inliners_sift, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    
+    plt.subplot(2,2,2)
+    plt.title("Brute Force KNN Matching on SIFT Features\n(# of Inliners: %d)" %(len(matches_inliers_sift_knn)))
+    plt.imshow(cv.cvtColor(img_inliners_sift_knn, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    
+    plt.subplot(2,2,3)
+    plt.title("Brute Force Matching on BRISK Features\n(# of Inliners: %d)" %(len(matches_inliers_brisk)))
+    plt.imshow(cv.cvtColor(img_inliners_brisk, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    
+    plt.subplot(2,2,4)
+    plt.title("Brute Force KNN Matching on BRISK Features\n(# of Inliners: %d)" %(len(matches_inliers_brisk_knn)))
+    plt.imshow(cv.cvtColor(img_inliners_brisk_knn, cv.COLOR_BGR2RGB))
     plt.axis('off')
     
     plt.show()
 
-
-
-
-
-    #img_transform = cv.warpPerspective(img1_hist, homo_mat,(img2_hist.shape[1],int(max(left_bottom[0],right_bottom[0]))))
-
-   
-    #img_transform[453:,:,:]=img2_hist
-
-   
-
     plt.axis('off')
-
-    #plt.show()
-
-
-    # Get the position of vertices
-    posVerts = transformVerts(img_size=np.array([img1_hist.shape[1],img1_hist.shape[0]]), homo_mat=homo_mat)
-    print("Left Top: ",posVerts[0,:],"\n"
-          "Right Top: ",posVerts[1,:],"\n"
-          "Right Bottom: ",posVerts[2,:],"\n"
-          "Left Bottom: ",posVerts[3,:],"\n")
     
-    x_min = posVerts[:,0].min()
-    x_max = posVerts[:,0].max()
-    y_min = posVerts[:,1].min()
-    y_max = posVerts[:,1].max()
-    print("x_min: %d, x_max: %d y_min: %d, y_max: %d" %(x_min,x_max,y_min,y_max))
 
-    stitch_size = (x_max,y_max)
+    # # Get the position of vertices
+    # posVerts = transformVerts(img_size=np.array([img1_hist.shape[1],img1_hist.shape[0]]), homo_mat=homo_mat)
+    # print("Left Top: ",posVerts[0,:],"\n"
+    #       "Right Top: ",posVerts[1,:],"\n"
+    #       "Right Bottom: ",posVerts[2,:],"\n"
+    #       "Left Bottom: ",posVerts[3,:],"\n")
+    
+    # x_min = posVerts[:,0].min()
+    # x_max = posVerts[:,0].max()
+    # y_min = posVerts[:,1].min()
+    # y_max = posVerts[:,1].max()
+    # print("x_min: %d, x_max: %d y_min: %d, y_max: %d" %(x_min,x_max,y_min,y_max))
 
-    homo_mat_ = np.eye(3)
-    img_super = cv.warpPerspective(img1_hist, homo_mat_,stitch_size,borderValue=(0,0,0))
+    # stitch_size = (x_max,y_max)
 
-    img_transform = cv.warpPerspective(img2_hist, homo_mat,stitch_size,borderValue=(0,0,0))
+    # homo_mat_ = np.eye(3)
+    # img_super = cv.warpPerspective(img1_hist, homo_mat_,stitch_size,borderValue=(0,0,0))
 
-    high_y = np.min(posVerts[:,1])
-    img_transform[high_y:high_y,:,:] = 0
+    # img_transform = cv.warpPerspective(img2_hist, homo_mat,stitch_size,borderValue=(0,0,0))
 
-    img_super[img_transform>0]=0
-    img_super = img_transform + img_super
+    # high_y = np.min(posVerts[:,1])
+    # img_transform[high_y:high_y,:,:] = 0
 
-    img_stitch = cv.rotate(img_super,cv.ROTATE_90_COUNTERCLOCKWISE)
-    plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
-    plt.show()
+    # img_super[img_transform>0]=0
+    # img_super = img_transform + img_super
+
+    # img_stitch = cv.rotate(img_super,cv.ROTATE_90_COUNTERCLOCKWISE)
+    # plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
+    # plt.show()
 
 
