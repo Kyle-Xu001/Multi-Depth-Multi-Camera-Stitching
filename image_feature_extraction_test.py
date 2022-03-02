@@ -10,7 +10,10 @@ class Image(object):
         self.nfeatures = nfeatures
         self.kps = None
         self.des = None
-
+        
+        # Equalize the YUV channels histogram
+        self.equalizeHist()
+        
         # self.candidate_links = dict()
         # self.candidate_links['top'] = list()
         # self.candidate_links['bottom'] = list()
@@ -40,6 +43,7 @@ class Image(object):
                 des_filtered.append(self.des[i])
     
         des_filtered = np.asarray(des_filtered)
+        
         print("\nTotal features: ", len(mask))
         print("Filtered features: ", len(kps_filtered),"\n")
         
@@ -53,8 +57,7 @@ class Image(object):
             kpsCluster.append(kps_filtered)
             desCluster.append(des_filtered)
         return kpsCluster, desCluster
-    
-    def clusterMatch
+        
     
 
     

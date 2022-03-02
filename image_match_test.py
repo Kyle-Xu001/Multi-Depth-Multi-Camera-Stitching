@@ -6,31 +6,6 @@ import itertools
 from image_feature_extraction_test import Image
 import utils
 
-def featureMatch(des1, des2, method, knn=False):
-    if method == 'sift' and knn == False:
-        bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
-    elif method == 'sift' and knn == True:
-        bf = cv.BFMatcher()
-    elif method == 'brisk'and knn == False:
-        bf = cv.BFMatcher(cv.NORM_HAMMING,crossCheck=True)
-    elif method == 'brisk'and knn == True:
-        bf = cv.BFMatcher()
-    
-    
-    if knn == False:
-        matches = bf.match(des1, des2)
-        matches_good = sorted(matches, key=lambda x: x.distance)
-    else:
-        matches = bf.knnMatch(des1, des2, k=2)
-        
-        matches_good = []
-        for m, n in matches:
-            if m.distance < 0.8*n.distance:
-                matches_good.append(m)
-                
-    return matches_good
-
-
 def findHomography(matches, kps1, kps2):
     queryIdxs = [match.queryIdx for match in matches]
     trainIdxs = [match.trainIdx for match in matches]
