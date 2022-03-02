@@ -10,8 +10,6 @@ class Image(object):
         self.nfeatures = nfeatures
         self.kps = None
         self.des = None
-        self.kps_histequal = None
-        self.des_histequal = None
 
         # self.candidate_links = dict()
         # self.candidate_links['top'] = list()
@@ -26,26 +24,37 @@ class Image(object):
         img = self.img
         kps, des = utils.findFeatures(img, method)
         
-        self.kps_histequal = kps
-        self.des_histequal = des
+        self.kps = kps
+        self.des = des
         self.nfeatures = len(kps)
-        return kps, des
 
+        return kps, des
+    
     def featureFilter(self, mask):
+        
         kps_filtered = ()
         des_filtered = []
         for i in range(len(mask)):
             if mask[i] == 1:
-                kps_filtered = kps_filtered + (self.kps_histequal[i],)
-                des_filtered.append(self.des_histequal[i])
+                kps_filtered = kps_filtered + (self.kps[i],)
+                des_filtered.append(self.des[i])
     
         des_filtered = np.asarray(des_filtered)
-        self.kps = kps_filtered
-        self.des = des_filtered
-        print("Total features: ", len(self.kps_histequal))
-        print("Filtered features: ", len(self.kps))
+        print("\nTotal features: ", len(mask))
+        print("Filtered features: ", len(kps_filtered),"\n")
         
         return kps_filtered, des_filtered
+    
+    def featureCluster(self, masks):
+        kpsCluster = []
+        desCluster = []
+        for mask in masks:
+            kps_filtered, des_filtered = self.featureFilter(mask)
+            kpsCluster.append(kps_filtered)
+            desCluster.append(des_filtered)
+        return kpsCluster, desCluster
+    
+    def clusterMatch
     
 
     

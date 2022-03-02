@@ -2,6 +2,30 @@ import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 
+def featureMatch(des1, des2, method, knn=False):
+    if method == 'sift' and knn == False:
+        bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
+    elif method == 'sift' and knn == True:
+        bf = cv.BFMatcher()
+    elif method == 'brisk'and knn == False:
+        bf = cv.BFMatcher(cv.NORM_HAMMING,crossCheck=True)
+    elif method == 'brisk'and knn == True:
+        bf = cv.BFMatcher()
+    
+    
+    if knn == False:
+        matches = bf.match(des1, des2)
+        matches_good = sorted(matches, key=lambda x: x.distance)
+    else:
+        matches = bf.knnMatch(des1, des2, k=2)
+        
+        matches_good = []
+        for m, n in matches:
+            if m.distance < 0.8*n.distance:
+                matches_good.append(m)
+                
+    return matches_good
+
 def findFeatures(img, method=None):
 
     if method == 'sift':
@@ -32,7 +56,7 @@ def equalizeHist_old(img):
     return img_histequal_
 
 
-def getMaskPointsInROIs(pts,ROIs):
+def getMaskPointsInROIs(kps,ROIs):
     """
     Parameters
     ----------
@@ -47,17 +71,18 @@ def getMaskPointsInROIs(pts,ROIs):
     ndarray of mask
 
     """
+    pts = cv.KeyPoint_convert(kps)
     submasks = []
     for ROI in ROIs:
         x_mask = np.logical_and(pts[:,0] >= ROI[0],pts[:,0] <= ROI[2])
         y_mask = np.logical_and(pts[:,1] >= ROI[1],pts[:,1] <= ROI[3])
         submasks.append(np.logical_and(x_mask,y_mask))
+    
+    # final_mask = np.zeros(submasks[0].shape,dtype=bool)
+    # for mask in submasks:
+    #     final_mask = np.logical_or(final_mask,mask)
         
-    final_mask = np.zeros(submasks[0].shape,dtype=bool)
-    for mask in submasks:
-        final_mask = np.logical_or(final_mask,mask)
-        
-    return final_mask
+    return submasks
 
 def drawPoints(img,pts):
     """
