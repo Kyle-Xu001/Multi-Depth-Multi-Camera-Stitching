@@ -6,6 +6,35 @@ import itertools
 from image_feature_extraction_test import Image
 import utils
 
+def getMaskPointsInROIs(kps,ROIs):
+    """
+    Parameters
+    ----------
+    kps : List of feature elements
+    pts : n x 2 ndarray
+        Each row is a point (x,y)
+    ROIs : List of ROIs, each ROI is a size 4 iterable
+        Each ROI consists of (x1,y1,x2,y2), where (x1,y1) is the top left point
+        and (x2,y2) is the bottom right point
+
+    Returns
+    -------
+    ndarray of mask
+
+    """
+    pts = cv.KeyPoint_convert(kps)
+    submasks = []
+    for ROI in ROIs:
+        x_mask = np.logical_and(pts[:,0] >= ROI[0],pts[:,0] <= ROI[2])
+        y_mask = np.logical_and(pts[:,1] >= ROI[1],pts[:,1] <= ROI[3])
+        submasks.append(np.logical_and(x_mask,y_mask))
+    
+    final_mask = np.zeros(submasks[0].shape,dtype=bool)
+    for mask in submasks:
+        final_mask = np.logical_or(final_mask,mask)
+        
+    return final_mask
+
 def findHomography(matches, kps1, kps2):
     queryIdxs = [match.queryIdx for match in matches]
     trainIdxs = [match.trainIdx for match in matches]
@@ -84,18 +113,16 @@ if __name__ == '__main__':
     ROIs1 = np.array([[350,150,760,1250]])
     ROIs2 = np.array([[0,150,400,1250]])
     
-    pts1_sift = cv.KeyPoint_convert(kps1_sift)
-    final_mask1 = utils.getMaskPointsInROIs(pts1_sift,ROIs1)
+    final_mask1 = getMaskPointsInROIs(kps1_sift,ROIs1)
     kps1_filter, des1_filter = Img1.featureFilter(final_mask1)
 
-    pts2_sift = cv.KeyPoint_convert(kps2_sift)
-    final_mask2 = utils.getMaskPointsInROIs(pts2_sift,ROIs2)
+    final_mask2 = getMaskPointsInROIs(kps2_sift,ROIs2)
     kps2_filter, des2_filter = Img2.featureFilter(final_mask2)
     
     
     # BFMatches(des1_filter, des2_filter)
-    matches_sift = featureMatch(des1_filter, des2_filter, 'sift')
-    matches_sift_knn = featureMatch(des1_filter, des2_filter, 'sift', knn=True)
+    matches_sift = utils.featureMatch(des1_filter, des2_filter, 'sift')
+    matches_sift_knn = utils.featureMatch(des1_filter, des2_filter, 'sift', knn=True)
     #bf_matches = FLANNMatches(des1_filter,des2_filter)
 
     img_sift = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches_sift[:50],None,**draw_params)
@@ -106,17 +133,15 @@ if __name__ == '__main__':
     kps1_brisk, dps1_brisk = Img1.findFeatures('brisk')
     kps2_brisk, dps2_brisk = Img2.findFeatures('brisk')
     
-    pts1_brisk = cv.KeyPoint_convert(kps1_brisk)
-    final_mask1_brisk = utils.getMaskPointsInROIs(pts1_brisk,ROIs1)
+    final_mask1_brisk = getMaskPointsInROIs(kps1_brisk,ROIs1)
     kps1_filter_, des1_filter_ = Img1.featureFilter(final_mask1_brisk)
 
-    pts2_brisk = cv.KeyPoint_convert(kps2_brisk)
-    final_mask2_brisk = utils.getMaskPointsInROIs(pts2_brisk,ROIs2)
+    final_mask2_brisk = getMaskPointsInROIs(kps2_brisk,ROIs2)
     kps2_filter_, des2_filter_ = Img2.featureFilter(final_mask2_brisk)
     
     
-    matches_brisk = featureMatch(des1_filter_, des2_filter_, 'brisk')
-    matches_brisk_knn = featureMatch(des1_filter_, des2_filter_, 'brisk',knn=True)
+    matches_brisk = utils.featureMatch(des1_filter_, des2_filter_, 'brisk')
+    matches_brisk_knn = utils.featureMatch(des1_filter_, des2_filter_, 'brisk',knn=True)
 
 
 

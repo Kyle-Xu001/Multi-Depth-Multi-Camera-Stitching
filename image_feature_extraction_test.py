@@ -72,7 +72,7 @@ class Image(object):
     
 if __name__ == '__main__':
     # Load exmaple image
-    img = cv.imread("lamp_19.JPG")
+    img = cv.imread("lamp_16.JPG")
     img = np.rot90(img,1) # Rotate the image to get better visualization
     
     Img = Image(img)

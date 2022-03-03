@@ -22,6 +22,7 @@ def getMaskPointsInROIs(kps,ROIs):
     """
     Parameters
     ----------
+    kps : List of feature elements
     pts : n x 2 ndarray
         Each row is a point (x,y)
     ROIs : List of ROIs, each ROI is a size 4 iterable
@@ -45,6 +46,7 @@ def getMaskPointsInROIs(kps,ROIs):
     #     final_mask = np.logical_or(final_mask,mask)
         
     return submasks
+
 
 def findFeatures(img, method=None):
     
@@ -96,7 +98,7 @@ def clusterMatch(desCluster1, desCluster2):
         
         matchFilter = []
         for m,n in match:
-            if m.distance < 0.5 * n.distance:
+            if m.distance < 0.8 * n.distance:
                 matchFilter.append(m)
         matches.append(matchFilter)
     return matches
@@ -107,9 +109,10 @@ def findHomography(matches, kps1, kps2):
     trainIdxs = [match.trainIdx for match in matches]
     kps2 = cv.KeyPoint_convert(kps2)
     kps1 = cv.KeyPoint_convert(kps1)
-    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=2)
+    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=5)
 
     return homo_mat, inliers_mask
+
 
 def featureIntegrate(kpsCluster1, kpsCluster2, matches):
     # Define the num of cluster
@@ -127,6 +130,7 @@ def featureIntegrate(kpsCluster1, kpsCluster2, matches):
         kps1_filter = kps1_filter + kpsCluster1[i]
         kps2_filter = kps2_filter + kpsCluster2[i]
         
+        # Update the index for each match cluster
         for j in range(len(matches[i])):
             match = matches[i]
             match[j].queryIdx = match[j].queryIdx + queryIdx
@@ -135,37 +139,20 @@ def featureIntegrate(kpsCluster1, kpsCluster2, matches):
         queryIdx = queryIdx + len(kpsCluster1[i])
         trainIdx = trainIdx + len(kpsCluster2[i])
 
+        # Combine the matches into one list
         matchInt = matchInt + matches[i]
     return kps1_filter, kps2_filter, matchInt
 
 
 
 def drawMatch(Img1, kpsCluster1, Img2, kpsCluster2, matches, params):
-    img_match = cv.drawMatches(Img1.img,kpsCluster1[1],Img2.img,kpsCluster2[1],matches[1],None,**params)
-     
-    #for i in range(len(matches)-1):
-     #   img_match = cv.drawMatches(Img1.img,kpsCluster1[i+1],Img2.img,kpsCluster2[i+1],matches[i+1],img_match,**params)
+    numCluster = len(kpsCluster1)
+    for i in range(numCluster):
+        plt.figure(0)
+        plt.subplot(numCluster,1,i+1)
+        img_match = cv.drawMatches(Img1.img,kpsCluster1[i],Img2.img,kpsCluster2[i],matches[i],None,**params)
+        plt.axis('off') 
+        plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
     
-    return img_match
+    plt.show()
         
-
-def drawPoints(img,pts):
-    """
-    Parameters
-    ----------
-    img : Image ndarray
-        
-    pts : n by 2 ndarray
-
-    Returns
-    -------
-    img : Image ndarray
-    """
-    assert(pts.shape[1]==2)
-    n_points = pts.shape[0]
-    
-    for i in range(n_points):
-        pt = tuple(pts[i,:])
-        img = cv.circle(img,pt,radius=4,color=(0,255,0))
-    
-    return img
