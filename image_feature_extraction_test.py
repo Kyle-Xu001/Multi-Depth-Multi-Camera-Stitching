@@ -21,7 +21,7 @@ class Image(object):
         # self.candidate_links['top'] = list()
         # self.candidate_links['bottom'] = list()
         # self.link = dict()
-        print("\nInitial Successfully!")
+        print("\nInitial Successfullys")
         
     def equalizeHist(self):
         self.img = utils.equalizeHist(self.img)        

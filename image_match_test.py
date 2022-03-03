@@ -44,38 +44,6 @@ def findHomography(matches, kps1, kps2):
 
     return homo_mat, inliers_mask
 
-def transformVerts(img_size,homo_mat):
-    """
-    Finds the vertices of image of img_size transformed by homo_mat
-
-    Parameters
-    ----------
-    img_size : Size 2 int iterable
-        (width,height)
-    homo_mat : 3x3 numpy array
-        Homography matrix
-
-    Returns
-    -------
-    4x2 numpy array
-        Array where each row is a vertice, first column is the x coordinate,
-        second column is the y coordinate.
-
-    """
-    x1 = np.array([0,0])
-    x2 = np.array([img_size[0],0])
-    x3 = np.array([img_size[0],img_size[1]])
-    x4 = np.array([0,img_size[1]])
-    
-    X = np.zeros([1,4,2])
-    X[:,0,:] = x1
-    X[:,1,:] = x2
-    X[:,2,:] = x3
-    X[:,3,:] = x4
-    X_transform = cv.perspectiveTransform(X,homo_mat)
-    
-    return X_transform.round().astype(np.int32).reshape(4,2)
-
 
 
 if __name__ == '__main__':

@@ -109,7 +109,7 @@ def findHomography(matches, kps1, kps2):
     trainIdxs = [match.trainIdx for match in matches]
     kps2 = cv.KeyPoint_convert(kps2)
     kps1 = cv.KeyPoint_convert(kps1)
-    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=5)
+    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=10)
 
     return homo_mat, inliers_mask
 
@@ -149,10 +149,40 @@ def drawMatch(Img1, kpsCluster1, Img2, kpsCluster2, matches, params):
     numCluster = len(kpsCluster1)
     for i in range(numCluster):
         plt.figure(0)
-        plt.subplot(numCluster,1,i+1)
+        plt.subplot(1,numCluster,i+1)
         img_match = cv.drawMatches(Img1.img,kpsCluster1[i],Img2.img,kpsCluster2[i],matches[i],None,**params)
         plt.axis('off') 
         plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
+
+
+def transformVerts(img_size,homo_mat):
+    """
+    Finds the vertices of image of img_size transformed by homo_mat
+
+    Parameters
+    ----------
+    img_size : Size 2 int iterable
+        (width,height)
+    homo_mat : 3x3 numpy array
+        Homography matrix
+
+    Returns
+    -------
+    4x2 numpy array
+        Array where each row is a vertice, first column is the x coordinate,
+        second column is the y coordinate.
+
+    """
+    x1 = np.array([0,0])
+    x2 = np.array([img_size[0],0])
+    x3 = np.array([img_size[0],img_size[1]])
+    x4 = np.array([0,img_size[1]])
     
-    plt.show()
-        
+    X = np.zeros([1,4,2])
+    X[:,0,:] = x1
+    X[:,1,:] = x2
+    X[:,2,:] = x3
+    X[:,3,:] = x4
+    X_transform = cv.perspectiveTransform(X,homo_mat)
+    
+    return X_transform.round().astype(np.int32).reshape(4,2)

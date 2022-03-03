@@ -12,24 +12,43 @@ draw_params = dict(matchColor = (0,255,0),
                    singlePointColor = (0,0,255),
                    flags = cv.DrawMatchesFlags_DEFAULT)
 
-# Manually define the ROI to locate the area for corresponding images
-ROIs1 = [
-    [100, 350, 350, 767],
-    [350, 450, 550, 767],
-    [550, 450, 800, 767],
-    [800, 450, 1200, 767]]
-
-ROIs2 = [
-    [100, 0, 350, 420],
-    [350, 0, 550, 450],
-    [550, 0, 800, 450],
-    [800, 0, 1200, 450]]
-
-
 # load the matching images
-img1 = cv.imread("lamp_19.JPG")
-img2 = cv.imread("lamp_18.JPG")
+img1 = cv.imread("lamp_15_empty.JPG")
+img2 = cv.imread("lamp_14_empty.JPG")
 
+img1 = np.rot90(img1,1) 
+img2 = np.rot90(img2,1)
+
+if (img1.shape[0]>img1.shape[1]):
+# Manually define the ROI to locate the area for corresponding images
+    ROIs1 = [
+        [450, 1080, 767, 1300],
+        [450, 800, 767, 1000],
+        [450, 500, 767, 800],
+        [450, 250, 767, 500]]
+    ROIs2 = [
+        [0, 1150, 400, 1376],
+        [0, 900, 400, 1100],
+        [0, 600, 400, 900],
+        [0, 250, 400, 600]]
+else:
+    ROIs1 = [
+        [100, 400, 250, 767],
+        [250, 400, 450, 767],
+        [450, 400, 650, 767],
+        [650, 400, 850, 767],
+        [850, 400, 1200, 767]]
+
+    ROIs2 = [
+        [0, 0, 250, 350],
+        [250, 0, 450, 350],
+        [450, 0, 650, 350],
+        [650, 0, 850, 350],
+        [850, 0, 1200, 350]]
+
+
+
+    
 # Initialize the object
 Img1 = Image(img1)
 Img2 = Image(img2)
@@ -63,21 +82,67 @@ utils.drawMatch(Img1,kpsCluster1,Img2,kpsCluster2,matches,draw_params)
 # Integrate the clusters into one list
 kps1_filter, kps2_filter, matches =utils.featureIntegrate(kpsCluster1,kpsCluster2,matches)
 
+# Visualize the total matches
+plt.figure(1)
+img_match = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches,None,**draw_params)
+plt.axis('off')
+plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
+
+
 # Calculate the homography matrix for image transformation
 homo_mat, inliers_mask = utils.findHomography(matches, kps1_filter, kps2_filter)
 matches_inliers = list(itertools.compress(matches, inliers_mask))
 img_inliers = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches_inliers,None,**draw_params)
 
 
-print("\nNumber of inlier matches: ", len(matches_inliers))
+print("\nNumber of inlier matches: ", len(matches_inliers),"\n")
 
 
-plt.figure(1)
+plt.figure(2)
 plt.imshow(cv.cvtColor(img_inliers, cv.COLOR_BGR2RGB))
 plt.axis('off')
 
+
+'''
+Stitch the Images
+'''
+ # Get the position of vertices
+posVerts = utils.transformVerts(img_size=np.array([Img1.img.shape[1],Img1.img.shape[0]]), homo_mat=homo_mat)
+# print("Left Top: ",posVerts[0,:],"\n",
+#       "Right Top: ",posVerts[1,:],"\n",
+#       "Right Bottom: ",posVerts[2,:],"\n",
+#       "Left Bottom: ",posVerts[3,:],"\n")
+    
+x_min = posVerts[:,0].min()
+x_max = posVerts[:,0].max()
+y_min = posVerts[:,1].min()
+y_max = posVerts[:,1].max()
+# print("x_min: %d, x_max: %d y_min: %d, y_max: %d" %(x_min,x_max,y_min,y_max))
+
+stitch_size = (x_max,y_max)
+
+homo_mat_ = np.eye(3)
+img_super = cv.warpPerspective(Img1.img, homo_mat_,stitch_size,borderValue=(0,0,0))
+img_transform = cv.warpPerspective(Img2.img, homo_mat,stitch_size,borderValue=(0,0,0))
+
+# Combine the image on one super image
+high_y = np.min(posVerts[:,1])
+img_transform[high_y:high_y,:,:] = 0
+img_super[img_transform>0]=0
+
+img_stitch = img_transform + img_super
+
+plt.figure(3)
+plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
+plt.axis('off')
+    
 plt.show()
 
+'''
+Print the parameters of homography matrix
+'''
+np.set_printoptions(suppress=True)
+print(homo_mat.flatten().tolist())
 
 
     
