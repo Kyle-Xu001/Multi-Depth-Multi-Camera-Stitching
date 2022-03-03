@@ -13,11 +13,11 @@ draw_params = dict(matchColor = (0,255,0),
                    flags = cv.DrawMatchesFlags_DEFAULT)
 
 # load the matching images
-img1 = cv.imread("lamp_15_empty.JPG")
-img2 = cv.imread("lamp_14_empty.JPG")
+img1 = cv.imread("lamp_18.JPG")
+img2 = cv.imread("lamp_17.JPG")
 
-img1 = np.rot90(img1,1) 
-img2 = np.rot90(img2,1)
+# img1 = np.rot90(img1,1) 
+# img2 = np.rot90(img2,1)
 
 if (img1.shape[0]>img1.shape[1]):
 # Manually define the ROI to locate the area for corresponding images
@@ -32,19 +32,30 @@ if (img1.shape[0]>img1.shape[1]):
         [0, 600, 400, 900],
         [0, 250, 400, 600]]
 else:
+    # ROIs1 = [
+    #     [50, 450, 250, 767],
+    #     [250, 450, 450, 767],
+    #     [450, 450, 650, 767],
+    #     [650, 450, 850, 767],
+    #     [850, 450, 1200, 767]]
+
+    # ROIs2 = [
+    #     [50, 0, 250, 350],
+    #     [250, 0, 450, 350],
+    #     [450, 0, 650, 350],
+    #     [650, 0, 850, 350],
+    #     [850, 0, 1200, 350]]
     ROIs1 = [
-        [100, 400, 250, 767],
-        [250, 400, 450, 767],
-        [450, 400, 650, 767],
-        [650, 400, 850, 767],
-        [850, 400, 1200, 767]]
+        [50, 450, 300, 767],
+        [376, 450, 576, 767],
+        [576, 450, 876, 767],
+        [876, 450, 1126, 767]]
 
     ROIs2 = [
-        [0, 0, 250, 350],
-        [250, 0, 450, 350],
-        [450, 0, 650, 350],
-        [650, 0, 850, 350],
-        [850, 0, 1200, 350]]
+        [0, 0, 250, 400],
+        [276, 0, 476, 400],
+        [476, 0, 776, 400],
+        [776, 0, 1126, 400]]
 
 
 
@@ -68,6 +79,7 @@ kpsCluster2, desCluster2 = Img2.featureCluster(masks2)
 matches = utils.clusterMatch(desCluster1,desCluster2)
 
 
+
 # Show the number of matches
 matchNum = 0
 for i in range(len(matches)):
@@ -75,9 +87,11 @@ for i in range(len(matches)):
     print("-- Number of original matches in each area", len(matches[i]))
 print("Number of original total matches: ", matchNum)
 
-
 # draw the matches in each cluster
 utils.drawMatch(Img1,kpsCluster1,Img2,kpsCluster2,matches,draw_params)
+
+
+
 
 # Integrate the clusters into one list
 kps1_filter, kps2_filter, matches =utils.featureIntegrate(kpsCluster1,kpsCluster2,matches)
@@ -87,8 +101,13 @@ plt.figure(1)
 img_match = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches,None,**draw_params)
 plt.axis('off')
 plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
+plt.title("Feature Matching for Total Selected Area")
 
 
+
+'''
+Find the parameters for homography matrix
+'''
 # Calculate the homography matrix for image transformation
 homo_mat, inliers_mask = utils.findHomography(matches, kps1_filter, kps2_filter)
 matches_inliers = list(itertools.compress(matches, inliers_mask))
@@ -100,7 +119,10 @@ print("\nNumber of inlier matches: ", len(matches_inliers),"\n")
 
 plt.figure(2)
 plt.imshow(cv.cvtColor(img_inliers, cv.COLOR_BGR2RGB))
+plt.title("Inlier Matches for Total Selected Area")
 plt.axis('off')
+
+
 
 
 '''
@@ -137,6 +159,8 @@ plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
 plt.axis('off')
     
 plt.show()
+
+
 
 '''
 Print the parameters of homography matrix

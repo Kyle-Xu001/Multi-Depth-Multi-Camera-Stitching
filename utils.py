@@ -109,7 +109,7 @@ def findHomography(matches, kps1, kps2):
     trainIdxs = [match.trainIdx for match in matches]
     kps2 = cv.KeyPoint_convert(kps2)
     kps1 = cv.KeyPoint_convert(kps1)
-    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=10)
+    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=8)
 
     return homo_mat, inliers_mask
 
@@ -147,12 +147,28 @@ def featureIntegrate(kpsCluster1, kpsCluster2, matches):
 
 def drawMatch(Img1, kpsCluster1, Img2, kpsCluster2, matches, params):
     numCluster = len(kpsCluster1)
-    for i in range(numCluster):
-        plt.figure(0)
-        plt.subplot(1,numCluster,i+1)
-        img_match = cv.drawMatches(Img1.img,kpsCluster1[i],Img2.img,kpsCluster2[i],matches[i],None,**params)
-        plt.axis('off') 
-        plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
+    
+    # Get the num of columns to show the inmages
+    if numCluster%2 == 0:
+        imageNum = numCluster/2
+        for i in range(numCluster):
+            plt.figure(0)
+            plt.subplot(2,imageNum,i+1)
+            plt.title('Feature Matching in Area %d' %(i+1))
+            img_match = cv.drawMatches(Img1.img,kpsCluster1[i],Img2.img,kpsCluster2[i],matches[i],None,**params)
+            plt.axis('off') 
+            plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
+    else:
+        imageNum = (numCluster+1)/2
+        for i in range(numCluster):
+            plt.figure(0)
+            plt.subplot(imageNum,2,i+1)
+            plt.title('Feature Matching in Area %d' %(i+1))
+            img_match = cv.drawMatches(Img1.img,kpsCluster1[i],Img2.img,kpsCluster2[i],matches[i],None,**params)
+            plt.axis('off') 
+            plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
+        
+        
 
 
 def transformVerts(img_size,homo_mat):
