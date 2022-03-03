@@ -2,63 +2,6 @@ import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 
-def featureMatch(des1, des2, method, knn=False):
-    if method == 'sift' and knn == False:
-        bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
-    elif method == 'sift' and knn == True:
-        bf = cv.BFMatcher()
-    elif method == 'brisk'and knn == False:
-        bf = cv.BFMatcher(cv.NORM_HAMMING,crossCheck=True)
-    elif method == 'brisk'and knn == True:
-        bf = cv.BFMatcher()
-    
-    
-    if knn == False:
-        matches = bf.match(des1, des2)
-        matches_good = sorted(matches, key=lambda x: x.distance)
-    else:
-        matches = bf.knnMatch(des1, des2, k=2)
-        
-        matches_good = []
-        for m, n in matches:
-            if m.distance < 0.8*n.distance:
-                matches_good.append(m)
-    return matches_good
-
-
-def clusterMatch(desCluster1, desCluster2):
-    matches = []
-    for i in range(len(desCluster1)):
-        des1 = desCluster1[i]
-        print("des1: ", len(des1))
-        des2 = desCluster2[i]
-
-        bf = cv.BFMatcher()
-        
-        match = bf.knnMatch(des1, des2, k=2)
-        
-        matchFilter = []
-        for m,n in match:
-            if m.distance < 0.8 * n.distance:
-                matchFilter.append(m)
-        matches.append(matchFilter)
-    return matches
-
-
-def findFeatures(img, method=None):
-
-    if method == 'sift':
-        descriptor = cv.SIFT_create()
-    elif method == 'brisk':
-        descriptor = cv.BRISK_create()
-    elif method == 'orb':
-        descriptor = cv.ORB_create(nfeatures=5000,nlevels=8)
-    
-    kps, des = descriptor.detectAndCompute(img, None)
-
-    return kps, des
-
-
 def equalizeHist(img):
     img_yuv = cv.cvtColor(img, cv.COLOR_BGR2YUV)
     img_yuv[:, :, 0] = cv.equalizeHist(img_yuv[:, :, 0])
@@ -102,6 +45,109 @@ def getMaskPointsInROIs(kps,ROIs):
     #     final_mask = np.logical_or(final_mask,mask)
         
     return submasks
+
+def findFeatures(img, method=None):
+    
+    if method == 'sift':
+        descriptor = cv.SIFT_create()
+    elif method == 'brisk':
+        descriptor = cv.BRISK_create()
+    elif method == 'orb':
+        descriptor = cv.ORB_create(nfeatures=5000,nlevels=8)
+    
+    kps, des = descriptor.detectAndCompute(img, None)
+
+    return kps, des
+
+
+def featureMatch(des1, des2, method, knn=False):
+    if method == 'sift' and knn == False:
+        bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
+    elif method == 'sift' and knn == True:
+        bf = cv.BFMatcher()
+    elif method == 'brisk'and knn == False:
+        bf = cv.BFMatcher(cv.NORM_HAMMING,crossCheck=True)
+    elif method == 'brisk'and knn == True:
+        bf = cv.BFMatcher()
+    
+    
+    if knn == False:
+        matches = bf.match(des1, des2)
+        matches_good = sorted(matches, key=lambda x: x.distance)
+    else:
+        matches = bf.knnMatch(des1, des2, k=2)
+        
+        matches_good = []
+        for m, n in matches:
+            if m.distance < 0.8*n.distance:
+                matches_good.append(m)
+    return matches_good
+
+
+def clusterMatch(desCluster1, desCluster2):
+    matches = []
+    for i in range(len(desCluster1)):
+        des1 = desCluster1[i]
+        des2 = desCluster2[i]
+
+        bf = cv.BFMatcher()
+        
+        match = bf.knnMatch(des1, des2, k=2)
+        
+        matchFilter = []
+        for m,n in match:
+            if m.distance < 0.5 * n.distance:
+                matchFilter.append(m)
+        matches.append(matchFilter)
+    return matches
+
+
+def findHomography(matches, kps1, kps2):
+    queryIdxs = [match.queryIdx for match in matches]
+    trainIdxs = [match.trainIdx for match in matches]
+    kps2 = cv.KeyPoint_convert(kps2)
+    kps1 = cv.KeyPoint_convert(kps1)
+    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=2)
+
+    return homo_mat, inliers_mask
+
+def featureIntegrate(kpsCluster1, kpsCluster2, matches):
+    # Define the num of cluster
+    numCluster = len(kpsCluster1)
+    assert(numCluster == len(kpsCluster2))
+    
+    kps1_filter = ()
+    kps2_filter = ()
+    matchInt = []
+    queryIdx = 0
+    trainIdx = 0
+    
+    # Integrete the features from each cluster into one list
+    for i in range(numCluster):
+        kps1_filter = kps1_filter + kpsCluster1[i]
+        kps2_filter = kps2_filter + kpsCluster2[i]
+        
+        for j in range(len(matches[i])):
+            match = matches[i]
+            match[j].queryIdx = match[j].queryIdx + queryIdx
+            match[j].trainIdx = match[j].trainIdx + trainIdx
+        
+        queryIdx = queryIdx + len(kpsCluster1[i])
+        trainIdx = trainIdx + len(kpsCluster2[i])
+
+        matchInt = matchInt + matches[i]
+    return kps1_filter, kps2_filter, matchInt
+
+
+
+def drawMatch(Img1, kpsCluster1, Img2, kpsCluster2, matches, params):
+    img_match = cv.drawMatches(Img1.img,kpsCluster1[1],Img2.img,kpsCluster2[1],matches[1],None,**params)
+     
+    #for i in range(len(matches)-1):
+     #   img_match = cv.drawMatches(Img1.img,kpsCluster1[i+1],Img2.img,kpsCluster2[i+1],matches[i+1],img_match,**params)
+    
+    return img_match
+        
 
 def drawPoints(img,pts):
     """
