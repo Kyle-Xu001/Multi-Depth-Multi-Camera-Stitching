@@ -150,7 +150,7 @@ def drawMatch(Img1, kpsCluster1, Img2, kpsCluster2, matches, params):
     
     # Get the num of columns to show the inmages
     if numCluster%2 == 0:
-        imageNum = numCluster/2
+        imageNum =int(numCluster/2)
         for i in range(numCluster):
             plt.figure(0)
             plt.subplot(2,imageNum,i+1)
@@ -167,8 +167,15 @@ def drawMatch(Img1, kpsCluster1, Img2, kpsCluster2, matches, params):
             img_match = cv.drawMatches(Img1.img,kpsCluster1[i],Img2.img,kpsCluster2[i],matches[i],None,**params)
             plt.axis('off') 
             plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
-        
-        
+
+# Check if the matching inliers are correct
+def inlierChecker(Img1, kps1, Img2, kps2, inliers, params, num):
+    for i in range(len(inliers)):
+        plt.figure(4)
+        img = cv.drawMatches(Img1.img,kps1,Img2.img,kps2,inliers[num:num+1],None,**params)
+        plt.title("Checking Matching Inlier [%d]"%(num))
+        plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB))
+        plt.axis('off')
 
 
 def transformVerts(img_size,homo_mat):

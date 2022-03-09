@@ -180,36 +180,3 @@ if __name__ == '__main__':
     plt.show()
 
     plt.axis('off')
-    
-
-    # # Get the position of vertices
-    # posVerts = transformVerts(img_size=np.array([img1_hist.shape[1],img1_hist.shape[0]]), homo_mat=homo_mat)
-    # print("Left Top: ",posVerts[0,:],"\n"
-    #       "Right Top: ",posVerts[1,:],"\n"
-    #       "Right Bottom: ",posVerts[2,:],"\n"
-    #       "Left Bottom: ",posVerts[3,:],"\n")
-    
-    # x_min = posVerts[:,0].min()
-    # x_max = posVerts[:,0].max()
-    # y_min = posVerts[:,1].min()
-    # y_max = posVerts[:,1].max()
-    # print("x_min: %d, x_max: %d y_min: %d, y_max: %d" %(x_min,x_max,y_min,y_max))
-
-    # stitch_size = (x_max,y_max)
-
-    # homo_mat_ = np.eye(3)
-    # img_super = cv.warpPerspective(img1_hist, homo_mat_,stitch_size,borderValue=(0,0,0))
-
-    # img_transform = cv.warpPerspective(img2_hist, homo_mat,stitch_size,borderValue=(0,0,0))
-
-    # high_y = np.min(posVerts[:,1])
-    # img_transform[high_y:high_y,:,:] = 0
-
-    # img_super[img_transform>0]=0
-    # img_super = img_transform + img_super
-
-    # img_stitch = cv.rotate(img_super,cv.ROTATE_90_COUNTERCLOCKWISE)
-    # plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
-    # plt.show()
-
-

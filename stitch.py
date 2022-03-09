@@ -13,24 +13,24 @@ draw_params = dict(matchColor = (0,255,0),
                    flags = cv.DrawMatchesFlags_DEFAULT)
 
 # load the matching images
-img1 = cv.imread("lamp_18.JPG")
-img2 = cv.imread("lamp_17.JPG")
+img1 = cv.imread("lamp_23.JPG")
+img2 = cv.imread("lamp_22.JPG")
 
-# img1 = np.rot90(img1,1) 
-# img2 = np.rot90(img2,1)
+img1 = np.rot90(img1,1) 
+img2 = np.rot90(img2,1)
 
 if (img1.shape[0]>img1.shape[1]):
 # Manually define the ROI to locate the area for corresponding images
     ROIs1 = [
-        [450, 1080, 767, 1300],
-        [450, 800, 767, 1000],
+        [450, 1070, 767, 1300],
+        [450, 800, 767, 1050],
         [450, 500, 767, 800],
-        [450, 250, 767, 500]]
+        [450, 300, 767, 500]]
     ROIs2 = [
-        [0, 1150, 400, 1376],
-        [0, 900, 400, 1100],
+        [0, 1100, 400, 1350],
+        [0, 850, 400, 1100],
         [0, 600, 400, 900],
-        [0, 250, 400, 600]]
+        [0, 200, 400, 600]]
 else:
     # ROIs1 = [
     #     [50, 450, 250, 767],
@@ -47,7 +47,7 @@ else:
     #     [850, 0, 1200, 350]]
     ROIs1 = [
         [50, 450, 300, 767],
-        [376, 450, 576, 767],
+        [300, 450, 576, 767],
         [576, 450, 876, 767],
         [876, 450, 1126, 767]]
 
@@ -57,9 +57,6 @@ else:
         [476, 0, 776, 400],
         [776, 0, 1126, 400]]
 
-
-
-    
 # Initialize the object
 Img1 = Image(img1)
 Img2 = Image(img2)
@@ -78,8 +75,6 @@ kpsCluster2, desCluster2 = Img2.featureCluster(masks2)
 # Match the features with corresponding clusters in each image
 matches = utils.clusterMatch(desCluster1,desCluster2)
 
-
-
 # Show the number of matches
 matchNum = 0
 for i in range(len(matches)):
@@ -89,8 +84,6 @@ print("Number of original total matches: ", matchNum)
 
 # draw the matches in each cluster
 utils.drawMatch(Img1,kpsCluster1,Img2,kpsCluster2,matches,draw_params)
-
-
 
 
 # Integrate the clusters into one list
@@ -118,12 +111,18 @@ print("\nNumber of inlier matches: ", len(matches_inliers),"\n")
 
 
 plt.figure(2)
+
 plt.imshow(cv.cvtColor(img_inliers, cv.COLOR_BGR2RGB))
 plt.title("Inlier Matches for Total Selected Area")
 plt.axis('off')
 
 
-
+# # Check the specific inliers
+# inlierCheck = input('Please Input [yes] to start checking the inliers:')
+# if inlierCheck == "yes":
+#     inliernum = int(input('Please Input the inlier Number you want to check:'))
+#     utils.inlierChecker(Img1,kps1_filter,Img2,kps2_filter,matches_inliers,draw_params,num=inliernum)
+    
 
 '''
 Stitch the Images
@@ -139,7 +138,7 @@ x_min = posVerts[:,0].min()
 x_max = posVerts[:,0].max()
 y_min = posVerts[:,1].min()
 y_max = posVerts[:,1].max()
-# print("x_min: %d, x_max: %d y_min: %d, y_max: %d" %(x_min,x_max,y_min,y_max))
+print("x_min: %d, x_max: %d y_min: %d, y_max: %d" %(x_min,x_max,y_min,y_max))
 
 stitch_size = (x_max,y_max)
 
