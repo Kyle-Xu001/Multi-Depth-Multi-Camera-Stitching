@@ -81,7 +81,7 @@ def featureMatch(des1, des2, method, knn=False):
         
         matches_good = []
         for m, n in matches:
-            if m.distance < 0.8*n.distance:
+            if m.distance < 0.9*n.distance:
                 matches_good.append(m)
     return matches_good
 
@@ -94,10 +94,10 @@ def clusterMatch(desCluster1, desCluster2):
 
         bf = cv.BFMatcher()
         
-        match = bf.knnMatch(des1, des2, k=2)
+        match = bf.knnMatch(des1, des2, k=3)
         
         matchFilter = []
-        for m,n in match:
+        for m,_,n in match:
             if m.distance < 0.8 * n.distance:
                 matchFilter.append(m)
         matches.append(matchFilter)
@@ -109,7 +109,7 @@ def findHomography(matches, kps1, kps2):
     trainIdxs = [match.trainIdx for match in matches]
     kps2 = cv.KeyPoint_convert(kps2)
     kps1 = cv.KeyPoint_convert(kps1)
-    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=8)
+    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=15)
 
     return homo_mat, inliers_mask
 

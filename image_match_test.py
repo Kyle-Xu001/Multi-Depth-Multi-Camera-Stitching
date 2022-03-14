@@ -53,8 +53,8 @@ if __name__ == '__main__':
                    flags = cv.DrawMatchesFlags_DEFAULT)
     
     # load the matching images
-    img1 = cv.imread("lamp_16.JPG")
-    img2 = cv.imread("lamp_15.JPG")
+    img1 = cv.imread("lamp_15_distorted_empty.JPG")
+    img2 = cv.imread("lamp_14_distorted_empty.JPG")
 
     img1 = np.rot90(img1,1) 
     img2 = np.rot90(img2,1)
