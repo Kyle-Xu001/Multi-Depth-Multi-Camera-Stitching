@@ -143,6 +143,15 @@ def featureIntegrate(kpsCluster1, kpsCluster2, matches):
         matchInt = matchInt + matches[i]
     return kps1_filter, kps2_filter, matchInt
 
+def matchFilter(matches, invalid_index1, invalid_index2):
+    new_matches = []
+    for match in matches:
+        if (match.queryIdx not in invalid_index1) and (match.trainIdx not in invalid_index2):
+            new_matches.add(match)
+    
+    return new_matches
+    
+
 
 
 def drawMatch(Img1, kpsCluster1, Img2, kpsCluster2, matches, params):
