@@ -65,7 +65,7 @@ def undistort(img,lamp_id,calib_dir,map1 = None, map2 = None):
     center_offset = int(center_offset*scale)
     map1, map2 = calculate_map(img,DIM,mtx,dist,balance,center_offset,right_extend)
     undistorted_img = cv.remap(img, map1, map2, interpolation=cv.INTER_LINEAR, borderMode=cv.BORDER_CONSTANT)
-    return undistorted_img,map1,map2
+    return undistorted_img, map1, map2
 
 
     
@@ -89,23 +89,23 @@ if __name__ =='__main__':
     img_undistort1,map1_1,map2_1 = undistort(img1_,lamp_id1,calib_dir)
     img_undistort2,map1_2,map2_2 = undistort(img2_,lamp_id2,calib_dir)
     
-    plt.figure(1)
-    plt.subplot(2,2,1)
-    plt.imshow(cv.cvtColor(img1_, cv.COLOR_BGR2RGB))
-    plt.title('(a) Original Distorted Image [%s]'%(lamp_id1))
-    plt.axis('off')
-    plt.subplot(2,2,2)
-    plt.imshow(cv.cvtColor(img_undistort1, cv.COLOR_BGR2RGB))
-    plt.title('(b) Undistorted Image [%s]'%(lamp_id1))
-    plt.axis('off')
-    plt.subplot(2,2,3)
-    plt.imshow(cv.cvtColor(img2_, cv.COLOR_BGR2RGB))
-    plt.title('(c) Original Distorted Image [%s]'%(lamp_id2))
-    plt.axis('off')
-    plt.subplot(2,2,4)
-    plt.imshow(cv.cvtColor(img_undistort2, cv.COLOR_BGR2RGB))
-    plt.title('(d) Undistorted Image [%s]'%(lamp_id2))
-    plt.axis('off')
+    # plt.figure(1)
+    # plt.subplot(2,2,1)
+    # plt.imshow(cv.cvtColor(img1_, cv.COLOR_BGR2RGB))
+    # plt.title('(a) Original Distorted Image [%s]'%(lamp_id1))
+    # plt.axis('off')
+    # plt.subplot(2,2,2)
+    # plt.imshow(cv.cvtColor(img_undistort1, cv.COLOR_BGR2RGB))
+    # plt.title('(b) Undistorted Image [%s]'%(lamp_id1))
+    # plt.axis('off')
+    # plt.subplot(2,2,3)
+    # plt.imshow(cv.cvtColor(img2_, cv.COLOR_BGR2RGB))
+    # plt.title('(c) Original Distorted Image [%s]'%(lamp_id2))
+    # plt.axis('off')
+    # plt.subplot(2,2,4)
+    # plt.imshow(cv.cvtColor(img_undistort2, cv.COLOR_BGR2RGB))
+    # plt.title('(d) Undistorted Image [%s]'%(lamp_id2))
+    # plt.axis('off')
     
     # Define the draw parameters for matching visualization
     draw_params = dict(matchColor = (0,255,0),
@@ -172,6 +172,23 @@ if __name__ =='__main__':
     kps1, des1 = Img1.findFeatures('sift')
     kps2, des2 = Img2.findFeatures('sift')   
 
+    # # Generate the heatmap Image
+    # heatImg = utils.featureHeatmap(Img1.img,kps1)
+    # heatImg2 = utils.featureHeatmap(Img2.img,kps2)
+    # plt.figure(5)
+    # plt.subplot(2,1,1)
+    # plt.imshow(heatImg,cmap='jet')
+    # plt.title('(a) Feature Distribution on Distorted Image [PNG]')
+    # plt.axis('off')
+    
+    # plt.subplot(2,1,2)
+    # plt.imshow(heatImg2,cmap='jet')
+    # plt.title('(b) Feature Distribution on Undistorted Image [JPG]')
+    # plt.axis('off')
+    
+    
+    # plt.show()
+    
     # Extract the masks to filter the features into several clusters
     masks1 = utils.getMaskPointsInROIs(kps1, ROIs1)
     masks2 = utils.getMaskPointsInROIs(kps2, ROIs2)
@@ -262,6 +279,7 @@ if __name__ =='__main__':
     plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
     plt.axis('off')
     plt.show()
+    
     
     '''
     Print the parameters of homography matrix
