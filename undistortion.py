@@ -79,8 +79,8 @@ if __name__ =='__main__':
     lamp_id2 = 'lamp18'
     
     # Load the distorted images
-    img1_ = cv.imread("lamp_19_distorted_empty.PNG")
-    img2_ = cv.imread("lamp_18_distorted_empty.PNG")
+    img1_ = cv.imread("dataset/origin_images/lamp_19_distorted_empty_for18.PNG")
+    img2_ = cv.imread("dataset/origin_images/lamp_18_distorted_empty_for19.PNG")
     
     # Enter the direction of the parameters
     calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Mathe"
@@ -131,27 +131,27 @@ if __name__ =='__main__':
         #     [0, 500, 350, 800],
         #     [0, 250, 350, 500]]
         ROIs1 = [
-            #[450, 850, 768, 1300],
-            [450, 625, 768, 900],
-            #[450, 300, 768, 625],
-            [450, 150, 768, 350]]
+            [425, 750, 767, 1050],
+            [425, 450, 767, 800],
+            [425, 250, 767, 500],
+            [425,  50, 767, 300]]
         ROIs2 = [
-            #[0, 900,350, 1300],
-            [0, 700, 350, 950],
-            #[0, 450, 350, 750],
-            [0, 150, 350, 450]]
+            [0, 800, 350, 1075],
+            [0, 500, 350, 850],
+            [0, 300, 350, 550],
+            [0,   0, 350, 350]]
     else:
         ROIs1 = [
-            [100, 400, 350, 767],
-            [300, 400, 500, 767],
-            [500, 400, 950, 767],
-            [800, 400, 1100, 7/67]]
+            [225, 425, 600, 767],
+            #[500, 450, 680, 767],
+            #[710, 450, 875, 767],
+            [800, 425, 1000, 767]]
 
         ROIs2 = [
-            [100, 0, 450, 400],
-            [350, 0, 550, 400],
-            [550, 0, 1000,400],
-            [800, 0, 1150, 400]]
+            [175, 0,  500, 350],
+            #[380, 0,  580, 275],
+            #[600, 0,  750, 275],
+            [650, 0, 1000, 350]]
         # ROIs1 = [
         #     [50, 450, 300, 767],
         #     [300, 450, 576, 767],
@@ -186,7 +186,7 @@ if __name__ =='__main__':
     matchNum = 0
     for i in range(len(matches)):
         matchNum += len(matches[i])
-        print("-- Number of original matches in each area", len(matches[i]))
+        print("-- Number of original matches in area (%d): %d"%(i, len(matches[i])))
     print("Number of original total matches: ", matchNum)
 
     # draw the matches in each cluster
@@ -195,26 +195,22 @@ if __name__ =='__main__':
     # Integrate the clusters into one list
     kps1_filter, kps2_filter, matches =utils.featureIntegrate(kpsCluster1,kpsCluster2,matches)
     
-    # Visualize the total matches
-    # plt.figure(2)
-    # img_match = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches,None,**draw_params)
-    # plt.axis('off')
-    # plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
-    # plt.title("Feature Matching for Total Selected Area")
-    
-    
+        
+    # Filter the invalid matches and transform the features
     pts1 = cv.KeyPoint_convert(kps1_filter)
     pts2 = cv.KeyPoint_convert(kps2_filter)
     features1, invalid_index1 = feature_mapping.feature_map(map1_1, map2_1, pts1)
     features2, invalid_index2 = feature_mapping.feature_map(map1_2, map2_2, pts2)
     matches = utils.matchFilter(matches, invalid_index1, invalid_index2)
     
-    # # Visualize the total matches
+    
+    # Visualize the total matches
     plt.figure(2)
     img_match = cv.drawMatches(img_undistort1,features1,img_undistort2,features2,matches,None,**draw_params)
     plt.axis('off')
     plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
     plt.title("Feature Matching for Total Selected Area")
+    
     
     '''
     Find the parameters for homography matrix
@@ -228,7 +224,6 @@ if __name__ =='__main__':
 
 
     plt.figure(3)
-
     plt.imshow(cv.cvtColor(img_inliers, cv.COLOR_BGR2RGB))
     plt.title("Inlier Matches for Total Selected Area")
     plt.axis('off')
@@ -253,8 +248,8 @@ if __name__ =='__main__':
     stitch_size = (x_max,y_max)
 
     homo_mat_ = np.eye(3)
-    img_super = cv.warpPerspective(Img1.img, homo_mat_,stitch_size,borderValue=(0,0,0))
-    img_transform = cv.warpPerspective(Img2.img, homo_mat,stitch_size,borderValue=(0,0,0))
+    img_super = cv.warpPerspective(img_undistort1, homo_mat_,stitch_size,borderValue=(0,0,0))
+    img_transform = cv.warpPerspective(img_undistort2, homo_mat,stitch_size,borderValue=(0,0,0))
 
     # Combine the image on one super image
     high_y = np.min(posVerts[:,1])
@@ -263,9 +258,13 @@ if __name__ =='__main__':
 
     img_stitch = img_transform + img_super
 
-    plt.figure(3)
+    plt.figure(4)
     plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
     plt.axis('off')
-
-
     plt.show()
+    
+    '''
+    Print the parameters of homography matrix
+    '''
+    np.set_printoptions(suppress=True)
+    print(homo_mat.flatten().tolist())

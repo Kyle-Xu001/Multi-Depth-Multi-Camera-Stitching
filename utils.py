@@ -98,7 +98,7 @@ def clusterMatch(desCluster1, desCluster2):
         
         matchFilter = []
         for m,_,n in match:
-            if m.distance < 0.8 * n.distance:
+            if m.distance < 0.85 * n.distance:
                 matchFilter.append(m)
         matches.append(matchFilter)
     return matches
@@ -109,7 +109,7 @@ def findHomography(matches, kps1, kps2):
     trainIdxs = [match.trainIdx for match in matches]
     kps2 = cv.KeyPoint_convert(kps2)
     kps1 = cv.KeyPoint_convert(kps1)
-    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=15)
+    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=20)
 
     return homo_mat, inliers_mask
 
@@ -143,11 +143,12 @@ def featureIntegrate(kpsCluster1, kpsCluster2, matches):
         matchInt = matchInt + matches[i]
     return kps1_filter, kps2_filter, matchInt
 
+
 def matchFilter(matches, invalid_index1, invalid_index2):
     new_matches = []
     for match in matches:
         if (match.queryIdx not in invalid_index1) and (match.trainIdx not in invalid_index2):
-            new_matches.add(match)
+            new_matches.append(match)
     
     return new_matches
     
