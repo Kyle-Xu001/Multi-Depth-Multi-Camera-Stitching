@@ -75,13 +75,13 @@ def undistort(img,lamp_id,calib_dir,map1 = None, map2 = None):
 
 if __name__ =='__main__':
     # Define the operating lamp
-    lamp_id1 = 'lamp19'
-    lamp_id2 = 'lamp18'
+    lamp_id1 = 'lamp17'
+    lamp_id2 = 'lamp16'
     
     # Load the distorted images
-    img1_ = cv.imread("dataset/origin_images/lamp_19_distorted_empty_for18.PNG")
-    img2_ = cv.imread("dataset/origin_images/lamp_18_distorted_empty_for19.PNG")
-    
+    img1_ = cv.imread("dataset/origin_images/lamp_17_distorted_empty_for16.PNG")
+    img2_ = cv.imread("dataset/origin_images/lamp_16_distorted_empty_for17.PNG")
+
     # Enter the direction of the parameters
     calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Mathe"
     
@@ -117,7 +117,7 @@ if __name__ =='__main__':
     #img2 = np.rot90(img2_,1)
     img1 = img1_
     img2 = img2_
-    
+    print(img1.shape)
     if (img1.shape[0]>img1.shape[1]):
     # Manually define the ROI to locate the area for corresponding images
         # ROIs1 = [
@@ -142,28 +142,23 @@ if __name__ =='__main__':
             [0,   0, 350, 350]]
     else:
         ROIs1 = [
-            [225, 425, 600, 767],
-            #[500, 450, 680, 767],
-            #[710, 450, 875, 767],
-            [800, 425, 1000, 767]]
+            [220, 475, 400, 767],
+            [730, 475, 890, 767]]
 
         ROIs2 = [
-            [175, 0,  500, 350],
-            #[380, 0,  580, 275],
-            #[600, 0,  750, 275],
-            [650, 0, 1000, 350]]
+            [210, 0, 400, 300],
+            [710, 0, 875, 300]]
+        
         # ROIs1 = [
-        #     [50, 450, 300, 767],
-        #     [300, 450, 576, 767],
-        #     [576, 450, 876, 767],
-        #     [876, 450, 1126, 767]]
+        #     [250, 425, 530, 767],
+        #     [550, 425, 850, 670],
+        #     [820, 425, 960, 767]]
 
         # ROIs2 = [
-        #     [0, 0, 250, 400],
-        #     [276, 0, 476, 400],
-        #     [476, 0, 776, 400],
-        #     [776, 0, 1126, 400]]
-
+        #     [220, 0, 400, 300],
+        #     [420, 0, 680, 85],
+        #     [700, 0, 900, 350]]
+        
     # Initialize the object
     Img1 = Image(img1)
     Img2 = Image(img2)
@@ -211,7 +206,7 @@ if __name__ =='__main__':
     
     # Integrate the clusters into one list
     kps1_filter, kps2_filter, matches =utils.featureIntegrate(kpsCluster1,kpsCluster2,matches)
-    
+    plt.show()
         
     # Filter the invalid matches and transform the features
     pts1 = cv.KeyPoint_convert(kps1_filter)

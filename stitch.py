@@ -13,8 +13,8 @@ draw_params = dict(matchColor = (0,255,0),
                    flags = cv.DrawMatchesFlags_DEFAULT)
 
 # load the matching images
-img1 = cv.imread("lamp_19_distorted_empty.JPG")
-img2 = cv.imread("lamp_18_distorted_empty.JPG")
+img1 = cv.imread("dataset/origin_images/lamp_16_distorted_empty_for15.PNG")
+img2 = cv.imread("dataset/origin_images/lamp_15_distorted_empty_for16.PNG")
 
 img1 = np.rot90(img1,1) 
 img2 = np.rot90(img2,1)
@@ -33,17 +33,17 @@ if (img1.shape[0]>img1.shape[1]):
     #     [0, 250, 350, 500]]
     ROIs1 = [
         #[450, 850, 768, 1300],
-        [450, 625, 768, 900],
+        [475, 752, 767, 932],
         #[450, 300, 768, 625],
-        [450, 150, 768, 350]]
+        [475, 260, 767, 422]]
     ROIs2 = [
         #[0, 900,350, 1300],
-        [0, 700, 350, 950],
+        [0, 752, 300, 942],
         #[0, 450, 350, 750],
-        [0, 150, 350, 450]]
+        [0, 297, 300, 442]]
 else:
     ROIs1 = [
-        [100, 400, 350, 767],
+        [100, 450, 350, 767],
         [300, 400, 500, 767],
         [500, 400, 950, 767],
         [800, 400, 1100, 767]]

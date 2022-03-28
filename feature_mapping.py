@@ -52,7 +52,3 @@ def feature_map(map1, map2, features):
     print('Number of Valid Features after Transformation: ',np.count_nonzero(num),'/',len(features))
 
     return features_undistorted, invalid_index
-        
-    
-    
-    

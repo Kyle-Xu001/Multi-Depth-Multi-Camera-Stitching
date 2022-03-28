@@ -52,7 +52,7 @@ def getMaskPointsInROIs(kps,ROIs):
 def findFeatures(img, method=None):
     
     if method == 'sift':
-        descriptor = cv.SIFT_create()
+        descriptor = cv.SIFT_create(contrastThreshold=0.01)
     elif method == 'brisk':
         descriptor = cv.BRISK_create()
     elif method == 'orb':
@@ -82,7 +82,7 @@ def featureMatch(des1, des2, method, knn=False):
         
         matches_good = []
         for m, n in matches:
-            if m.distance < 0.9*n.distance:
+            if m.distance < 0.8*n.distance:
                 matches_good.append(m)
     return matches_good
 
@@ -99,7 +99,7 @@ def clusterMatch(desCluster1, desCluster2):
         
         matchFilter = []
         for m,_,n in match:
-            if m.distance < 0.85 * n.distance:
+            if m.distance < 0.9 * n.distance:
                 matchFilter.append(m)
         matches.append(matchFilter)
     return matches
@@ -110,7 +110,7 @@ def findHomography(matches, kps1, kps2):
     trainIdxs = [match.trainIdx for match in matches]
     kps2 = cv.KeyPoint_convert(kps2)
     kps1 = cv.KeyPoint_convert(kps1)
-    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=20)
+    homo_mat,inliers_mask = cv.findHomography(kps2[trainIdxs],kps1[queryIdxs],method=cv.RANSAC,ransacReprojThreshold=25)
 
     return homo_mat, inliers_mask
 
