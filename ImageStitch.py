@@ -1,13 +1,12 @@
 import itertools
 import numpy as np
 import cv2 as cv
-import math
-import matplotlib.pyplot as plt
+
 import utils
 
 '''
 IMAGE Class: 
-Define the feature based properties on one image
+Define the feature properties for single image
 ----------
 '''
 class Image(object):
@@ -74,46 +73,39 @@ class Image(object):
  
 '''
 STITCH CLASS: 
-Define the relations between two images 
+Define the related features and matches between a pair of images 
 ----------
-`featureExtract`: extract features within each image and cluster them into given ROIs
-`featureMatch`: match the corresponding features to generate homography matrix
-`simpleStitch`: transform image2 using homography matrix and directly combine image1 and image2
+`featureExtract`: extract features within each image and classify them in given ROIs
 '''
 class Stitch(object):
-    def __init__(self, img1, img2, ROIs1, ROIs2):
+    def __init__(self, img1, img2):
         self.Img1 = Image(img1)
         self.Img2 = Image(img2)
-        self.ROIs1 = ROIs1
-        self.ROIs2 = ROIs2
         self.matches = None
         
-    def featureExtract(self):
-        masks1 = utils.getMaskPointsInROIs(self.Img1.kps, self.ROIs1)
-        masks2 = utils.getMaskPointsInROIs(self.Img2.kps, self.ROIs2)
+    def featureExtract(self, ROIs1, ROIs2):
+        masks1 = utils.getMaskPointsInROIs(self.Img1.kps, ROIs1)
+        masks2 = utils.getMaskPointsInROIs(self.Img2.kps, ROIs2)
         
         self.Img1.featureCluster(masks1)
         self.Img2.featureCluster(masks2)
     
-
     def homoEstimate(self):
         # Define the matches based on two images
-        matches = utils.clusterMatch(self.Img1.desCluster, self.Img2.desCluster)
-        self.matches = matches
-        
+        matches_list = utils.clusterMatch(self.Img1.desCluster, self.Img2.desCluster)
+
         # Combine the features in one lists from each cluster
-        self.featureIntegrate()
+        self.featureIntegrate(matches_list)
         
         homo_mat, inliers_mask = utils.findHomography(self.matches, self.Img1.kps, self.Img2.kps)
         matches_inliers = list(itertools.compress(self.matches, inliers_mask))
         
         return homo_mat, matches_inliers
     
-    def featureIntegrate(self):
+    def featureIntegrate(self, matches_list):
         # Define the variables
         kpsCluster1 = self.Img1.kpsCluster
         kpsCluster2 = self.Img2.kpsCluster
-        matches = self.matches
         numCluster = len(kpsCluster1)
         assert(numCluster == len(kpsCluster2))
 
@@ -129,16 +121,17 @@ class Stitch(object):
             kps2 = kps2 + kpsCluster2[i]
 
             # Update the index for each match cluster
-            for j in range(len(matches[i])):
-                matches[i][j].queryIdx = matches[i][j].queryIdx + queryIdx
-                matches[i][j].trainIdx = matches[i][j].trainIdx + trainIdx
+            for j in range(len(matches_list[i])):
+                matches_list[i][j].queryIdx = matches_list[i][j].queryIdx + queryIdx
+                matches_list[i][j].trainIdx = matches_list[i][j].trainIdx + trainIdx
 
             queryIdx = queryIdx + len(kpsCluster1[i])
             trainIdx = trainIdx + len(kpsCluster2[i])
 
             # Combine the matches into one list
-            matchInt = matchInt + matches[i]
+            matchInt = matchInt + matches_list[i]
         
+        # Update the features and matches in class
         self.Img1.kps = kps1
         self.Img2.kps = kps2
         self.matches = matchInt

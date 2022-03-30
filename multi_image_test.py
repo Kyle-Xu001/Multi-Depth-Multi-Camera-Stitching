@@ -47,8 +47,8 @@ if __name__ == '__main__':
         ROIs2[i, 3] = ROIs2[i, 1] + ROIs2[i, 3]
         
 
-    stitches = Stitch(img1, img2, ROIs1, ROIs2)
-    stitches.featureExtract()
+    stitches = Stitch(img1, img2)
+    stitches.featureExtract(ROIs1, ROIs2)
     homo_mat, matches_inliers = stitches.homoEstimate()
     kps1 = stitches.Img1.kps
     kps2 = stitches.Img2.kps
