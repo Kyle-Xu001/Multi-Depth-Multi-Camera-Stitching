@@ -1,6 +1,7 @@
 *.JPG
 *.PNG
 *.png
+*.json
 result/
 dataset/
 calib_params_Mathe/

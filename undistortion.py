@@ -79,8 +79,8 @@ if __name__ =='__main__':
     lamp_id2 = 'lamp16'
     
     # Load the distorted images
-    img1_ = cv.imread("dataset/origin_images/lamp_17_distorted_empty_for16.PNG")
-    img2_ = cv.imread("dataset/origin_images/lamp_16_distorted_empty_for17.PNG")
+    img1_ = cv.imread("dataset/origin_images/lamp_15_distorted_empty.PNG")
+    img2_ = cv.imread("dataset/origin_images/lamp_14_distorted_empty.PNG")
 
     # Enter the direction of the parameters
     calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Mathe"
@@ -113,51 +113,58 @@ if __name__ =='__main__':
                     flags = cv.DrawMatchesFlags_DEFAULT)
 
     # load the matching images
-    #img1 = np.rot90(img1_,1) 
-    #img2 = np.rot90(img2_,1)
     img1 = img1_
     img2 = img2_
-    print(img1.shape)
-    if (img1.shape[0]>img1.shape[1]):
-    # Manually define the ROI to locate the area for corresponding images
-        # ROIs1 = [
-        #     [450, 950, 768, 1300],
-        #     [450, 750, 768, 1000],
-        #     [450, 450, 768, 750],
-        #     [450, 250, 768, 450]]
-        # ROIs2 = [
-        #     [0, 950,350, 1300],
-        #     [0, 750, 350, 1000],
-        #     [0, 500, 350, 800],
-        #     [0, 250, 350, 500]]
-        ROIs1 = [
-            [425, 750, 767, 1050],
-            [425, 450, 767, 800],
-            [425, 250, 767, 500],
-            [425,  50, 767, 300]]
-        ROIs2 = [
-            [0, 800, 350, 1075],
-            [0, 500, 350, 850],
-            [0, 300, 350, 550],
-            [0,   0, 350, 350]]
-    else:
-        ROIs1 = [
-            [220, 475, 400, 767],
-            [730, 475, 890, 767]]
 
-        ROIs2 = [
-            [210, 0, 400, 300],
-            [710, 0, 875, 300]]
+    # if (img1.shape[0]>img1.shape[1]):
+    # # Manually define the ROI to locate the area for corresponding images
+    #     # ROIs1 = [
+    #     #     [450, 950, 768, 1300],
+    #     #     [450, 750, 768, 1000],
+    #     #     [450, 450, 768, 750],
+    #     #     [450, 250, 768, 450]]
+    #     # ROIs2 = [
+    #     #     [0, 950,350, 1300],
+    #     #     [0, 750, 350, 1000],
+    #     #     [0, 500, 350, 800],
+    #     #     [0, 250, 350, 500]]
+    #     ROIs1 = [
+    #         [425, 750, 767, 1050],
+    #         [425, 450, 767, 800],
+    #         [425, 250, 767, 500],
+    #         [425,  50, 767, 300]]
+    #     ROIs2 = [
+    #         [0, 800, 350, 1075],
+    #         [0, 500, 350, 850],
+    #         [0, 300, 350, 550],
+    #         [0,   0, 350, 350]]
+    # else:
+    #     ROIs1 = [
+    #         [220, 475, 400, 767],
+    #         [730, 475, 890, 767]]
+
+    #     ROIs2 = [
+    #         [210, 0, 400, 300],
+    #         [710, 0, 875, 300]]
         
-        # ROIs1 = [
-        #     [250, 425, 530, 767],
-        #     [550, 425, 850, 670],
-        #     [820, 425, 960, 767]]
+    #     # ROIs1 = [
+    #     #     [250, 425, 530, 767],
+    #     #     [550, 425, 850, 670],
+    #     #     [820, 425, 960, 767]]
 
-        # ROIs2 = [
-        #     [220, 0, 400, 300],
-        #     [420, 0, 680, 85],
-        #     [700, 0, 900, 350]]
+    #     # ROIs2 = [
+    #     #     [220, 0, 400, 300],
+    #     #     [420, 0, 680, 85],
+    #     #     [700, 0, 900, 350]]
+    
+    ROIs1 = cv.selectROIs("select the area", img1)
+    ROIs2 = cv.selectROIs("select the area", img2)
+
+    for i in range(len(ROIs1)):        
+        ROIs1[i,2] = ROIs1[i,0] + ROIs1[i,2]
+        ROIs1[i,3] = ROIs1[i,1] + ROIs1[i,3]
+        ROIs2[i,2] = ROIs2[i,0] + ROIs2[i,2]
+        ROIs2[i,3] = ROIs2[i,1] + ROIs2[i,3]
         
     # Initialize the object
     Img1 = Image(img1)
