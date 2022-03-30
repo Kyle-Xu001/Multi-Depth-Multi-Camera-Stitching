@@ -2,74 +2,9 @@ import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 import utils
+from utils import Image
 
 
-class Image(object):
-    # Initialization for the Image object
-    def __init__(self, img, nfeatures=0):
-        self.img = img
-        self.nfeatures = nfeatures
-        self.kps = None
-        self.des = None
-        self.kpsCluster = None
-        self.desCluster = None
-        
-        # Equalize the YUV channels histogram
-        self.equalizeHist()
-        
-        # self.candidate_links = dict()
-        # self.candidate_links['top'] = list()
-        # self.candidate_links['bottom'] = list()
-        # self.link = dict()
-        print("\nInitial Successfullys")
-        
-    def equalizeHist(self):
-        self.img = utils.equalizeHist(self.img)        
-
-    def findFeatures(self, method=None):
-        img = self.img
-        kps, des = utils.findFeatures(img, method)
-        
-        self.kps = kps
-        self.des = des
-        self.nfeatures = len(kps)
-
-        return kps, des
-    
-    def featureFilter(self, mask):
-        kps_filtered = ()
-        des_filtered = []
-        
-        # Filter the key points and descriptions within the range
-        for i in range(len(mask)):
-            if mask[i] == 1:
-                kps_filtered = kps_filtered + (self.kps[i],)
-                des_filtered.append(self.des[i])
-    
-        des_filtered = np.asarray(des_filtered)
-        
-        print("\nTotal features: ", len(mask))
-        print("Filtered features: ", len(kps_filtered),"\n")
-        
-        return kps_filtered, des_filtered
-    
-    def featureCluster(self, masks):
-        kpsCluster = []
-        desCluster = []
-        
-        # Filter the features in the same range in one cluster
-        for mask in masks:
-            kps_filtered, des_filtered = self.featureFilter(mask)
-            kpsCluster.append(kps_filtered)
-            desCluster.append(des_filtered)
-        
-        self.kpsCluster = kpsCluster
-        self.desCluster = desCluster
-            
-        return kpsCluster, desCluster
-        
-
-    
 if __name__ == '__main__':
     # Load exmaple image
     img = cv.imread("dataset/origin_images/lamp_14_distorted_empty.PNG")

@@ -1,6 +1,6 @@
-## Multi-Depth-Multi-Camera-Stitching
+# Multi-Depth-Multi-Camera-Stitching
 
-## Description
+## Project Description
 
 This submission consists of various methods for image stitching from multi-cameras.
 
@@ -11,4 +11,3 @@ This submission consists of various methods for image stitching from multi-camer
     ├── LICENSE
     └── README.md
 - `multi_image_test.py` - Stitch the new image with last stitching combination
-    

@@ -13,54 +13,43 @@ draw_params = dict(matchColor = (0,255,0),
                    flags = cv.DrawMatchesFlags_DEFAULT)
 
 # load the matching images
-img1 = cv.imread("dataset/origin_images/lamp_17.JPG")
-img2 = cv.imread("dataset/origin_images/lamp_16.JPG")
+img1 = cv.imread("dataset/origin_images/lamp_15_empty.JPG")
+img2 = cv.imread("dataset/origin_images/lamp_14_empty.JPG")
 
 #img1 = np.rot90(img1,1) 
 #img2 = np.rot90(img2,1)
 
-# if (img1.shape[0]>img1.shape[1]):
-# # Manually define the ROI to locate the area for corresponding images
-#     # ROIs1 = [
-#     #     [450, 950, 768, 1300],
-#     #     [450, 750, 768, 1000],
-#     #     [450, 450, 768, 750],
-#     #     [450, 250, 768, 450]]
-#     # ROIs2 = [
-#     #     [0, 950,350, 1300],
-#     #     [0, 750, 350, 1000],
-#     #     [0, 500, 350, 800],
-#     #     [0, 250, 350, 500]]
-#     ROIs1 = [
-#         #[450, 850, 768, 1300],
-#         [475, 752, 767, 932],
-#         #[450, 300, 768, 625],
-#         [475, 260, 767, 422]]
-#     ROIs2 = [
-#         #[0, 900,350, 1300],
-#         [0, 752, 300, 942],
-#         #[0, 450, 350, 750],
-#         [0, 297, 300, 442]]
-# else:
-#     ROIs1 = [
-#         [100, 450, 350, 767],
-#         [300, 400, 500, 767],
-#         [500, 400, 950, 767],
-#         [800, 400, 1100, 767]]
+if (img1.shape[0]>img1.shape[1]):
+# Manually define the ROI to locate the area for corresponding images
+    # ROIs1 = [
+    #     [450, 950, 768, 1300],
+    #     [450, 750, 768, 1000],
+    #     [450, 450, 768, 750],
+    #     [450, 250, 768, 450]]
+    # ROIs2 = [
+    #     [0, 950,350, 1300],
+    #     [0, 750, 350, 1000],
+    #     [0, 500, 350, 800],
+    #     [0, 250, 350, 500]]
+    ROIs1 = [
+        #[450, 850, 768, 1300],
+        [475, 752, 767, 932],
+        #[450, 300, 768, 625],
+        [475, 260, 767, 422]]
+    ROIs2 = [
+        #[0, 900,350, 1300],
+        [0, 752, 300, 942],
+        #[0, 450, 350, 750],
+        [0, 297, 300, 442]]
+else:
+    ROIs1 = [
+        [180, 450, 500, 767],
+        [600, 450, 900, 767]]
 
-#     ROIs2 = [
-#         [100, 0, 450, 400],
-#         [350, 0, 550, 400],
-#         [550, 0, 1000,400],
-#         [800, 0, 1150, 400]]
-ROIs1 = cv.selectROIs("select the area", img1)
-ROIs2 = cv.selectROIs("select the area", img2)
+    ROIs2 = [
+        [200, 0, 520, 350],
+        [590, 0, 940, 350]]
 
-for i in range(len(ROIs1)):        
-    ROIs1[i,2] = ROIs1[i,0] + ROIs1[i,2]
-    ROIs1[i,3] = ROIs1[i,1] + ROIs1[i,3]
-    ROIs2[i,2] = ROIs2[i,0] + ROIs2[i,2]
-    ROIs2[i,3] = ROIs2[i,1] + ROIs2[i,3]
 
 # Initialize the object
 Img1 = Image(img1)
