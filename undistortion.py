@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import utils
-from image_feature_extraction_test import Image
+from ImageStitch import Stitch
 import image_match_test as match_utils
 import feature_mapping
 
@@ -75,12 +75,12 @@ def undistort(img,lamp_id,calib_dir,map1 = None, map2 = None):
 
 if __name__ =='__main__':
     # Define the operating lamp
-    lamp_id1 = 'lamp15'
-    lamp_id2 = 'lamp14'
+    lamp_id1 = 'lamp19'
+    lamp_id2 = 'lamp18'
     
     # Load the distorted images
-    img1_ = cv.imread("dataset/origin_images/lamp_15_distorted_empty.PNG")
-    img2_ = cv.imread("dataset/origin_images/lamp_14_distorted_empty.PNG")
+    img1_ = cv.imread("dataset/origin_images/lamp_19_distorted_empty_for18.PNG")
+    img2_ = cv.imread("dataset/origin_images/lamp_18_distorted_empty_for19.PNG")
 
     # Enter the direction of the parameters
     calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Mathe"
@@ -116,36 +116,36 @@ if __name__ =='__main__':
     img1 = img1_
     img2 = img2_
 
-    if (img1.shape[0]>img1.shape[1]):
-    # Manually define the ROI to locate the area for corresponding images
-        # ROIs1 = [
-        #     [450, 950, 768, 1300],
-        #     [450, 750, 768, 1000],
-        #     [450, 450, 768, 750],
-        #     [450, 250, 768, 450]]
-        # ROIs2 = [
-        #     [0, 950,350, 1300],
-        #     [0, 750, 350, 1000],
-        #     [0, 500, 350, 800],
-        #     [0, 250, 350, 500]]
-        ROIs1 = [
-            [425, 750, 767, 1050],
-            [425, 450, 767, 800],
-            [425, 250, 767, 500],
-            [425,  50, 767, 300]]
-        ROIs2 = [
-            [0, 800, 350, 1075],
-            [0, 500, 350, 850],
-            [0, 300, 350, 550],
-            [0,   0, 350, 350]]
-    else:
-        ROIs1 = [
-            [185, 450, 462, 767],
-            [630, 450, 900, 767]]
+    # if (img1.shape[0]>img1.shape[1]):
+    # # Manually define the ROI to locate the area for corresponding images
+    #     # ROIs1 = [
+    #     #     [450, 950, 768, 1300],
+    #     #     [450, 750, 768, 1000],
+    #     #     [450, 450, 768, 750],
+    #     #     [450, 250, 768, 450]]
+    #     # ROIs2 = [
+    #     #     [0, 950,350, 1300],
+    #     #     [0, 750, 350, 1000],
+    #     #     [0, 500, 350, 800],
+    #     #     [0, 250, 350, 500]]
+    #     ROIs1 = [
+    #         [425, 750, 767, 1050],
+    #         [425, 450, 767, 800],
+    #         [425, 250, 767, 500],
+    #         [425,  50, 767, 300]]
+    #     ROIs2 = [
+    #         [0, 800, 350, 1075],
+    #         [0, 500, 350, 850],
+    #         [0, 300, 350, 550],
+    #         [0,   0, 350, 350]]
+    # else:
+    #     ROIs1 = [
+    #         [185, 450, 462, 767],
+    #         [630, 450, 900, 767]]
 
-        ROIs2 = [
-            [160, 0, 390, 310],
-            [575, 0, 850, 310]]
+    #     ROIs2 = [
+    #         [160, 0, 390, 310],
+    #         [575, 0, 850, 310]]
         
         # ROIs1 = [
         #     [250, 425, 530, 767],
@@ -156,15 +156,22 @@ if __name__ =='__main__':
         #     [220, 0, 400, 300],
         #     [420, 0, 680, 85],
         #     [700, 0, 900, 350]]
-    
+    ROIs1 = cv.selectROIs("select the area", img1)
+    ROIs2 = cv.selectROIs("select the area", img2)
+
+    for i in range(len(ROIs1)):
+        ROIs1[i, 2] = ROIs1[i, 0] + ROIs1[i, 2]
+        ROIs1[i, 3] = ROIs1[i, 1] + ROIs1[i, 3]
+        ROIs2[i, 2] = ROIs2[i, 0] + ROIs2[i, 2]
+        ROIs2[i, 3] = ROIs2[i, 1] + ROIs2[i, 3]
         
     # Initialize the object
-    Img1 = Image(img1)
-    Img2 = Image(img2)
-
-    # Extract the features from each images
-    kps1, des1 = Img1.findFeatures('sift')
-    kps2, des2 = Img2.findFeatures('sift')   
+    stitches = Stitch(img1, img2)
+    stitches.featureExtract(ROIs1, ROIs2)
+    
+    # Match the features with corresponding clusters in each image
+    homo_mat, matches_inliers = stitches.homoEstimate()
+ 
 
     # # Generate the heatmap Image
     # heatImg = utils.featureHeatmap(Img1.img,kps1)
@@ -182,37 +189,29 @@ if __name__ =='__main__':
     
     
     # plt.show()
+
+
+
+    # # Show the number of matches
+    # matchNum = 0
+    # for i in range(len(matches)):
+    #     matchNum += len(matches[i])
+    #     print("-- Number of original matches in area (%d): %d"%(i, len(matches[i])))
+    # print("Number of original total matches: ", matchNum)
+
+    # # draw the matches in each cluster
+    # utils.drawMatch(s,kpsCluster1,Img2,kpsCluster2,matches,draw_params)
     
-    # Extract the masks to filter the features into several clusters
-    masks1 = utils.getMaskPointsInROIs(kps1, ROIs1)
-    masks2 = utils.getMaskPointsInROIs(kps2, ROIs2)
-
-    kpsCluster1, desCluster1 = Img1.featureCluster(masks1)
-    kpsCluster2, desCluster2 = Img2.featureCluster(masks2)
-
-    # Match the features with corresponding clusters in each image
-    matches = utils.clusterMatch(desCluster1,desCluster2)
-
-    # Show the number of matches
-    matchNum = 0
-    for i in range(len(matches)):
-        matchNum += len(matches[i])
-        print("-- Number of original matches in area (%d): %d"%(i, len(matches[i])))
-    print("Number of original total matches: ", matchNum)
-
-    # draw the matches in each cluster
-    utils.drawMatch(Img1,kpsCluster1,Img2,kpsCluster2,matches,draw_params)
-    
-    # Integrate the clusters into one list
-    kps1_filter, kps2_filter, matches =utils.featureIntegrate(kpsCluster1,kpsCluster2,matches)
-    plt.show()
+    # # Integrate the clusters into one list
+    # kps1_filter, kps2_filter, matches =utils.featureIntegrate(kpsCluster1,kpsCluster2,matches)
+    # plt.show()
         
     # Filter the invalid matches and transform the features
-    pts1 = cv.KeyPoint_convert(kps1_filter)
-    pts2 = cv.KeyPoint_convert(kps2_filter)
+    pts1 = cv.KeyPoint_convert(stitches.Img1.kps)
+    pts2 = cv.KeyPoint_convert(stitches.Img2.kps)
     features1, invalid_index1 = feature_mapping.feature_map(map1_1, map2_1, pts1)
     features2, invalid_index2 = feature_mapping.feature_map(map1_2, map2_2, pts2)
-    matches = utils.matchFilter(matches, invalid_index1, invalid_index2)
+    matches = utils.matchFilter(stitches.matches, invalid_index1, invalid_index2)
     
     
     # Visualize the total matches
@@ -244,7 +243,7 @@ if __name__ =='__main__':
     Stitch the Images
     '''
     # Get the position of vertices
-    posVerts = utils.transformVerts(img_size=np.array([Img1.img.shape[1],Img1.img.shape[0]]), homo_mat=homo_mat)
+    posVerts = utils.transformVerts(img_size=np.array([stitches.Img1.img.shape[1],stitches.Img1.img.shape[0]]), homo_mat=homo_mat)
     # print("Left Top: ",posVerts[0,:],"\n",
     #       "Right Top: ",posVerts[1,:],"\n",
     #       "Right Bottom: ",posVerts[2,:],"\n",
