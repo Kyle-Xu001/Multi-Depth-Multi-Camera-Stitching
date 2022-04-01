@@ -6,8 +6,10 @@ This submission consists of various methods for image stitching from multi-camer
 
 ## Files Description
     .
-    ├── multi_image_test.py          # multiple homography transforamtion
+    ├── paranoma_test.py          # Generate paranoma image for one frame
+    ├── ImageStitch.py            # Define the Image and Stitch class
     ├── .gitignore
     ├── LICENSE
     └── README.md
-- `multi_image_test.py` - Stitch the new image with last stitching combination
+- `paranoma_test.py` - Stitch the new image with input stitching combination, using Perspective Transform to stitch the left whole area and the right whole area
+- `ImageStitch.py` - Define the `Image` class which combines properties and functions for feature processing on one image, and `Stitch` class which combines properties and functions for matches and features on a pair of images
