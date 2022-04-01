@@ -10,11 +10,6 @@ from ImageStitch import Stitch
 
 # Define the main function
 if __name__ == '__main__':
-
-    # Define the size of opencv window
-    cv.namedWindow("select the area", cv.WINDOW_NORMAL)
-    cv.resizeWindow("select the area", 800, 600)
-
     # Define the draw parameters for matching visualization
     draw_params = dict(matchColor=(0, 255, 0),
                        singlePointColor=(0, 0, 255),
@@ -82,76 +77,46 @@ if __name__ == '__main__':
     #                       0.00008008349410686805, -0.000001116226659156957,1.0]]).reshape(-1, 3)
     # img_stitch_ = ImageStitch.simpleStitch(img1, img_stitch, homo_mat)
     
-    # Param Tesing 1 
+    # Param Tesing 2
     homo_mat = np.array([[
-        0.9962750152836561,
-        0.011394294761734253,
-        -15.863355184114155,
-        -0.005241890227618538,
-        1.0267777741157014,
-        411.4732629218854,
-        -0.000006746897821467397,
-        0.00004496214822227408,
-        1.0
-    ]]).reshape(-1, 3)
+        0.9962750152836561, 0.011394294761734253, -15.863355184114155,
+        -0.005241890227618538, 1.0267777741157014, 411.4732629218854,
+        -0.000006746897821467397, 0.00004496214822227408, 1.0]]).reshape(-1, 3)
     img_stitch = ImageStitch.simpleStitch(img4, img5, homo_mat)
 
     homo_mat = np.array([[
-        0.8625498230406553,
-        -0.02301907588895937,
-        59.70997505303934,
-        -0.08656426471273822,
-        0.8907494006294058,
-        441.9432628853975,
-        -0.00011029468806013377,
-        -0.00004138440551081008,
-        1.0
-    ]]).reshape(-1, 3)
+        0.8625498230406553, -0.02301907588895937, 59.70997505303934,
+        -0.08656426471273822, 0.8907494006294058, 441.9432628853975,
+        -0.00011029468806013377, -0.00004138440551081008, 1.0]]).reshape(-1, 3)
     img_stitch = ImageStitch.simpleStitch(img3, img_stitch, homo_mat)
 
     homo_mat = np.array([[
-        0.9448958866207864,
-        -0.042861248612460975,
-        72.84439636268718,
-        -0.013266144059998328,
-        0.9300566760247033,
-        399.48686600411634,
-        -0.000025221215424675617,
-        -0.00006304664715663776,
-        0.9999999999999999
-    ]]).reshape(-1, 3)
+        0.9448958866207864, -0.042861248612460975, 72.84439636268718,
+        -0.013266144059998328, 0.9300566760247033, 399.48686600411634,
+        -0.000025221215424675617, -0.00006304664715663776, 0.9999999999999999]]).reshape(-1, 3)
     img_stitch = ImageStitch.simpleStitch(img2, img_stitch, homo_mat)
 
     homo_mat = np.array([[
-        1.1386527445204575,
-        0.031927187738166204,
-        -109.45549680535996,
-        0.04498832067998204,
-        1.0320031734670985,
-        463.08525965607436,
-        0.00010009854442945858,
-        0.00006315329701074331,
-        1.0
-    ]]).reshape(-1, 3)
+        1.1386527445204575, 0.031927187738166204, -109.45549680535996,
+        0.04498832067998204, 1.0320031734670985, 463.08525965607436,
+        0.00010009854442945858, 0.00006315329701074331, 1.0 ]]).reshape(-1, 3)
     img_stitch_ = ImageStitch.simpleStitch(img1, img_stitch, homo_mat)
 
     plt.figure(0)
     plt.imshow(cv.cvtColor(img_stitch_, cv.COLOR_BGR2RGB))
     plt.axis('off')
     plt.show()
-    '''
-    Four Point Transform the Stitching Result
-    '''
-    pts = np.array([
-        [0, 0],
-        [1100, 0],
-        [1200, 2500],
-        [50, 2550]])
-    dst = np.array([
-        [0, 0],
-        [1100, 0],
-        [1250, 2800],
-        [250, 2200]], dtype="float32")
+    
+    '''Transform Stitching Result to avoid Distortion in final stitching'''
+    pts = np.array([[0, 0],
+                    [1100, 0],
+                    [1200, 2500],
+                    [50, 2550]])
+    
+    dst = np.array([[0, 0],
+                    [1100, 0],
+                    [1250, 2800],
+                    [250, 2200]], dtype="float32")
 
     img_stitch_ = transform.four_point_transform(img_stitch_, pts, dst)
 
@@ -160,15 +125,17 @@ if __name__ == '__main__':
     plt.axis('off')
     plt.show()
 
+
+    # '''Using feature-based estimation to generate homography matrix'''
     # # load the matching images
     # img1_ = cv.imread("dataset/lamp1415161718-lamp19/lamp_19_031613.PNG")
     # lamp_id1 = 'lamp19'
-
-    # img1, map1_1, map2_1 = undistortion.undistort(img1_, lamp_id1, calib_dir)
+    
+    # img1, _, _ = undistortion.undistort(img1_, lamp_id1, calib_dir)
     # img2 = img_stitch
 
-    # ROIs1 = cv.selectROIs("select the area", img1)
-    # ROIs2 = cv.selectROIs("select the area", img2)
+    # ROIs1 = cv.selectROIs("Area Selection", img1)
+    # ROIs2 = cv.selectROIs("Area Selection", img2)
 
     # for i in range(len(ROIs1)):
     #     ROIs1[i, 2] = ROIs1[i, 0] + ROIs1[i, 2]
@@ -189,12 +156,10 @@ if __name__ == '__main__':
 
     # plt.figure(2)
     # plt.imshow(cv.cvtColor(img_inliers, cv.COLOR_BGR2RGB))
-    # plt.title("Inlier Matches for Total Selected Area")
+    # plt.title("Inlier Matches for Total Selected Area [Num: %d]"%(len(matches_inliers)))
     # plt.axis('off')
 
-    # '''
-    # Stitch the Images
-    # '''
+    # '''Stitch the Images'''
     # img_stitch_ = ImageStitch.simpleStitch(img1, img2, homo_mat)
 
     # plt.figure(3)
@@ -203,13 +168,19 @@ if __name__ == '__main__':
     # plt.show()
 
     '''
-    STITCH the LEFT AREA
-    ----------
-    Input:
-    Images of lamp23 - lamp19
+    Stitch the Left Area from lamp23 to lamp19
     
-    Output:
-    Image of Stitching Result
+    Generate estimated homography matrix using matches between corresponding features in ROIs.
+    Directly apply homography matrix to stitch all frames
+    --------------------
+    
+    :param img: images from each frame
+    :type img: nparray (768*1152*3)
+    
+    :param homo_mat: homography matrix generated from feature estimation, using for image transformation
+    :type homo_mat: nparray (3*3)
+    
+    :return img_stitch: stitching image of lamp14 to lamp18
     '''
     # load the initial images and corresponding homo matrix
     img1_ = cv.imread("dataset/Paranoma/lamp_23_031513.PNG")
@@ -235,15 +206,14 @@ if __name__ == '__main__':
     img4, _, _ = undistortion.undistort(img4_, lamp_id4, calib_dir)
     img5, _, _ = undistortion.undistort(img5_, lamp_id5, calib_dir)
 
+    # Keep the img5 as background image, stitch from left to right
     img1 = cv.flip(img1, 0)
     img2 = cv.flip(img2, 0)
     img3 = cv.flip(img3, 0)
     img4 = cv.flip(img4, 0)
     img5 = cv.flip(img5, 0)
 
-    '''
-    Stitch the Images
-    '''
+    '''Stitch Images'''
     homo_mat = np.array([[1.0218209881498754, -0.042645259634918185, -7.994198996506845,
                           -0.10410234684075273, 0.966529343724799, 384.2736252631494,
                           3.3695504080035906e-05, -6.383390869394006e-05, 1.0]]).reshape(-1, 3)
@@ -264,50 +234,42 @@ if __name__ == '__main__':
                           -2.625850345364947e-06, -8.670763250018663e-06, 1.0]]).reshape(-1, 3)
     img_stitch = ImageStitch.simpleStitch(img5, img_stitch, homo_mat)
 
-    # homo_mat = np.array([[1.531377223673118, -0.09420641594437201, -17.083883674895635,
-    #                       1.0214203951714997, 1.0746240680265424, 2188.8250559369794,
-    #                       0.00047561484942954256, -7.001838036624984e-05, 0.9999999999999999]]).reshape(-1, 3)
-
     img_stitch = cv.flip(img_stitch, 0)
-    # img_stitch = ImageStitch.simpleStitch(img_stitch, img_stitch_, homo_mat)
 
-    plt.figure(1)
+    plt.figure(2)
     plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
     plt.axis('off')
     plt.show()
 
-    '''
-    Four Point Transform the Stitching Result
-    '''
-    pts = np.array([
-        [0, 50],
-        [1350, 700],
-        [1200, 2540],
-        [250, 2540]])
-    dst = np.array([
-        [0, 550],
-        [1350, 600],
-        [1200, 2540],
-        [200, 2540]], dtype="float32")
+    '''Transform Stitching Result to avoid Distortion in final stitching'''
+    pts = np.array([[0, 50],
+                    [1350, 700],
+                    [1200, 2540],
+                    [250, 2540]])
+    
+    dst = np.array([[0, 550],
+                    [1350, 600],
+                    [1200, 2540],
+                    [200, 2540]], dtype="float32")
 
     img_stitch = transform.four_point_transform(img_stitch, pts, dst)
-    plt.figure(2)
+    
+    plt.figure(3)
     plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
     plt.axis("off")
     plt.show()
 
-    homo_mat = np.array([[1.531377223673118, -0.09420641594437201, -17.083883674895635,
-                          1.0214203951714997, 1.0746240680265424, 2188.8250559369794,
-                          0.00047561484942954256, -7.001838036624984e-05, 0.9999999999999999]]).reshape(-1, 3)
-
-    #img_stitch = cv.flip(img_stitch, 0)
-    img_stitch = ImageStitch.simpleStitch(img_stitch, img_stitch_, homo_mat)
-
+    # '''Estimate the Homo Matrix for Final Stitching'''
     # # load the matching images
     # img1 = img_stitch
     # img2 = img_stitch_
-    # ROIs1 = cv.selectROIs("select the area", img1)
-    # ROIs2 = cv.selectROIs("select the area", img2)
+    
+    # # Define the size of opencv window
+    # cv.namedWindow("select the area", cv.WINDOW_NORMAL)
+    # cv.resizeWindow("select the area", 800, 600)
+    
+    # ROIs1 = cv.selectROIs("Area Selection", img1)
+    # ROIs2 = cv.selectROIs("Area Selection", img2)
 
     # for i in range(len(ROIs1)):
     #     ROIs1[i, 2] = ROIs1[i, 0] + ROIs1[i, 2]
@@ -326,25 +288,31 @@ if __name__ == '__main__':
     # img_inliers = cv.drawMatches(
     #     img1, kps1, img2, kps2, matches_inliers, None, **draw_params)
 
-    # plt.figure(2)
+    # plt.figure(4)
     # plt.imshow(cv.cvtColor(img_inliers, cv.COLOR_BGR2RGB))
-    # plt.title("Inlier Matches for Total Selected Area")
+    # plt.title("Inlier Matches for Total Selected Area [Num: %d]"%(len(matches_inliers)))
     # plt.axis('off')
 
-    # '''
-    # Stitch the Images
-    # '''
+    # '''Final Stitch'''
     # img_stitch = ImageStitch.simpleStitch(img1, img2, homo_mat)
+    
+    
+    '''Final Stitch between two Area'''
+    homo_mat = np.array([[1.531377223673118, -0.09420641594437201, -17.083883674895635,
+                          1.0214203951714997, 1.0746240680265424, 2188.8250559369794,
+                          0.00047561484942954256, -7.001838036624984e-05, 0.9999999999999999]]).reshape(-1, 3)
 
-    plt.figure(3)
+    #img_stitch = cv.flip(img_stitch, 0)
+    img_stitch = ImageStitch.simpleStitch(img_stitch, img_stitch_, homo_mat)
+
+    plt.figure(5)
     plt.imshow(cv.cvtColor(np.rot90(img_stitch), cv.COLOR_BGR2RGB))
     plt.axis('off')
     plt.show()
+
 
     '''
     Print the parameters of homography matrix
     '''
     np.set_printoptions(suppress=True)
     print(homo_mat.flatten().tolist())
-    # print(ROIs1.flatten().tolist())
-    # print(ROIs2.flatten().tolist())
