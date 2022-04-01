@@ -112,7 +112,7 @@ def findHomography(matches, kps1, kps2):
     kps2 = cv.KeyPoint_convert(kps2)
     kps1 = cv.KeyPoint_convert(kps1)
     homo_mat, inliers_mask = cv.findHomography(
-        kps2[trainIdxs], kps1[queryIdxs], method=cv.RANSAC, ransacReprojThreshold=30)
+        kps2[trainIdxs], kps1[queryIdxs], method=cv.RANSAC, ransacReprojThreshold=35)
 
     return homo_mat, inliers_mask
 
