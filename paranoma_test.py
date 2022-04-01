@@ -22,13 +22,13 @@ if __name__ == '__main__':
     Directly apply homography matrix to stitch all frames
     --------------------
     
-    :param img: images from each frame
-    :type img: nparray (768*1152*3)
+    :param  img1_~img5_: original distorted images from each frame
+    :type  img1_~img5_: nparray (768*1152*3)
     
-    :param homo_mat: homography matrix generated from feature estimation, using for image transformation
-    :type homo_mat: nparray (3*3)
+    :param  homo_mat: homography matrix generated from feature estimation, using for image transformation
+    :type  homo_mat: nparray (3*3)
     
-    :return img_stitch: stitching image of lamp14 to lamp18
+    :return  img_stitch: stitching image of lamp14 to lamp18
     '''
     
     # load the initial images and corresponding homo matrix
@@ -82,22 +82,24 @@ if __name__ == '__main__':
     # img_stitch_ = ImageStitch.simpleStitch(img1, img_stitch, homo_mat)
     
     # Param Tesing 2
-    homo_mat = np.array([[
-        1.010638759789845, -0.020425372912002478, -14.695282380876835,
-        0.0075814846672632484, 1.0066178703225623, 412.43074450438576,
-        2.1888462791375407e-05, -2.2383079441019405e-05, 1.0]]).reshape(-1, 3)
+    homo_mat = np.array([[1.010638759789845, -0.020425372912002478, -14.695282380876835,
+                          0.0075814846672632484, 1.0066178703225623, 412.43074450438576,
+                          2.1888462791375407e-05, -2.2383079441019405e-05, 1.0]]).reshape(-1, 3)
     img_stitch = ImageStitch.simpleStitch(img4, img5, homo_mat)
 
-    homo_mat = np.array([[0.9111138797319636, 0.025992907667642014, 43.51630224609544, -0.08061531667103257, 0.976052629267486, 444.77675271224103, -7.790215434632145e-05, 2.9319041438978976e-05, 1.0]]).reshape(-1, 3)
+    homo_mat = np.array([[0.9111138797319636, 0.025992907667642014, 43.51630224609544,
+                          -0.08061531667103257, 0.976052629267486, 444.77675271224103,
+                          -7.790215434632145e-05, 2.9319041438978976e-05, 1.0]]).reshape(-1, 3)
     img_stitch = ImageStitch.simpleStitch(img3, img_stitch, homo_mat)
 
-    homo_mat = np.array([[0.9296608798773768, -0.04505056659216292, 78.06623318399255, -0.016900992281276207, 0.917599731615178, 400.8510671764359, -3.617106314861764e-05, -6.205541847742475e-05, 1.0]]).reshape(-1, 3)
+    homo_mat = np.array([[0.9296608798773768, -0.04505056659216292, 78.06623318399255,
+                          -0.016900992281276207, 0.917599731615178, 400.8510671764359,
+                          -3.617106314861764e-05, -6.205541847742475e-05, 1.0]]).reshape(-1, 3)
     img_stitch = ImageStitch.simpleStitch(img2, img_stitch, homo_mat)
 
-    homo_mat = np.array([[
-        1.1386527445204575, 0.031927187738166204, -109.45549680535996,
-        0.04498832067998204, 1.0320031734670985, 463.08525965607436,
-        0.00010009854442945858, 0.00006315329701074331, 1.0 ]]).reshape(-1, 3)
+    homo_mat = np.array([[1.1386527445204575, 0.031927187738166204, -109.45549680535996,
+                          0.04498832067998204, 1.0320031734670985, 463.08525965607436,
+                          0.00010009854442945858, 0.00006315329701074331, 1.0 ]]).reshape(-1, 3)
     img_stitch_ = ImageStitch.simpleStitch(img1, img_stitch, homo_mat)
 
     plt.figure(0)
@@ -172,13 +174,13 @@ if __name__ == '__main__':
     Directly apply homography matrix to stitch all frames
     --------------------
     
-    :param img: images from each frame
-    :type img: nparray (768*1152*3)
+    :param  img1_~img5_: original distorted images from each frame
+    :type  img1_~img5_: nparray (768*1152*3)
     
-    :param homo_mat: homography matrix generated from feature estimation, using for image transformation
-    :type homo_mat: nparray (3*3)
+    :param  homo_mat: homography matrix generated from feature estimation, using for image transformation
+    :type  homo_mat: nparray (3*3)
     
-    :return img_stitch: stitching image of lamp14 to lamp18
+    :return  img_stitch: stitching image of lamp23 to lamp19
     '''
     # load the initial images and corresponding homo matrix
     img1_ = cv.imread("dataset/Paranoma/lamp_23_031513.PNG")
