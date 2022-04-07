@@ -1,4 +1,4 @@
-import itertools
+import json
 import numpy as np
 import cv2 as cv
 import math
@@ -253,3 +253,9 @@ def transformVerts(img_size, homo_mat):
     X_transform = cv.perspectiveTransform(X, homo_mat)
 
     return X_transform.round().astype(np.int32).reshape(4, 2)
+
+def getHomoParams(params_path):
+    with open(params_path,'r') as f:
+        params = json.load(f)
+        
+    return params

@@ -146,8 +146,8 @@ def simpleStitch(img1, img2, homo_mat):
     x_max = posVerts[:, 0].max()
     y_min = posVerts[:, 1].min()
     y_max = posVerts[:, 1].max()
-    print("x_min: %d, x_max: %d y_min: %d, y_max: %d" %
-          (x_min, x_max, y_min, y_max))
+    # print("x_min: %d, x_max: %d y_min: %d, y_max: %d" %
+    #       (x_min, x_max, y_min, y_max))
 
     # Define the size of the result image
     stitch_size = (x_max, y_max)
