@@ -25,9 +25,10 @@ This submission consists of various methods for video stitching from multi-camer
 
 ## Usage
 - Video Stitching Test: Stitch the input videos to generate a panorama video:
-
+```
     $ python stitch_custom.py -ivid /PATH/TO/VIDEO/GROUP -pst /PATH/TO/PARAMS/FILE
-
+```
 - Image Stitching Test: Stitch the images at the same frame from all cameras to generate a panorama image:
-
+```
     $ python panorama_test.py
+```
