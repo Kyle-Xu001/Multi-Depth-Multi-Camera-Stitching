@@ -4,6 +4,10 @@
 
 This submission consists of various methods for image stitching from multi-cameras.
 
+<div align=center>
+<img src="https://github.com/Kyle-Xu001/Multi-Depth-Multi-Camera-Stitching/blob/main/Result/panaroma.gif" controls="controls" muted="muted"/>
+</div>
+
 ## Files Description
     .
     ├── Result                    # Folder for Video and Image Demonstrations
