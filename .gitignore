@@ -2,6 +2,7 @@
 *.PNG
 *.png
 *.json
+*.mp4
 result/
 dataset/
 calib_params_Mathe/
