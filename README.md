@@ -15,6 +15,7 @@ This submission consists of various methods for video stitching from multi-camer
     ├── panorama_test.py          # Generate panorama image for one frame
     ├── ImageStitch.py            # Define the Image and Stitch class
     ├── stitch_custom.py          # Script about Real-time Video Stitching
+    ├── utils.py                  # Basic functions for stitching
     ├── .gitignore
     ├── LICENSE
     └── README.md
