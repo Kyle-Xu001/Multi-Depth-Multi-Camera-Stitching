@@ -234,7 +234,6 @@ if __name__ == '__main__':
                           0.00012140360121091282, -3.315567108552388e-05, 1.0]]).reshape(-1, 3)
     img_stitch = ImageStitch.simpleStitch(img5, img_stitch, homo_mat)
 
-    img_stitch = cv.flip(img_stitch, 0)
 
     plt.figure(2)
     plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
@@ -242,18 +241,19 @@ if __name__ == '__main__':
     plt.show()
 
     '''Transform Stitching Result to avoid Distortion in final stitching'''
-    bottom = img_stitch.shape[0]
-    pts = np.array([[180, 400],
-                    [930, 910],
-                    [920, bottom],
-                    [270, bottom]])
+    width = img_stitch.shape[0]
+    pts = np.array([[270, 0],
+                    [920, 0],
+                    [930, width-910],
+                    [180, width-400]])
     
-    dst = np.array([[250, 775],
-                    [910, 775],
-                    [920, bottom],
-                    [270, bottom]], dtype="float32")
+    dst = np.array([[270, 0],
+                    [920, 0],
+                    [910, width-775],
+                    [250, width-775]], dtype="float32")
 
     img_stitch = transform.four_point_transform(img_stitch, pts, dst)
+    img_stitch = cv.flip(img_stitch, 0)
     
     plt.figure(3)
     plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))

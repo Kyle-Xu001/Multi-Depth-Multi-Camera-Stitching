@@ -17,6 +17,12 @@ def getPosMatrix(img_ID, homo_params):
     lampDict['lamp17'] = ("lamp18-lamp17","Right_Transform","stitch_total")
     lampDict['lamp18'] = ("Right_Transform","stitch_total")
     
+    lampDict['lamp23'] = ("lamp23-lamp22","lamp22-lamp21","lamp21-lamp20","lamp20-lamp19","Left_Transform")
+    lampDict['lamp22'] = ("lamp22-lamp21","lamp21-lamp20","lamp20-lamp19","Left_Transform")
+    lampDict['lamp21'] = ("lamp21-lamp20","lamp20-lamp19","Left_Transform")
+    lampDict['lamp20'] = ("lamp20-lamp19","Left_Transform")
+    lampDict['lamp19'] = ("Left_Transform",)
+    
     
     homo_mat = np.eye(3)
     for param in lampDict[img_ID]:
@@ -28,13 +34,24 @@ def getPosMatrix(img_ID, homo_params):
 
 def getPos(img_ID, pt, trans_params):
     '''get the global position of point from individual camera'''
-    trans_param = trans_params[img_ID]
-    pos = np.array([pt[0],pt[1],1])
+    if img_ID == 'lamp14' or img_ID == 'lamp15' or img_ID == 'lamp16' or img_ID == 'lamp17' or img_ID == 'lamp18':
+        trans_param = trans_params[img_ID]
+        pos = np.array([pt[0],pt[1],1])
     
-    pos_new = np.matmul(trans_param, pos)
-    pos_new = pos_new/pos_new[2]
+        pos_new = np.matmul(trans_param, pos)
+        pos_new = pos_new/pos_new[2]
     
-    pt_new = (pos_new[0]-50, pos_new[1]-500)
+        pt_new = (pos_new[0]-50, pos_new[1]-500)
+    else:
+        trans_param = trans_params[img_ID]
+        pos = np.array([pt[0],768-pt[1],1])
+        
+        pos_new = np.matmul(trans_param, pos)
+        pos_new = pos_new/pos_new[2]
+        
+        print(pos_new)
+        pt_new = (pos_new[0]-50, 2802-pos_new[1]-500)
+        
     return pt_new
     
     
@@ -49,8 +66,6 @@ if __name__ == '__main__':
     for trans_param in trans_params:
         trans_params[trans_param] = np.array(trans_params[trans_param]).reshape(-1, 3)
     
-    pt = (500, 280)
-        
     # load the initial images and corresponding homo matrix
     img1_ = cv.imread("dataset/Paranoma/lamp_18_031513.PNG")
     img2_ = cv.imread("dataset/Paranoma/lamp_17_031513.PNG")
@@ -74,12 +89,7 @@ if __name__ == '__main__':
     img3, _, _ = undistortion.undistort(img3_, lamp_id3, calib_dir)
     img4, _, _ = undistortion.undistort(img4_, lamp_id4, calib_dir)
     img5, _, _ = undistortion.undistort(img5_, lamp_id5, calib_dir)
-    
-    img_ID = 'lamp14'
-    plt.figure(5)
-    plt.imshow(img5)
-    plt.scatter(pt[0],pt[1],marker='+',color='r')
-    plt.axis('off')
+
     
     '''Stitch Images'''
     # Param Tesing 1 
@@ -208,6 +218,14 @@ if __name__ == '__main__':
     img3, _, _ = undistortion.undistort(img3_, lamp_id3, calib_dir)
     img4, _, _ = undistortion.undistort(img4_, lamp_id4, calib_dir)
     img5, _, _ = undistortion.undistort(img5_, lamp_id5, calib_dir)
+    
+    pt = (620, 588)
+    
+    img_ID = 'lamp22'
+    plt.figure(5)
+    plt.imshow(img2)
+    plt.scatter(pt[0],pt[1],marker='+',color='r')
+    plt.axis('off')
 
     # Keep the img5 as background image, stitch from left to right
     img1 = cv.flip(img1, 0)
@@ -258,10 +276,12 @@ if __name__ == '__main__':
 
     img_stitch = transform.four_point_transform(img_stitch, pts, dst)
     
+    
     plt.figure(3)
     plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
     plt.axis("off")
     plt.show()
+
 
     # '''Estimate the Homo Matrix for Final Stitching'''
     # # load the matching images

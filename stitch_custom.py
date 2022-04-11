@@ -43,8 +43,8 @@ def stitchImages(imgs, homo_params):
     img_stitch_left = ImageStitch.simpleStitch(cv2.flip(imgs["lamp21"], 0), img_stitch_left, homo_params["lamp22-lamp21"])
     img_stitch_left = ImageStitch.simpleStitch(cv2.flip(imgs["lamp20"], 0), img_stitch_left, homo_params["lamp21-lamp20"])
     img_stitch_left = ImageStitch.simpleStitch(cv2.flip(imgs["lamp19"], 0), img_stitch_left, homo_params["lamp20-lamp19"])
-    img_stitch_left = cv2.flip(img_stitch_left, 0)
     img_stitch_left = cv2.warpPerspective(img_stitch_left, homo_params["Left_Transform"], (img_stitch_left.shape[1], img_stitch_left.shape[0]))
+    img_stitch_left = cv2.flip(img_stitch_left, 0)
     
     img_stitch = ImageStitch.simpleStitch(img_stitch_left, img_stitch_right, homo_params["stitch_total"])
     img_stitch = img_stitch[500:5300,50:1450,:]
