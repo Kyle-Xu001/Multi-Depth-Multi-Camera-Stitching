@@ -75,12 +75,12 @@ def undistort(img,lamp_id,calib_dir,map1 = None, map2 = None):
 
 if __name__ =='__main__':
     # Define the operating lamp
-    lamp_id1 = 'lamp19'
-    lamp_id2 = 'lamp18'
+    lamp_id1 = 'lamp05'
+    lamp_id2 = 'lamp06'
     
     # Load the distorted images
-    img1_ = cv.imread("dataset/origin_images/lamp_19_distorted_empty_for18.PNG")
-    img2_ = cv.imread("dataset/origin_images/lamp_18_distorted_empty_for19.PNG")
+    img1_ = cv.imread("dataset/lamp_05_122014_for06.PNG")
+    img2_ = cv.imread("dataset/lamp_06_122014.PNG")
     
     #img1_ = cv.flip(img1_, 0)
     #img2_ = cv.flip(img2_, 0)
@@ -92,7 +92,7 @@ if __name__ =='__main__':
     img_undistort1,map1_1,map2_1 = undistort(img1_,lamp_id1,calib_dir)
     img_undistort2,map1_2,map2_2 = undistort(img2_,lamp_id2,calib_dir)
     
-    # plt.figure(1)
+    # plt.figure(1)q
     # plt.subplot(2,2,1)
     # plt.imshow(cv.cvtColor(img1_, cv.COLOR_BGR2RGB))
     # plt.title('(a) Original Distorted Image [%s]'%(lamp_id1))

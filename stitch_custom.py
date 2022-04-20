@@ -33,6 +33,12 @@ def parse_args():
 
 # Define the image stitching method for every frame
 def stitchImages(imgs, homo_params):
+    img_front = ImageStitch.simpleStitch(cv2.flip(imgs["lamp03"],0), cv2.flip(imgs["lamp02"],0), homo_params["lamp03-lamp02"])
+    img_front = ImageStitch.simpleStitch(cv2.flip(imgs["lamp04"],0), img_front, homo_params["lamp04-lamp03"])
+    img_front = ImageStitch.simpleStitch(cv2.flip(imgs["lamp05"],0), img_front, homo_params["lamp05-lamp04"])
+    img_front = ImageStitch.simpleStitch(cv2.flip(imgs["lamp06"],0), img_front, homo_params["lamp06-lamp05"])
+    img_front = cv2.flip(img_front, 0)
+    
     img_stitch_right = ImageStitch.simpleStitch(imgs["lamp15"], imgs["lamp14"], homo_params["lamp15-lamp14"])
     img_stitch_right = ImageStitch.simpleStitch(imgs["lamp16"], img_stitch_right, homo_params["lamp16-lamp15"])
     img_stitch_right = ImageStitch.simpleStitch(imgs["lamp17"], img_stitch_right, homo_params["lamp17-lamp16"])
@@ -47,9 +53,14 @@ def stitchImages(imgs, homo_params):
     img_stitch_left = cv2.flip(img_stitch_left, 0)
     
     img_stitch = ImageStitch.simpleStitch(img_stitch_left, img_stitch_right, homo_params["stitch_total"])
-    img_stitch = img_stitch[500:5300,50:1450,:]
-    return img_stitch
-
+    
+    panorama = np.zeros((7000,1300,3),dtype = np.uint8)
+    panorama[0:4600,:,:] = img_stitch[600:5200,100:1400,:]
+    panorama[4600:7000,:,:] = img_front[100:2500,100:1400,:]
+ 
+    #panorama[4700:6300,:,:] = img_front[]
+    #print(panorama)
+    return panorama
 
 def stitch_all_frames(args):
     # Define the path to the video group (from lamp14-lamp23)

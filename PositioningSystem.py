@@ -68,8 +68,44 @@ def getPos_box(img_ID, obb, trans_params):
     obb_transform = obb_transform.reshape(obb.shape[1:])
     
     obb_transform = obb_transform + np.array([-50, -500])
-    return obb_transform
     
+    
+    return obb_transform
+
+def getPos_box_array(img_ID, obb, trans_params):
+    '''transform the single box to the panorama image'''
+    trans_param = trans_params[img_ID]
+    obb = np.asarray(obb,dtype='float64')
+    obb = obb.reshape(-1,2)
+    
+    obb = projectToFloor_box(obb)
+    
+    obb = obb.reshape([1,len(obb),2])
+    
+    obb_transform = cv.perspectiveTransform(obb, trans_param)
+    obb_transform = obb_transform.reshape(obb.shape[1:])
+    
+    obb_transform = obb_transform + np.array([-50, -500])
+    
+    #obb_transform = projectToFloor_box(obb_transform)
+    return obb_transform
+
+def projectToFloor_box(box):
+        
+        width = 1376
+        height = 768
+        
+        xintercept = 0.07885366*width
+        xcoef = -0.16325128
+        yintercept = 0.08407642*height
+        ycoef = -0.15205884
+        
+        test = np.copy(box)
+        test[:,0] = box[:,0] + xintercept + xcoef*box[:,0]
+        test[:,1] = box[:,1] + yintercept + ycoef*box[:,1]
+
+        
+        return test
     
 if __name__ == '__main__':
     
@@ -171,10 +207,17 @@ if __name__ == '__main__':
            ['lamp20',(362, 568)]]
     
     box = [246, 225, 318, 250, 227, 375, 146, 330]
-    box_15 = [95, 291, 217, 242, 250, 300, 145, 350]
+    box_15 = [[95, 291, 217, 242, 250, 300, 145, 350],
+              [140, 480, 220, 480, 180, 620, 100, 610]]
     
-    obb = getPos_box('lamp15',box_15, trans_params)
-    obb = np.row_stack((obb, obb[0,:]))
+    print(np.array(box_15).reshape(-1,2))
+    
+    obb = getPos_box_array('lamp15',box_15, trans_params)
+    obb1 = obb[0:4,:]
+    obb1 = np.row_stack((obb1, obb1[0,:]))
+    
+    obb2= obb[4:8,:]
+    obb2 = np.row_stack((obb2, obb2[0,:]))
     
     pts_global = []
     
@@ -188,6 +231,7 @@ if __name__ == '__main__':
     #plt.imshow(cv.cvtColor(np.rot90(paranoma), cv.COLOR_BGR2RGB))
     plt.imshow(cv.cvtColor(panorama, cv.COLOR_BGR2RGB))
     plt.scatter(pts_global[:,0],pts_global[:,1],marker='+',color='r')
-    plt.plot(obb[:,0],obb[:,1],color='r')
+    plt.plot(obb1[:,0],obb1[:,1],color='r')
+    plt.plot(obb2[:,0],obb2[:,1],color='r')
     plt.axis('off')
     plt.show()
