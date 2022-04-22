@@ -69,24 +69,21 @@ def undistort(img,lamp_id,calib_dir,map1 = None, map2 = None):
 
 
     
-    
-    
-    
 
 if __name__ =='__main__':
     # Define the operating lamp
-    lamp_id1 = 'lamp07'
-    lamp_id2 = 'lamp02'
+    lamp_id1 = 'lamp02'
+    lamp_id2 = 'lamp01'
     
     # Load the distorted images
-    img1_ = cv.imread("dataset/lamp_07_030715.PNG")
-    img2_ = cv.imread("dataset/lamp_02_030715.PNG")
+    img1_ = cv.imread("dataset/Arie/lamp_02.PNG")
+    img2_ = cv.imread("dataset/Arie/lamp_01.PNG")
     
     #img1_ = cv.flip(img1_, 0)
     #img2_ = cv.flip(img2_, 0)
 
     # Enter the direction of the parameters
-    calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Mathe"
+    calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Arie"
     
     # Calculate the mapping matrix
     img_undistort1,map1_1,map2_1 = undistort(img1_,lamp_id1,calib_dir)

@@ -15,7 +15,7 @@ This submission consists of various methods for video stitching from multi-camer
     ├── panorama_test.py          # Generate panorama image for one frame
     ├── ImageStitch.py            # Define the Image and Stitch class
     ├── PositioningSystem.py      # Transform the Detection Information from Local to Global
-    ├── stitch_custom.py          # Script about Real-time Video Stitching
+    ├── stitch_custom.py          # Script for Real-time Video Stitching
     ├── utils.py                  # Basic functions for stitching
     ├── .gitignore
     ├── LICENSE
@@ -23,7 +23,7 @@ This submission consists of various methods for video stitching from multi-camer
 
 - `panorama_test.py` - Stitch the new image with input stitching combination, using Perspective Transform to stitch the left whole area and the right whole area
 - `ImageStitch.py` - Define the `Image` class which combines properties and functions for feature processing on one image, and `Stitch` class which combines properties and functions for matches and features on a pair of images
-- `stitch_custom.py` - Given the distortion videos of multiple cameras, utilize the estimated homography parameters generated from `panorama_test.py` to stitch the image of every frame to create panorama video
+- `stitch_custom.py` - Given the undistortion videos of multiple cameras, utilize the estimated homography parameters generated from `panorama_test.py` to stitch the image of every frame to create a panorama video
 
 ## Usage
 - Video Stitching Test: Stitch the input videos to generate a panorama video:
