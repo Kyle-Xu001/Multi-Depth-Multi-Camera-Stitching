@@ -109,7 +109,7 @@ def projectToFloor_box(box):
     
 if __name__ == '__main__':
     
-    homo_params = getHomoParams("multi_stitch_params.json")
+    homo_params = getHomoParams("stitch_params_Mathe.json")
     for homo_param in homo_params:
         homo_params[homo_param] = np.array(homo_params[homo_param]).reshape(-1, 3)
     
@@ -133,6 +133,7 @@ if __name__ == '__main__':
     
     # Enter the direction of the parameters
     calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Mathe"
+    farm_name = 'Mathe'
 
     # Generate the undistorted image according to intrinsic parameters
     img1, _, _ = undistortion.undistort(img1_, lamp_id1, calib_dir)
@@ -181,7 +182,7 @@ if __name__ == '__main__':
     imgs["lamp20"] = img4
     imgs["lamp19"] = img5
     
-    panorama = stitchImages(imgs, homo_params)
+    panorama = stitchImages(imgs, homo_params, farm_name)
     
     
     # Define the transform point in original images

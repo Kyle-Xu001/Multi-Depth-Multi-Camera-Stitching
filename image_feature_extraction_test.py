@@ -7,8 +7,8 @@ from ImageStitch import Image
 
 if __name__ == '__main__':
     # Load exmaple image
-    img = cv.imread("dataset/origin_images/lamp_14_distorted_empty.PNG")
-    img = np.rot90(img,1) # Rotate the image to get better visualization
+    img = cv.imread("dataset/img_left_551_3.jpg")
+    #mg = np.rot90(img,1) # Rotate the image to get better visualization
     
     Img = Image(img)
     Img_copy = Image(img)
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     plt.axis('off')
 
     plt.subplot(1, 3, 2)
-    plt.imshow(cv.cvtColor(Img_.img, cv.COLOR_BGR2RGB))
+    plt.imshow(cv.cvtColor(Img.img, cv.COLOR_BGR2RGB))
     plt.title("(b) RGB Equalized Image")
     plt.axis('off')
     
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     plt.imshow(cv.cvtColor(Img.img, cv.COLOR_BGR2RGB))
     plt.title("(c) YUV Equalized Image")
     plt.axis('off')
-    
+    plt.show()
     
     
     # Extract the features from image
@@ -43,6 +43,7 @@ if __name__ == '__main__':
     kps_brisk, dps_brisk = Img.findFeatures('brisk')
     kps_orb, dps_orb = Img.findFeatures('orb')
     # show the original image and equalhist image
+    
     plt.figure(2)
     plt.subplot(1, 3, 1)
     img_kps_sift = cv.drawKeypoints(Img.img, kps_sift, None,(0,255,0), flags=cv.DRAW_MATCHES_FLAGS_DEFAULT)

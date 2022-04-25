@@ -2,6 +2,8 @@
 Created on Thu Apr 7 10:41:05 2022
 
 @author: Chenghao Xu
+
+This is the test of new function `stitchImages` based on the stitch_custom.py
 """
 
 import cv2
@@ -12,6 +14,7 @@ import numpy as np
 from utils import getParams
 from pathlib import Path
 from vid_sync import VideoSynchronizer
+import matplotlib.pyplot as plt
 
 # Create visualize window for Videos
 def create_window(window_name):
@@ -25,7 +28,9 @@ def parse_args():
 
     ap.add_argument("-ivid", "--input_vid_group_path", required=True, help="path to the input video group")
     
-    ap.add_argument("-pst", "--stitch_params_path", required=True, help="path to the stitching params") 
+    ap.add_argument("-sp", "--stitch_params_path", required=True, help="path to the stitching params") 
+    
+    ap.add_argument("-so", "--stitch_order_path", required=True, help="path to the stitching order") 
     
     ap.add_argument("--farm_name", type=str, default="")
     
@@ -37,18 +42,49 @@ def parse_args():
 
 
 # Define the image stitching method for every frame
-def stitchImages(imgs, homo_params,farm_name):
+def stitchImages(imgs, homo_params, stitch_order):
     '''TO DO: Try to simplify this function'''
-    
+    for image in stitch_order:
+        for item in stitch_order[image]:
+            # Define the image combination type
+            stitch_type = stitch_order[image][item]["type"]
+            
+            if stitch_type == 'stitch':
+                if stitch_order[image][item]["member"][0] != "img_stitch":
+                    img1 = imgs[stitch_order[image][item]["member"][0]]
+                else:
+                    img1 = img_stitch
+                    
+                if stitch_order[image][item]["member"][1] != "img_stitch":
+                    img2 = imgs[stitch_order[image][item]["member"][1]]
+                else:
+                    img2 = img_stitch
+
+                img_stitch = ImageStitch.simpleStitch(img1, img2, homo_params[item])
+            
+            elif stitch_type == 'warp':
+                if stitch_order[image][item]["member"][0] != "img_stitch":
+                    img = imgs[stitch_order[image][item]["member"][0]]
+                else:
+                    img = img_stitch
+                
+                img_size = (img.shape[1], img.shape[0])
+                img_stitch = cv2.warpPerspective(img, homo_params[item], img_size)
+        
+        #panorama = 
+            plt.figure(0)
+            plt.imshow(img_stitch)
+            plt.show()
+            
     if farm_name == 'Mathe':
         # Stitch the right area of Mathe farm
-        img_stitch_right = ImageStitch.simpleStitch(imgs["lamp02"], imgs["lamp03"], homo_params["lamp02-lamp03"])
-        img_stitch_right = ImageStitch.simpleStitch(img_stitch_right, imgs["lamp04"], homo_params["lamp02_03-lamp04"])
-        img_stitch_right = ImageStitch.simpleStitch(img_stitch_right, imgs["lamp05"], homo_params["lamp02_03_04-lamp05"])
-        img_stitch_right = ImageStitch.simpleStitch(img_stitch_right, imgs["lamp06"], homo_params["lamp02_03_04_05-lamp06"])
+        img_stitch_right = ImageStitch.simpleStitch(imgs["lamp02"], imgs["lamp03"], homo_params["lamp03-lamp02"])
+        img_stitch_right = ImageStitch.simpleStitch(img_stitch_right, imgs["lamp04"], homo_params["lamp04-lamp03"])
+        img_stitch_right = ImageStitch.simpleStitch(img_stitch_right, imgs["lamp05"], homo_params["lamp05-lamp04"])
+        img_stitch_right = ImageStitch.simpleStitch(img_stitch_right, imgs["lamp06"], homo_params["lamp06-lamp05"])
         
         # Correction of right stitching image
-        img_stitch_right = cv2.warpPerspective(img_stitch_right, homo_params["lamp02-lamp06-correction"], (img_stitch_right.shape[1], img_stitch_right.shape[0]))
+        img_stitch_right = cv2.warpPerspective(img_stitch_right, homo_params["lamp02-lamp06"], (img_stitch_right.shape[1], img_stitch_right.shape[0]))
         img_stitch_right = cv2.warpPerspective(img_stitch_right, homo_params["lamp02-lamp06-shrink"], (img_stitch_right.shape[1], img_stitch_right.shape[0]))
     
         # Resize the corridor image (lamp07)
@@ -99,6 +135,16 @@ def stitch_all_frames(args):
     # Define the path to the video group (from lamp14-lamp23)
     vid_path = args["input_vid_group_path"]
     
+    # Load the homography transform parameters
+    homo_params = getParams(args["stitch_params_path"])
+    for homo_param in homo_params:
+        # Transform the parameters from list to matrix
+        homo_params[homo_param] = np.array(homo_params[homo_param]).reshape(-1, 3)
+    
+    # Load the stitch order params for stitching
+    stitch_order = getParams(args["stitch_order_path"])[args["farm_name"]]
+
+    
     # Define the function about saving the stitching video
     save = False
     if args["save_path"] == True:
@@ -109,19 +155,14 @@ def stitch_all_frames(args):
         p.mkdir(parents=True,exist_ok=True)
         
         save_video_path = os.path.join(args["save_path"],"stitched",vid_path.split('/')[-1]+"_stitch.mp4")
-
-    # Load the homography transform parameters
-    homo_params = getParams(args["stitch_params_path"])
-    for homo_param in homo_params:
-        # Transform the parameters from list to matrix
-        homo_params[homo_param] = np.array(homo_params[homo_param]).reshape(-1, 3)
+    
     
     # Initialize the stitching to estimate the parameters
     vid_sync_test = VideoSynchronizer(vid_path, use_distorted=False, skip_init_frames=0)
     frameset = vid_sync_test.getFrames()
     imgs = frameset.imgs
 
-    img_stitch = stitchImages(imgs, homo_params, args["farm_name"])
+    img_stitch = stitchImages(imgs, homo_params, stitch_order)
     img_stitch = cv2.rotate(img_stitch,cv2.ROTATE_90_COUNTERCLOCKWISE)
     
     width = img_stitch.shape[1]
@@ -143,7 +184,7 @@ def stitch_all_frames(args):
         frameset = vid_sync.getFrames()
         imgs = frameset.imgs
                     
-        img_stitch = stitchImages(imgs, homo_params, args["farm_name"])
+        img_stitch = stitchImages(imgs, homo_params, stitch_order)
         img_stitch = cv2.rotate(img_stitch,cv2.ROTATE_90_COUNTERCLOCKWISE)
         
         cv2.imshow(window_name,img_stitch)
@@ -165,5 +206,3 @@ if __name__ =='__main__':
     
     # Destory the windows for real time
     cv2.destroyAllWindows()
-
-    

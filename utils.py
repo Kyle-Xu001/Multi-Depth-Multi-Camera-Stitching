@@ -58,7 +58,7 @@ def findFeatures(img, method=None):
     elif method == 'brisk':
         descriptor = cv.BRISK_create()
     elif method == 'orb':
-        descriptor = cv.ORB_create(nfeatures=5000, nlevels=8)
+        descriptor = cv.ORB_create(nfeatures=1500, nlevels=8, edgeThreshold=3)
 
     kps, des = descriptor.detectAndCompute(img, None)
 
@@ -254,7 +254,7 @@ def transformVerts(img_size, homo_mat):
 
     return X_transform.round().astype(np.int32).reshape(4, 2)
 
-def getHomoParams(params_path):
+def getParams(params_path):
     with open(params_path,'r') as f:
         params = json.load(f)
         

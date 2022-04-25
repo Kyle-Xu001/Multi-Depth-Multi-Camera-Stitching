@@ -56,15 +56,18 @@ Img1 = Image(img1)
 Img2 = Image(img2)
 
 # Extract the features from each images
-kps1, des1 = Img1.findFeatures('sift')
-kps2, des2 = Img2.findFeatures('sift')   
+kps1, des1 = Img1.kps, Img1.des
+kps2, des2 = Img2.kps, Img2.des 
 
 # Extract the masks to filter the features into several clusters
 masks1 = utils.getMaskPointsInROIs(kps1, ROIs1)
 masks2 = utils.getMaskPointsInROIs(kps2, ROIs2)
 
-kpsCluster1, desCluster1 = Img1.featureCluster(masks1)
-kpsCluster2, desCluster2 = Img2.featureCluster(masks2)
+Img1.featureCluster(masks1)
+Img2.featureCluster(masks2)
+
+kpsCluster1, desCluster1 = Img1.kpsCluster, Img1.desCluster
+kpsCluster2, desCluster2 = Img2.kpsCluster, Img2.desCluster
 
 # Match the features with corresponding clusters in each image
 matches = utils.clusterMatch(desCluster1,desCluster2)

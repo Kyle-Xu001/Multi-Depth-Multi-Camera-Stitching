@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
+import undistortion
 import argparse
 import cv2 as cv
 
@@ -29,58 +30,51 @@ def four_point_transform(image, pts, dst):
     maxHeight = max(int(heightA),int(heightB))
     
     M = cv.getPerspectiveTransform(rect, dst)
-    print(M)
     warped = cv.warpPerspective(image, M, (image.shape[1], image.shape[0]))
+    
+    '''
+    Print the parameters of homography matrix
+    '''
+    np.set_printoptions(suppress=True)
+    print(M.flatten().tolist())
+    
     return warped
 
 
 if __name__ == '__main__':
-    image = cv.imread("stitch.PNG")
-    #image2 = cv.imread("lamp_18.JPG")
+    # Load the target image
+    image = cv.imread("dataset/lamp_07_030715.PNG")
+    
+    # Undistorted the oringal image
+    calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Mathe"
+    lamp_id = 'lamp07'
+    image, _, _ = undistortion.undistort(image, lamp_id, calib_dir)
+    
+    #image = cv.rotate(image,cv.ROTATE_90_COUNTERCLOCKWISE)
+    
     
     plt.figure(1)
     plt.imshow(cv.cvtColor(image, cv.COLOR_BGR2RGB))
     plt.axis("off")
-
-    
-    #plt.figure(2)
-    #plt.imshow(cv.cvtColor(image2, cv.COLOR_BGR2RGB))
-    #plt.axis("off")
-    
-    pts = np.array([
-        [200, 3600],
-        [1150,2850],
-        [1250, 4250],
-        [0, 5450]
-    ])
-    
-    dst = np.array([
-        [250, 3300],
-        [1150, 2850],
-        [1350, 4250],
-        [0, 4500]],dtype="float32")
-    
-    warped = four_point_transform(image, pts, dst)
-    plt.figure(2)
-    plt.imshow(cv.cvtColor(np.rot90(warped), cv.COLOR_BGR2RGB))
-    plt.axis("off")
-    
-    # plt.figure(4)
-    # plt.imshow(cv.cvtColor(image2, cv.COLOR_BGR2RGB))
-    # plt.axis("off")
     plt.show()
     
-    # ap = argparse.ArgumentParser()
-    # ap.add_argument("-i", "--image", help = "path to the image file")
-    # ap.add_argument("-c", "--coords",
-    #                 help = "comma seperated list of source points")
-    # args = vars(ap.parse_args())
+    # Select the target four points for transformation
+    pts = np.array([
+        [0, 0],
+        [1376, 0],
+        [1000,550],
+        [300, 550]])
     
-    # image = cv.imread(args["image"])
-    # pts = np.array(eval(args["coords"]),dtype="float32")
+    dst = np.array([
+        [0, 0],
+        [1376, 0],
+        [1200, 450],
+        [300, 450]],dtype="float32")
     
-    # warped = four_point_transform(image, pts)
+    warped = four_point_transform(image, pts, dst)
     
-    # cv.imshow("Original", image)
-    # cv.imshow("Warped", warped)
-    # cv.waitKey(0)
+    # Show the transformed result
+    plt.figure(2)
+    plt.imshow(cv.cvtColor(warped, cv.COLOR_BGR2RGB))
+    plt.axis("off")
+    plt.show()

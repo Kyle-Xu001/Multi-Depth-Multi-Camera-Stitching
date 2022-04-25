@@ -37,7 +37,7 @@ class Image(object):
         self.kps = kps
         self.des = des
         self.nfeatures = len(kps)
-    
+        
     # Select features in the target region (single region)
     def featureFilter(self, mask):
         kps_filtered = ()
