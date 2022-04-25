@@ -42,8 +42,8 @@ def parse_args():
 
 
 # Define the image stitching method for every frame
-def stitchImages(imgs, homo_params, stitch_order):
-    '''TO DO: Try to simplify this function'''
+def stitchImages(imgs, homo_params, stitch_order, panorama):
+
     for image in stitch_order:
         for item in stitch_order[image]:
             # Define the image combination type
@@ -70,11 +70,15 @@ def stitchImages(imgs, homo_params, stitch_order):
                 
                 img_size = (img.shape[1], img.shape[0])
                 img_stitch = cv2.warpPerspective(img, homo_params[item], img_size)
-        
-        #panorama = 
-            plt.figure(0)
-            plt.imshow(img_stitch)
-            plt.show()
+
+            else:
+                result_pos = stitch_order[image][item]["member"][0]
+                stitch_pos = stitch_order[image][item]["member"][1]
+                panorama[result_pos[0]:result_pos[1], result_pos[2]:result_pos[3],:] = img_stitch[stitch_pos[0]:stitch_pos[1], stitch_pos[2]:stitch_pos[3],:]
+            
+        plt.figure(0)
+        plt.imshow(panorama)
+        plt.show()
             
     if farm_name == 'Mathe':
         # Stitch the right area of Mathe farm
@@ -142,8 +146,11 @@ def stitch_all_frames(args):
         homo_params[homo_param] = np.array(homo_params[homo_param]).reshape(-1, 3)
     
     # Load the stitch order params for stitching
-    stitch_order = getParams(args["stitch_order_path"])[args["farm_name"]]
+    stitch_order = getParams(args["stitch_order_path"])
 
+    panorama = np.zeros((stitch_order["img_size"][0],stitch_order["img_size"][1],3),dtype = np.uint8)
+    
+    stitch_order = stitch_order[args["farm_name"]]
     
     # Define the function about saving the stitching video
     save = False
@@ -162,8 +169,8 @@ def stitch_all_frames(args):
     frameset = vid_sync_test.getFrames()
     imgs = frameset.imgs
 
-    img_stitch = stitchImages(imgs, homo_params, stitch_order)
-    img_stitch = cv2.rotate(img_stitch,cv2.ROTATE_90_COUNTERCLOCKWISE)
+    panorama = stitchImages(imgs, homo_params, stitch_order, panorama)
+    panorama = cv2.rotate(panorama,cv2.ROTATE_90_COUNTERCLOCKWISE)
     
     width = img_stitch.shape[1]
     height = img_stitch.shape[0]
@@ -184,10 +191,10 @@ def stitch_all_frames(args):
         frameset = vid_sync.getFrames()
         imgs = frameset.imgs
                     
-        img_stitch = stitchImages(imgs, homo_params, stitch_order)
-        img_stitch = cv2.rotate(img_stitch,cv2.ROTATE_90_COUNTERCLOCKWISE)
+        panorama = stitchImages(imgs, homo_params, stitch_order,panorama)
+        panorama = cv2.rotate(panorama, cv2.ROTATE_90_COUNTERCLOCKWISE)
         
-        cv2.imshow(window_name,img_stitch)
+        cv2.imshow(window_name,panorama)
         
         if save:
             writer.write(img_stitch)
