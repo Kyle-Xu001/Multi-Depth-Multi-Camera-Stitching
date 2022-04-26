@@ -16,6 +16,7 @@ from pathlib import Path
 from vid_sync import VideoSynchronizer
 import matplotlib.pyplot as plt
 
+
 # Create visualize window for Videos
 def create_window(window_name):
     cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)    # Create window with freedom of dimensions
@@ -42,62 +43,84 @@ def parse_args():
 
 
 # Define the image stitching method for every frame
-def stitchImages(imgs, homo_params, stitch_params):
-
+def stitchImages(imgs, homo_params, stitch_params, farm_name):
+    # Initialize the size of the panorama image
+    panorama_size = (stitch_params["panorama_size"][0], stitch_params["panorama_size"][1])
+    
+    # Create a blank panorama image
+    panorama = np.zeros((panorama_size[0],panorama_size[1],3),dtype = np.uint8)
+    
+    # Update the stitch parameters
+    stitch_params =  stitch_params[farm_name]
+    '''
+    Process the images input based on the stitch params
+                
+    Extract the image based on the members in .JSON file. Sometimes the original image should be flipped to stitch with another image.
+    --------------------
+    :param  img(img2): image including individual camera image or stitching result in the last step
+    :type   img(img2): nparray (uint8)
+    
+    :param  homo_mat: homography matrix generated from feature estimation, using for image transformation
+    :type  homo_mat: nparray (3*3)
+    
+    :return  img_stitch: stitching image of two images
+    '''
     for image in stitch_params:
         for item in stitch_params[image]:
             # Define the image combination type
             stitch_type = stitch_params[image][item]["type"]
             
-            if stitch_type == 'stitch':
-                if stitch_params[image][item]["member"][0] != "img_stitch":
-                    img1 = imgs[stitch_params[image][item]["member"][0]]
-                else:
-                    img1 = img_stitch
-                    
-                if stitch_params[image][item]["member"][1] != "img_stitch":
-                    img2 = imgs[stitch_params[image][item]["member"][1]]
+            # Extract the arguments for this step
+            param = stitch_params[image][item]
+            
+            # Define the image to be processed
+            if param["member"][0] != "img_stitch" and param["flip"] == 0:
+                img = imgs[param["member"][0]]
+            elif param["member"][0] != "img_stitch" and param["flip"] == 1:
+                img = cv2.flip(imgs[param["member"][0]],0)
+            else:
+                img = img_stitch
+            
+            if len(param["member"]) == 2:
+                if param["member"][1] != "img_stitch" and param["flip"] == 0:
+                    img2 = imgs[param["member"][1]]
+                elif param["member"][1] != "img_stitch" and param["flip"] == 1:
+                    img2 = cv2.flip(imgs[param["member"][1]],0)
                 else:
                     img2 = img_stitch
-
-                img_stitch = ImageStitch.simpleStitch(img1, img2, homo_params[item])
+                    
+            # Stitch two images into one image
+            if stitch_type == 'stitch':
+                img_stitch = ImageStitch.simpleStitch(img, img2, homo_params[item])
             
-            elif stitch_type == 'warp':
-                if stitch_params[image][item]["member"][0] != "img_stitch":
-                    img = imgs[stitch_params[image][item]["member"][0]]
-                else:
-                    img = img_stitch
-                
+            # Warping one image based on perspective
+            elif stitch_type == 'warp':                
                 img_size = (img.shape[1], img.shape[0])
                 img_stitch = cv2.warpPerspective(img, homo_params[item], img_size)
-                
-            elif stitch_type == 'rotate':
-                if stitch_params[image][item]["member"][0] != "img_stitch":
-                    img = imgs[stitch_params[image][item]["member"][0]]
-                else:
-                    img = img_stitch
-                
+            
+            # Rotate one image
+            elif stitch_type == 'rotate':                
                 img_stitch = cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE)
-                
-            elif stitch_type == 'resize':
-                if stitch_params[image][item]["member"][0] != "img_stitch":
-                    img = imgs[stitch_params[image][item]["member"][0]]
-                else:
-                    img = img_stitch
-                
-                img_size = (stitch_params[image][item]["value"][0], stitch_params[image][item]["value"][1])
+            
+            # Resize image to target size
+            elif stitch_type == 'resize':                
+                img_size = (param["value"][0], param["value"][1])
                 img_stitch = cv2.resize(img, img_size)
+            
+            # Flip the image
+            elif stitch_type == 'flip':                
+                img_stitch = cv2.flip(img,0)
                 
-            elif stitch_type == 'output':
-                panorama = img_stitch
-            
-            
-                # result_pos = stitch_params[image][item]["value"][0]
-                # stitch_pos = stitch_params[image][item]["value"][1]
-                # print(panorama.shape)
-                # panorama[result_pos[0]:result_pos[1], result_pos[2]:result_pos[3],:] = img_stitch[stitch_pos[0]:stitch_pos[1], stitch_pos[2]:stitch_pos[3],:]
+            elif stitch_type == 'store':
+                # add the result to the dictionary
+                imgs.update({image:img})
+                
+            else:
+                # Final Transition
+                panorama_pos = param["value"][0]
+                stitch_pos = param["value"][1]
+                panorama[panorama_pos[0]:panorama_pos[1], panorama_pos[2]:panorama_pos[3],:] = img[stitch_pos[0]:stitch_pos[1], stitch_pos[2]:stitch_pos[3],:]
            
-        
     return panorama
 
 
@@ -113,10 +136,7 @@ def stitch_all_frames(args):
     
     # Load the stitch order params for stitching
     stitch_params = getParams(args["stitch_params_path"])
-
-    panorama = np.zeros((stitch_params["img_size"][0],stitch_params["img_size"][1],3),dtype = np.uint8)
-    
-    stitch_params = stitch_params[args["farm_name"]]
+    farm_name = args["farm_name"]
     
     # Define the function about saving the stitching video
     save = False
@@ -135,7 +155,7 @@ def stitch_all_frames(args):
     frameset = vid_sync_test.getFrames()
     imgs = frameset.imgs
 
-    panorama = stitchImages(imgs, homo_params, stitch_params, panorama)
+    panorama = stitchImages(imgs, homo_params, stitch_params, farm_name)
     panorama = cv2.rotate(panorama,cv2.ROTATE_90_COUNTERCLOCKWISE)
     
     width = panorama.shape[1]
@@ -157,7 +177,7 @@ def stitch_all_frames(args):
         frameset = vid_sync.getFrames()
         imgs = frameset.imgs
                     
-        panorama = stitchImages(imgs, homo_params, stitch_params,panorama)
+        panorama = stitchImages(imgs, homo_params, stitch_params, farm_name)
         panorama = cv2.rotate(panorama, cv2.ROTATE_90_COUNTERCLOCKWISE)
         
         cv2.imshow(window_name,panorama)

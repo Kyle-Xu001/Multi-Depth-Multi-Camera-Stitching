@@ -155,7 +155,7 @@ def simpleStitch(img1, img2, homo_mat):
     homo_mat_ = np.eye(3)
     img_super = cv.warpPerspective(
         img1, homo_mat_, stitch_size, borderValue=(0, 0, 0))
-    img2[0:200,:,:] =0
+    img2[0:150,:,:] =0
     img_transform = cv.warpPerspective(
         img2, homo_mat, stitch_size, borderValue=(0, 0, 0))
 
