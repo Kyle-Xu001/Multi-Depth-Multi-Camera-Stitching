@@ -28,9 +28,9 @@ def parse_args():
 
     ap.add_argument("-ivid", "--input_vid_group_path", required=True, help="path to the input video group")
     
-    ap.add_argument("-sp", "--stitch_params_path", required=True, help="path to the stitching params") 
+    ap.add_argument("-hpp", "--homo_params_path", required=True, help="path to the stitching params") 
     
-    ap.add_argument("-so", "--stitch_order_path", required=True, help="path to the stitching order") 
+    ap.add_argument("-spp", "--stitch_params_path", required=True, help="path to the stitching order") 
     
     ap.add_argument("--farm_name", type=str, default="")
     
@@ -42,95 +42,61 @@ def parse_args():
 
 
 # Define the image stitching method for every frame
-def stitchImages(imgs, homo_params, stitch_order, panorama):
+def stitchImages(imgs, homo_params, stitch_params):
 
-    for image in stitch_order:
-        for item in stitch_order[image]:
+    for image in stitch_params:
+        for item in stitch_params[image]:
             # Define the image combination type
-            stitch_type = stitch_order[image][item]["type"]
+            stitch_type = stitch_params[image][item]["type"]
             
             if stitch_type == 'stitch':
-                if stitch_order[image][item]["member"][0] != "img_stitch":
-                    img1 = imgs[stitch_order[image][item]["member"][0]]
+                if stitch_params[image][item]["member"][0] != "img_stitch":
+                    img1 = imgs[stitch_params[image][item]["member"][0]]
                 else:
                     img1 = img_stitch
                     
-                if stitch_order[image][item]["member"][1] != "img_stitch":
-                    img2 = imgs[stitch_order[image][item]["member"][1]]
+                if stitch_params[image][item]["member"][1] != "img_stitch":
+                    img2 = imgs[stitch_params[image][item]["member"][1]]
                 else:
                     img2 = img_stitch
 
                 img_stitch = ImageStitch.simpleStitch(img1, img2, homo_params[item])
             
             elif stitch_type == 'warp':
-                if stitch_order[image][item]["member"][0] != "img_stitch":
-                    img = imgs[stitch_order[image][item]["member"][0]]
+                if stitch_params[image][item]["member"][0] != "img_stitch":
+                    img = imgs[stitch_params[image][item]["member"][0]]
                 else:
                     img = img_stitch
                 
                 img_size = (img.shape[1], img.shape[0])
                 img_stitch = cv2.warpPerspective(img, homo_params[item], img_size)
-
-            else:
-                result_pos = stitch_order[image][item]["member"][0]
-                stitch_pos = stitch_order[image][item]["member"][1]
-                panorama[result_pos[0]:result_pos[1], result_pos[2]:result_pos[3],:] = img_stitch[stitch_pos[0]:stitch_pos[1], stitch_pos[2]:stitch_pos[3],:]
+                
+            elif stitch_type == 'rotate':
+                if stitch_params[image][item]["member"][0] != "img_stitch":
+                    img = imgs[stitch_params[image][item]["member"][0]]
+                else:
+                    img = img_stitch
+                
+                img_stitch = cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE)
+                
+            elif stitch_type == 'resize':
+                if stitch_params[image][item]["member"][0] != "img_stitch":
+                    img = imgs[stitch_params[image][item]["member"][0]]
+                else:
+                    img = img_stitch
+                
+                img_size = (stitch_params[image][item]["value"][0], stitch_params[image][item]["value"][1])
+                img_stitch = cv2.resize(img, img_size)
+                
+            elif stitch_type == 'output':
+                panorama = img_stitch
             
-        plt.figure(0)
-        plt.imshow(panorama)
-        plt.show()
             
-    if farm_name == 'Mathe':
-        # Stitch the right area of Mathe farm
-        img_stitch_right = ImageStitch.simpleStitch(imgs["lamp02"], imgs["lamp03"], homo_params["lamp03-lamp02"])
-        img_stitch_right = ImageStitch.simpleStitch(img_stitch_right, imgs["lamp04"], homo_params["lamp04-lamp03"])
-        img_stitch_right = ImageStitch.simpleStitch(img_stitch_right, imgs["lamp05"], homo_params["lamp05-lamp04"])
-        img_stitch_right = ImageStitch.simpleStitch(img_stitch_right, imgs["lamp06"], homo_params["lamp06-lamp05"])
-        
-        # Correction of right stitching image
-        img_stitch_right = cv2.warpPerspective(img_stitch_right, homo_params["lamp02-lamp06"], (img_stitch_right.shape[1], img_stitch_right.shape[0]))
-        img_stitch_right = cv2.warpPerspective(img_stitch_right, homo_params["lamp02-lamp06-shrink"], (img_stitch_right.shape[1], img_stitch_right.shape[0]))
-    
-        # Resize the corridor image (lamp07)
-        img_corridor = cv2.warpPerspective(imgs["lamp07"], homo_params["lamp07-correction"], (imgs["lamp07"].shape[1], imgs["lamp07"].shape[0]))
-        img_corridor = cv2.rotate(img_corridor,cv2.ROTATE_90_COUNTERCLOCKWISE)
-        img_corridor = cv2.resize(img_corridor, (450, 900))
-        
-        # Stitch the middle area of Mathe farm
-        img_stitch_middle = ImageStitch.simpleStitch(imgs["lamp15"], imgs["lamp14"], homo_params["lamp15-lamp14"])
-        img_stitch_middle = ImageStitch.simpleStitch(imgs["lamp16"], img_stitch_middle, homo_params["lamp16-lamp15"])
-        img_stitch_middle = ImageStitch.simpleStitch(imgs["lamp17"], img_stitch_middle, homo_params["lamp17-lamp16"])
-        img_stitch_middle = ImageStitch.simpleStitch(imgs["lamp18"], img_stitch_middle, homo_params["lamp18-lamp17"])
-        img_stitch_middle = cv2.warpPerspective(img_stitch_middle, homo_params["Right_Transform"], (img_stitch_middle.shape[1], img_stitch_middle.shape[0]))
-        
-        # Stitch the left area of Mathe farm
-        img_stitch_left = ImageStitch.simpleStitch(cv2.flip(imgs["lamp22"], 0), cv2.flip(imgs["lamp23"], 0), homo_params["lamp23-lamp22"])
-        img_stitch_left = ImageStitch.simpleStitch(cv2.flip(imgs["lamp21"], 0), img_stitch_left, homo_params["lamp22-lamp21"])
-        img_stitch_left = ImageStitch.simpleStitch(cv2.flip(imgs["lamp20"], 0), img_stitch_left, homo_params["lamp21-lamp20"])
-        img_stitch_left = ImageStitch.simpleStitch(cv2.flip(imgs["lamp19"], 0), img_stitch_left, homo_params["lamp20-lamp19"])
-        img_stitch_left = cv2.warpPerspective(img_stitch_left, homo_params["Left_Transform"], (img_stitch_left.shape[1], img_stitch_left.shape[0]))
-        img_stitch_left = cv2.flip(img_stitch_left, 0)
-        
-        # Stitch the left area and middle area
-        img_stitch = ImageStitch.simpleStitch(img_stitch_left, img_stitch_middle, homo_params["stitch_total"])
-        
-        # Create a empty image and combine all stitching images
-        panorama = np.zeros((7650,1300,3),dtype = np.uint8)
-        panorama[4500:5400, 825:1275,:] = img_corridor
-        panorama[0:4600,:,:] = img_stitch[600:5200,100:1400,:]
-        panorama[5150:7550,:,:] = img_stitch_right[100:2500,20:1320,:]
-        
-    elif farm_name == 'Arie':
-        img_stitch = ImageStitch.simpleStitch(imgs["lamp02"], imgs["lamp01"], homo_params["lamp02-lamp01"])
-        img_stitch = ImageStitch.simpleStitch(imgs["lamp03"], img_stitch, homo_params["lamp03-lamp02"])
-        img_stitch = ImageStitch.simpleStitch(imgs["lamp04"], img_stitch, homo_params["lamp04-lamp03"])
-        img_stitch = ImageStitch.simpleStitch(imgs["lamp05"], img_stitch, homo_params["lamp05-lamp04"])
-        panorama = img_stitch
-        
-    elif farm_name == 'office_farm':
-        img_stitch = ImageStitch.simpleStitch(imgs["lamp02"], imgs["lamp03"], homo_params["lamp03-lamp02"])
-        img_stitch = ImageStitch.simpleStitch(imgs["lamp01"], img_stitch, homo_params["lamp02-lamp01"])
-        panorama = img_stitch
+                # result_pos = stitch_params[image][item]["value"][0]
+                # stitch_pos = stitch_params[image][item]["value"][1]
+                # print(panorama.shape)
+                # panorama[result_pos[0]:result_pos[1], result_pos[2]:result_pos[3],:] = img_stitch[stitch_pos[0]:stitch_pos[1], stitch_pos[2]:stitch_pos[3],:]
+           
         
     return panorama
 
@@ -140,17 +106,17 @@ def stitch_all_frames(args):
     vid_path = args["input_vid_group_path"]
     
     # Load the homography transform parameters
-    homo_params = getParams(args["stitch_params_path"])
+    homo_params = getParams(args["homo_params_path"])
     for homo_param in homo_params:
         # Transform the parameters from list to matrix
         homo_params[homo_param] = np.array(homo_params[homo_param]).reshape(-1, 3)
     
     # Load the stitch order params for stitching
-    stitch_order = getParams(args["stitch_order_path"])
+    stitch_params = getParams(args["stitch_params_path"])
 
-    panorama = np.zeros((stitch_order["img_size"][0],stitch_order["img_size"][1],3),dtype = np.uint8)
+    panorama = np.zeros((stitch_params["img_size"][0],stitch_params["img_size"][1],3),dtype = np.uint8)
     
-    stitch_order = stitch_order[args["farm_name"]]
+    stitch_params = stitch_params[args["farm_name"]]
     
     # Define the function about saving the stitching video
     save = False
@@ -169,11 +135,11 @@ def stitch_all_frames(args):
     frameset = vid_sync_test.getFrames()
     imgs = frameset.imgs
 
-    panorama = stitchImages(imgs, homo_params, stitch_order, panorama)
+    panorama = stitchImages(imgs, homo_params, stitch_params, panorama)
     panorama = cv2.rotate(panorama,cv2.ROTATE_90_COUNTERCLOCKWISE)
     
-    width = img_stitch.shape[1]
-    height = img_stitch.shape[0]
+    width = panorama.shape[1]
+    height = panorama.shape[0]
     if save:
         writer = cv2.VideoWriter(save_video_path, fourcc, fps, (width, height))
     
@@ -191,13 +157,13 @@ def stitch_all_frames(args):
         frameset = vid_sync.getFrames()
         imgs = frameset.imgs
                     
-        panorama = stitchImages(imgs, homo_params, stitch_order,panorama)
+        panorama = stitchImages(imgs, homo_params, stitch_params,panorama)
         panorama = cv2.rotate(panorama, cv2.ROTATE_90_COUNTERCLOCKWISE)
         
         cv2.imshow(window_name,panorama)
         
         if save:
-            writer.write(img_stitch)
+            writer.write(panorama)
         
         if cv2.waitKey(1) & 0xFF == ord('q'):
             return
