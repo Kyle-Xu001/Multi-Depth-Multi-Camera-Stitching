@@ -6,6 +6,7 @@ from ImageStitch import Image
 
 
 if __name__ == '__main__':
+    '''This script is used for'''
     # Load exmaple image
     img = cv.imread("dataset/img_left_551_3.jpg")
     #mg = np.rot90(img,1) # Rotate the image to get better visualization

@@ -15,7 +15,8 @@ This submission consists of various methods for video stitching from multi-camer
     ├── panorama_test.py          # Generate panorama image for one frame
     ├── ImageStitch.py            # Define the Image and Stitch class
     ├── PositioningSystem.py      # Transform the Detection Information from Local to Global
-    ├── stitch_custom.py          # Script for Real-time Video Stitching
+    ├── stitch_custom.py          # Script for Real-time Video Stitching using generalized stitching function with stitching params input
+    ├── stitch_custom_old.py      # Script for Real-time Video Stitching using different functions for each farm
     ├── utils.py                  # Basic functions for stitching
     ├── .gitignore
     ├── LICENSE
@@ -28,7 +29,7 @@ This submission consists of various methods for video stitching from multi-camer
 ## Usage
 - Video Stitching Test: Stitch the input videos to generate a panorama video:
 ```
-    $ python stitch_custom.py -ivid /PATH/TO/VIDEO/GROUP -pst /PATH/TO/PARAMS/FILE
+    $ python stitch_custom.py -ivid /PATH/TO/VIDEO/GROUP -hpp /PATH/TO/HOMO/PARAMS/FILE -spp /PATH/TO/STITCH/PARAMS/FILE --farm_name FARM_NAME
 ```
 - Image Stitching Test: Stitch the images at the same frame from all cameras to generate a panorama image:
 ```
