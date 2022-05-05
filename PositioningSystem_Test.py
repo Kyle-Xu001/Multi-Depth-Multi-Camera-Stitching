@@ -15,10 +15,13 @@ def getPosMatrix(img_ID, homo_params):
     '''Estimate the transformation matrix for point positioning'''
     
     lampDict = {}
-    lampDict['lamp01'] = ("lamp02-lamp01","lamp03-lamp02","lamp04-lamp03","lamp05-lamp04")
-    lampDict['lamp02'] = ("lamp03-lamp02","lamp04-lamp03","lamp05-lamp04")
-    lampDict['lamp03'] = ("lamp04-lamp03","lamp05-lamp04")
-    lampDict['lamp04'] = ("lamp05-lamp04",)
+    # lampDict['lamp01'] = ("lamp02-lamp01","lamp03-lamp02","lamp04-lamp03","lamp05-lamp04")
+    # lampDict['lamp02'] = ("lamp03-lamp02","lamp04-lamp03","lamp05-lamp04")
+    # lampDict['lamp03'] = ("lamp04-lamp03","lamp05-lamp04")
+    # lampDict['lamp04'] = ("lamp05-lamp04",)
+    lampDict['lamp03'] = ("lamp02-lamp03","lamp01-lamp02","correction")
+    lampDict['lamp02'] = ("lamp02-lamp03","correction")
+    lampDict['lamp01'] = ("correction",)
     
     lampDict['lamp14'] = ("lamp15-lamp14","lamp16-lamp15","lamp17-lamp16","lamp18-lamp17","Right_Transform","stitch_total")
     lampDict['lamp15'] = ("lamp16-lamp15","lamp17-lamp16","lamp18-lamp17","Right_Transform","stitch_total")
@@ -177,6 +180,76 @@ if __name__ == '__main__':
     
     # pts_global = np.array(pts_global)
     
+    
+    
+    
+    '''Office Farm Positioning Test'''
+    # Define the homography stitching parameters
+    homo_params = getParams("params/homo_params_office_farm.json")
+    for homo_param in homo_params:
+        homo_params[homo_param] = np.array(homo_params[homo_param]).reshape(-1, 3)
+    
+    # Define the stitching arguments
+    stitch_params = getParams("params/stitch_params_office_farm.json")
+    
+    # Define the translation parameters
+    trans_params = getParams("params/trans_params_office_farm.json")
+        
+    # Define the dictionary for images
+    imgs = {}
+    imgs["lamp01"] = cv.imread("dataset/office_farm/lamp_01_office.PNG")
+    imgs["lamp02"] = cv.imread("dataset/office_farm/lamp_02_office.PNG")
+    imgs["lamp03"] = cv.imread("dataset/office_farm/lamp_03_office.PNG")
+    
+    panorama = stitchImages(imgs, homo_params, stitch_params,'office_farm')
+    
+    # Define the transform point in original images
+    pts = [['lamp01',(713, 230)],
+           ['lamp01',(814, 70)],
+           ['lamp02',(874, 260)],
+           ['lamp02',(912, 309)],
+           ['lamp03',(800, 560)],
+           ['lamp03',(1200, 600)]]
+    
+    # Define Rectangle Boxs in lamp01
+    boxes_01 = [[525, 80, 725, 80, 725, 600, 520, 590]]
+    
+    # Define Rectangle Boxs in lamp01
+    boxes_03 = [[530, 400, 840, 400, 830, 555, 520, 550]]
+    
+    '''Test: Boxes Array in global image'''
+    obb = ps.getPos_box_array('lamp01',boxes_01, trans_params)
+    obb_ = ps.getPos_box_array('lamp03',boxes_03, trans_params)
+    
+    obb1 = obb[0:4,:]
+    obb1 = np.row_stack((obb1, obb1[0,:]))
+    
+    obb3 = obb_[0:4,:]
+    obb3 = np.row_stack((obb3, obb3[0,:]))
+    
+    
+    '''Test: Point Transformation in global image'''
+    pts_global = []
+    
+    for pt in pts:
+        pt_global = ps.getPos(pt[0],pt[1],trans_params)
+        pts_global.append([pt_global[0], pt_global[1]])
+    
+    pts_global = np.array(pts_global)
+
+
+    plt.figure(1)
+    #plt.imshow(cv.cvtColor(imgs['lamp01'], cv.COLOR_BGR2RGB))
+    plt.imshow(cv.cvtColor(panorama, cv.COLOR_BGR2RGB))
+    plt.scatter(pts_global[:,0],pts_global[:,1],marker='+',color='r')
+    plt.plot(obb1[:,0],obb1[:,1],color='r')
+    plt.plot(obb3[:,0],obb3[:,1],color='r')
+    plt.axis('off')
+    plt.show()
+    
+    
+    
+    
     '''Arie Farm Positioning Test'''
     # Define the homography stitching parameters
     homo_params = getParams("params/homo_params_Arie.json")
@@ -188,8 +261,8 @@ if __name__ == '__main__':
     
     # Define the translation parameters
     trans_params = getParams("params/trans_params_Arie.json")
-    for trans_param in trans_params:
-        trans_params[trans_param] = np.array(trans_params[trans_param]).reshape(-1, 3)
+    for trans_param in trans_params["lamp"]:
+        trans_params["lamp"][trans_param] = np.array(trans_params["lamp"][trans_param]).reshape(-1, 3)
     
     # Define the dictionary for images
     imgs = {}
