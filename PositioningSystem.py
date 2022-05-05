@@ -5,8 +5,8 @@ import numpy as np
 def getPos(ID, pt, trans_params):
     '''get the global position of point from individual camera'''
     # Get the Translation Parameters for specific Lamp ID
-    trans_param = np.array(trans_params["lamp"][ID]).reshape(-1, 3)
-    trans_compensate = np.array(trans_params["transition"])
+    trans_param = np.array(trans_params[ID]["param"]).reshape(-1, 3)
+    trans_compensate = np.array(trans_params[ID]["transition"])
     
     # Change the shape of position of the point
     pos = np.array(pt,dtype='float64').reshape([1,1,2])
@@ -22,8 +22,8 @@ def getPos(ID, pt, trans_params):
 def getPos_box(ID, obb, trans_params):
     '''transform the single box to the panorama image'''
     # Get the Translation Parameters for specific Lamp ID
-    trans_param = trans_params["lamp"][ID]
-    trans_compensate = np.array(trans_params["transition"])
+    trans_param = trans_params[ID]["param"]
+    trans_compensate = np.array(trans_params[ID]["transition"])
     
     # Change the shape of position of the point
     obb = np.asarray(obb,dtype='float64')
@@ -39,8 +39,8 @@ def getPos_box(ID, obb, trans_params):
 def getPos_box_array(ID, obb, trans_params):
     '''transform the single box to the panorama image'''
     # Get the Translation Parameters for specific Lamp ID
-    trans_param = np.array(trans_params["lamp"][ID]).reshape(-1, 3)
-    trans_compensate = np.array(trans_params["transition"])
+    trans_param = np.array(trans_params[ID]["param"]).reshape(-1, 3)
+    trans_compensate = np.array(trans_params[ID]["transition"])
     
     # Change the shape of position of the point
     obb = np.asarray(obb,dtype='float64')
