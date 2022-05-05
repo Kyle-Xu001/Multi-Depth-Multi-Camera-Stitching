@@ -44,14 +44,6 @@ def parse_args():
 
 # Define the image stitching method for every frame
 def stitchImages(imgs, homo_params, stitch_params, farm_name):
-    # Initialize the size of the panorama image
-    panorama_size = (stitch_params["panorama_size"][0], stitch_params["panorama_size"][1])
-    
-    # Create a blank panorama image
-    panorama = np.zeros((panorama_size[0],panorama_size[1],3),dtype = np.uint8)
-    
-    # Update the stitch parameters
-    stitch_params =  stitch_params[farm_name]
     '''
     Process the images input based on the stitch params
                 
@@ -66,6 +58,16 @@ def stitchImages(imgs, homo_params, stitch_params, farm_name):
     
     :return  img_stitch: stitching image of two images
     '''
+    
+    # Initialize the size of the panorama image (for visualization)
+    panorama_size = (stitch_params["panorama_size"][0], stitch_params["panorama_size"][1])
+    
+    # Create a blank panorama image
+    panorama = np.zeros((panorama_size[0],panorama_size[1],3),dtype = np.uint8)
+    
+    # Extract the stitch parameters
+    stitch_params =  stitch_params[farm_name]
+
     for image in stitch_params:
         for item in stitch_params[image]:
             # Define the image combination type
@@ -89,7 +91,8 @@ def stitchImages(imgs, homo_params, stitch_params, farm_name):
                     img2 = cv2.flip(imgs[param["member"][1]],0)
                 else:
                     img2 = img_stitch
-                    
+            
+            '''Based on different stitch type, img will be processed in different ways'''
             # Stitch two images into one image
             if stitch_type == 'stitch':
                 img_stitch = ImageStitch.simpleStitch(img, img2, homo_params[item])
@@ -117,7 +120,7 @@ def stitchImages(imgs, homo_params, stitch_params, farm_name):
                 imgs.update({image:img})
                 
             else:
-                # Final Transition
+                # Translate to the panorama image and ouput the result
                 panorama_pos = param["value"][0]
                 stitch_pos = param["value"][1]
                 panorama[panorama_pos[0]:panorama_pos[1], panorama_pos[2]:panorama_pos[3],:] = img[stitch_pos[0]:stitch_pos[1], stitch_pos[2]:stitch_pos[3],:]
