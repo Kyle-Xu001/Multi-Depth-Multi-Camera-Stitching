@@ -4,7 +4,7 @@ import cv2 as cv
 import matplotlib.pyplot as plt
 
 import utils
-from image_feature_extraction_test import Image
+from feature_extraction_test import Image
 import image_match_test as match_utils
 
 if __name__ == '__main__':

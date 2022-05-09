@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import utils
-from image_feature_extraction_test import Image
+from feature_extraction_test import Image
 import image_match_test as match_utils
 
 # Define the draw parameters for matching visualization

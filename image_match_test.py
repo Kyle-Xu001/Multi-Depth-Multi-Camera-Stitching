@@ -3,7 +3,7 @@ import numpy as np
 import cv2 as cv
 import itertools
 
-from image_feature_extraction_test import Image
+from feature_extraction_test import Image
 import utils
 
 def getMaskPointsInROIs(kps,ROIs):
