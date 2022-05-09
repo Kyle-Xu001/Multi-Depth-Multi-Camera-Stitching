@@ -9,8 +9,17 @@ from stitch_custom import stitchImages
 
 
 def getPosMatrix(img_ID, homo_params):
-    '''Estimate the transformation matrix for point positioning'''
+    '''
+    Estimate the transformation matrix for translation positioning
     
+    For lamp dictionary, input the stitching order of each camera.
+    The function will go over stitching steps to output the final translation matrix.
+    ------------------
+    :param  img_ID: ID name of the camera
+    :param  homo_params: homography matrices of all cameras
+    
+    :return  print the translation matrix for target camera 
+    '''
     lampDict = {}
     '''Arie'''
     # lampDict['lamp01'] = ("lamp02-lamp01","lamp03-lamp02","lamp04-lamp03","lamp05-lamp04")
@@ -18,10 +27,12 @@ def getPosMatrix(img_ID, homo_params):
     # lampDict['lamp03'] = ("lamp04-lamp03","lamp05-lamp04")
     # lampDict['lamp04'] = ("lamp05-lamp04",)
     
+    
     '''office_farm'''
     # lampDict['lamp03'] = ("lamp02-lamp03","lamp01-lamp02","correction")
     # lampDict['lamp02'] = ("lamp02-lamp03","correction")
     # lampDict['lamp01'] = ("correction",)
+    
     
     '''Mathe'''
     lampDict["lamp02"] = ("lamp02-lamp06-correction","lamp02-lamp06-shrink")
@@ -132,7 +143,7 @@ if __name__ == '__main__':
            ['lamp03',(685, 350)],
            ['lamp02',(613, 547)]]
     
-    # box = [246, 225, 318, 250, 227, 375, 146, 330]
+    # Define the transform boxes in original images
     box_15 = [[95, 291, 217, 242, 250, 300, 145, 350]]
     box_23 = [[386, 419, 620, 419, 620, 500, 386, 500]]
     box_07 = [[570, 230, 764, 230, 764, 570, 570, 570]]
@@ -151,22 +162,22 @@ if __name__ == '__main__':
     obb7 = box2obb(box_03, 'lamp03', trans_params)
     obb8 = box2obb(box_02, 'lamp02', trans_params)
     
+    # Get global points from each camera
     pts_global = []
     
     for pt in pts:
         pt_global = ps.getPos(pt[0],pt[1],trans_params)
         pts_global.append([pt_global[0], pt_global[1]])
         
-    
     pts_global = np.array(pts_global)
     
     
+    # Visualize the Transformation Result
     plt.figure(1)    
-    #plt.imshow(cv.cvtColor(imgs["lamp02"], cv.COLOR_BGR2RGB))
     plt.imshow(cv.cvtColor(panorama, cv.COLOR_BGR2RGB))
     plt.scatter(pts_global[:,0],pts_global[:,1],marker='+',color='r')
-    #plt.plot(obb1[:,0],obb1[:,1],color='r')
-    #plt.plot(obb2[:,0],obb2[:,1],color='r')
+    plt.plot(obb1[:,0],obb1[:,1],color='r')
+    plt.plot(obb2[:,0],obb2[:,1],color='r')
     plt.plot(obb3[:,0],obb3[:,1],color='r')
     plt.plot(obb4[:,0],obb4[:,1],color='r')
     plt.plot(obb5[:,0],obb5[:,1],color='r')
@@ -174,7 +185,7 @@ if __name__ == '__main__':
     plt.plot(obb7[:,0],obb7[:,1],color='r')
     plt.plot(obb8[:,0],obb8[:,1],color='r')
     plt.axis('off')
-    plt.show()
+    
     
     
     
@@ -209,7 +220,7 @@ if __name__ == '__main__':
     # Define Rectangle Boxs in lamp01
     boxes_01 = [[525, 80, 725, 80, 725, 600, 520, 590]]
     
-    # Define Rectangle Boxs in lamp01
+    # Define Rectangle Boxs in lamp03
     boxes_03 = [[530, 400, 840, 400, 830, 555, 520, 550]]
     
     '''Test: Boxes Array in global image'''
@@ -233,14 +244,12 @@ if __name__ == '__main__':
     pts_global = np.array(pts_global)
 
 
-    plt.figure(1)
-    #plt.imshow(cv.cprint(pts_global[0])vtColor(imgs['lamp01'], cv.COLOR_BGR2RGB))
+    plt.figure(2)
     plt.imshow(cv.cvtColor(panorama, cv.COLOR_BGR2RGB))
     plt.scatter(pts_global[:,0],pts_global[:,1],marker='+',color='r')
     plt.plot(obb1[:,0],obb1[:,1],color='r')
     plt.plot(obb3[:,0],obb3[:,1],color='r')
     plt.axis('off')
-    plt.show()
     
     
     
@@ -283,7 +292,7 @@ if __name__ == '__main__':
     boxes_01 = [[390, 300, 535, 295, 535, 385, 390, 380],
                 [560, 140, 700, 140, 700, 215, 560, 215]]
     
-    # Define Rectangle Boxs in lamp01
+    # Define Rectangle Boxs in lamp03
     boxes_03 = [[435, 240, 747, 249, 743, 336, 433, 334]]
     
     '''Test: Boxes Array in global image'''
@@ -310,8 +319,7 @@ if __name__ == '__main__':
     pts_global = np.array(pts_global)
 
 
-    plt.figure(1)
-    #plt.imshow(cv.cvtColor(imgs['lamp03'], cv.COLOR_BGR2RGB))
+    plt.figure(3)
     plt.imshow(cv.cvtColor(panorama, cv.COLOR_BGR2RGB))
     plt.scatter(pts_global[:,0],pts_global[:,1],marker='+',color='r')
     plt.plot(obb1[:,0],obb1[:,1],color='r')
