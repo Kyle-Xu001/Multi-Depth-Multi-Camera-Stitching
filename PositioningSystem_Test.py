@@ -1,28 +1,36 @@
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
+from torch import _batch_norm_impl_index
 import PositioningSystem as ps
-import undistortion
-import ImageStitch
 import transform
 from utils import getParams
-from ImageStitch import Stitch
 from stitch_custom import stitchImages
-
 
 
 def getPosMatrix(img_ID, homo_params):
     '''Estimate the transformation matrix for point positioning'''
     
     lampDict = {}
+    '''Arie'''
     # lampDict['lamp01'] = ("lamp02-lamp01","lamp03-lamp02","lamp04-lamp03","lamp05-lamp04")
     # lampDict['lamp02'] = ("lamp03-lamp02","lamp04-lamp03","lamp05-lamp04")
     # lampDict['lamp03'] = ("lamp04-lamp03","lamp05-lamp04")
     # lampDict['lamp04'] = ("lamp05-lamp04",)
-    lampDict['lamp03'] = ("lamp02-lamp03","lamp01-lamp02","correction")
-    lampDict['lamp02'] = ("lamp02-lamp03","correction")
-    lampDict['lamp01'] = ("correction",)
     
+    '''office_farm'''
+    # lampDict['lamp03'] = ("lamp02-lamp03","lamp01-lamp02","correction")
+    # lampDict['lamp02'] = ("lamp02-lamp03","correction")
+    # lampDict['lamp01'] = ("correction",)
+    
+    '''Mathe'''
+    lampDict["lamp02"] = ("lamp02-lamp06-correction","lamp02-lamp06-shrink")
+    lampDict['lamp03'] = ("lamp02-lamp03","lamp02-lamp06-correction","lamp02-lamp06-shrink")
+    lampDict['lamp04'] = ("lamp03-lamp04","lamp02-lamp06-correction","lamp02-lamp06-shrink")
+    lampDict['lamp05'] = ("lamp04-lamp05","lamp02-lamp06-correction","lamp02-lamp06-shrink")
+    lampDict['lamp06'] = ("lamp05-lamp06","lamp02-lamp06-correction","lamp02-lamp06-shrink")
+    
+    lampDict['lamp07'] = ("lamp07-correction",)
     lampDict['lamp14'] = ("lamp15-lamp14","lamp16-lamp15","lamp17-lamp16","lamp18-lamp17","Right_Transform","stitch_total")
     lampDict['lamp15'] = ("lamp16-lamp15","lamp17-lamp16","lamp18-lamp17","Right_Transform","stitch_total")
     lampDict['lamp16'] = ("lamp17-lamp16","lamp18-lamp17","Right_Transform","stitch_total")
@@ -39,7 +47,7 @@ def getPosMatrix(img_ID, homo_params):
     trans_mat = np.eye(3)
     for param in lampDict[img_ID]:
         trans_mat = np.matmul(homo_params[param], trans_mat)
-    
+
     # Normalize the homography matrix
     trans_mat = trans_mat/trans_mat[2,2]
     
@@ -47,10 +55,19 @@ def getPosMatrix(img_ID, homo_params):
     print(trans_mat.flatten().tolist())
 
 
+def box2obb(box, ID, trans_params):
+    '''Testing Function for transforming local boxes into global boxes'''
+    obb = ps.getPos_box_array(ID, box, trans_params)
+    
+    obb = obb[0:4,:]
+    obb = np.row_stack((obb, obb[0,:]))
+    
+    return obb
+
 
 
 if __name__ == '__main__':
-    
+
     '''Mathe Farm Positioning Test'''
     # Define the homography stitching parameters
     homo_params = getParams("params/homo_params_Mathe.json")
@@ -105,20 +122,34 @@ if __name__ == '__main__':
            ['lamp21',(635, 547)],
            ['lamp21',(692, 547)],
            ['lamp21',(749, 542)],
-           ['lamp20',(362, 568)]]
+           ['lamp20',(362, 568)],
+           ['lamp07',(570, 230)],
+           ['lamp07',(755, 230)],
+           ['lamp07',(576, 562)],
+           ['lamp06',(495, 215)],
+           ['lamp05',(677, 187)],
+           ['lamp04',(580, 320)],
+           ['lamp03',(685, 350)],
+           ['lamp02',(613, 547)]]
     
     # box = [246, 225, 318, 250, 227, 375, 146, 330]
-    # box_15 = [[95, 291, 217, 242, 250, 300, 145, 350],
-    #           [140, 480, 220, 480, 180, 620, 100, 610]]
+    box_15 = [[95, 291, 217, 242, 250, 300, 145, 350]]
+    box_23 = [[386, 419, 620, 419, 620, 500, 386, 500]]
+    box_07 = [[570, 230, 764, 230, 764, 570, 570, 570]]
+    box_06 = [[90, 150, 300, 150, 300, 250, 90, 250]]
+    box_05 = [[591, 295, 723, 295, 724, 401, 591, 400]]
+    box_04 = [[477, 329, 641, 323, 640, 430, 477, 430]]
+    box_03 = [[330, 405, 444, 405, 444, 600, 330, 600]]
+    box_02 = [[550, 530, 685, 530, 685, 565, 550, 565]]
     
-    # print(np.array(box_15).reshape(-1,2))
-    
-    # obb = getPos_box_array('lamp15',box_15, trans_params)
-    # obb1 = obb[0:4,:]
-    # obb1 = np.row_stack((obb1, obb1[0,:]))
-    
-    # obb2= obb[4:8,:]
-    # obb2 = np.row_stack((obb2, obb2[0,:]))
+    obb1 = box2obb(box_15, 'lamp15', trans_params)
+    obb2 = box2obb(box_23, 'lamp23', trans_params)
+    obb3 = box2obb(box_07, 'lamp07', trans_params)
+    obb4 = box2obb(box_06, 'lamp06', trans_params)
+    obb5 = box2obb(box_05, 'lamp05', trans_params)
+    obb6 = box2obb(box_04, 'lamp04', trans_params)
+    obb7 = box2obb(box_03, 'lamp03', trans_params)
+    obb8 = box2obb(box_02, 'lamp02', trans_params)
     
     pts_global = []
     
@@ -130,13 +161,18 @@ if __name__ == '__main__':
     pts_global = np.array(pts_global)
     
     
-    plt.figure(1)
-    #plt.imshow(cv.cvtColor(imgs['lamp03'], cv.COLOR_BGR2RGB))
+    plt.figure(1)    
+    #plt.imshow(cv.cvtColor(imgs["lamp02"], cv.COLOR_BGR2RGB))
     plt.imshow(cv.cvtColor(panorama, cv.COLOR_BGR2RGB))
     plt.scatter(pts_global[:,0],pts_global[:,1],marker='+',color='r')
     #plt.plot(obb1[:,0],obb1[:,1],color='r')
     #plt.plot(obb2[:,0],obb2[:,1],color='r')
-    #plt.plot(obb3[:,0],obb3[:,1],color='r')
+    plt.plot(obb3[:,0],obb3[:,1],color='r')
+    plt.plot(obb4[:,0],obb4[:,1],color='r')
+    plt.plot(obb5[:,0],obb5[:,1],color='r')
+    plt.plot(obb6[:,0],obb6[:,1],color='r')
+    plt.plot(obb7[:,0],obb7[:,1],color='r')
+    plt.plot(obb8[:,0],obb8[:,1],color='r')
     plt.axis('off')
     plt.show()
     

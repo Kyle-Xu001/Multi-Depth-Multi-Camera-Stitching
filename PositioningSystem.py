@@ -7,6 +7,7 @@ def getPos(ID, pt, trans_params):
     # Get the Translation Parameters for specific Lamp ID
     trans_param = np.array(trans_params[ID]["param"]).reshape(-1, 3)
     trans_compensate = np.array(trans_params[ID]["transition"])
+    trans_flip = trans_params[ID]["flip"]
     
     # Change the shape of position of the point
     pos = np.array(pt,dtype='float64').reshape([1,1,2])
@@ -14,8 +15,11 @@ def getPos(ID, pt, trans_params):
     # Transform the local position to global position
     pos_new = cv.perspectiveTransform(pos, trans_param).flatten()
     
-    pt_new = (pos_new[0], pos_new[1])
-    pt_new = pt_new - trans_compensate
+    pt_new = pos_new - trans_compensate
+    
+    if trans_flip:
+        pt_new[1] = pt_new[1]*-1
+        
     return pt_new
 
 
@@ -41,6 +45,7 @@ def getPos_box_array(ID, obb, trans_params):
     # Get the Translation Parameters for specific Lamp ID
     trans_param = np.array(trans_params[ID]["param"]).reshape(-1, 3)
     trans_compensate = np.array(trans_params[ID]["transition"])
+    trans_flip = trans_params[ID]["flip"]
     
     # Change the shape of position of the point
     obb = np.asarray(obb,dtype='float64')
@@ -52,8 +57,12 @@ def getPos_box_array(ID, obb, trans_params):
     obb_transform = obb_transform.reshape(obb.shape[1:])
     
     obb_transform = obb_transform - trans_compensate
+    
+    if trans_flip:
+        obb_transform[:,1] = obb_transform[:,1]*-1
+    
     # Floor Projection
-    #obb_transform = projectToFloor_box(obb_transform)
+    # obb_transform = projectToFloor_box(obb_transform)
     return obb_transform
 
 
