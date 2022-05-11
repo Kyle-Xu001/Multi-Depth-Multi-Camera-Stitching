@@ -4,6 +4,8 @@ import cv2 as cv
 import math
 import matplotlib.pyplot as plt
 
+'''Image Class Functions'''
+
 def equalizeHist(img):
     img_yuv = cv.cvtColor(img, cv.COLOR_BGR2YUV)
     img_yuv[:, :, 0] = cv.equalizeHist(img_yuv[:, :, 0])
@@ -79,32 +81,13 @@ def featureMatch(des1, des2, method, knn=False):
         matches = bf.match(des1, des2)
         matches_good = sorted(matches, key=lambda x: x.distance)
     else:
-        matches = bf.knnMatch(des1, des2, k=2)
+        matches = bf.knnMatch(des1, des2, k=3)
 
         matches_good = []
-        for m, n in matches:
-            if m.distance < 0.8*n.distance:
+        for m,_,n in matches:
+            if m.distance < 0.9*n.distance:
                 matches_good.append(m)
     return matches_good
-
-
-def clusterMatch(desCluster1, desCluster2):
-    matches = []
-    for i in range(len(desCluster1)):
-        des1 = desCluster1[i]
-        des2 = desCluster2[i]
-
-        bf = cv.BFMatcher()
-
-        match = bf.knnMatch(des1, des2, k=3)
-
-        matchFilter = []
-        for m, _, n in match:
-            if m.distance < 0.9 * n.distance:
-                matchFilter.append(m)
-        matches.append(matchFilter)
-    return matches
-
 
 def findHomography(matches, kps1, kps2):
     queryIdxs = [match.queryIdx for match in matches]

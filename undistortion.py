@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 import utils
 from stitch.ImageStitch import Stitch
-import image_match_test as match_utils
+import feature_matching_test as match_utils
 import feature_mapping
 
 

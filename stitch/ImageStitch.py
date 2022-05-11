@@ -5,24 +5,31 @@ from . import utils
 
 '''
 IMAGE Class: 
+
 Define the feature properties for single image
 ----------
+self.img : Camera Image from Single Frame [np.array]
+self.nfeatures : Number of Total Features [int]
+self.kps : Total Key Points (Features) [tuple]
+self.des : Total Key Points Descriptors [np.array]
+self.kpsCluster : Cluster List of Key Points(Features) [list of tuple]
+self.desCluster : Cluster List of Descriptors [list of np.array]
 '''
 class Image(object):
     # Initialization for the Image object
     def __init__(self, img, nfeatures=0):
         self.img = img
         self.nfeatures = nfeatures
-        self.kps = None
+        self.kps = None # Position of Total Features 
         self.des = None
         self.kpsCluster = None
         self.desCluster = None
         
         # Equalize the YUV channels histogram
-        #self.equalizeHist()
+        self.equalizeHist()
         
         # Extract the features from image and update the feature property
-        kps,des = self.findFeatures('sift')
+        kps, des = self.findFeatures('sift')
         print("\nInitial Successfullys")
         
     def equalizeHist(self):
@@ -71,6 +78,7 @@ class Image(object):
         self.kpsCluster = kpsCluster
         self.desCluster = desCluster
 
+
  
 '''
 STITCH CLASS: 
@@ -93,7 +101,7 @@ class Stitch(object):
     
     def homoEstimate(self):
         # Define the matches based on two images
-        matches_list = utils.clusterMatch(self.Img1.desCluster, self.Img2.desCluster)
+        matches_list = self.clusterMatch()
 
         # Combine the features in one lists from each cluster
         self.featureIntegrate(matches_list)
@@ -102,6 +110,25 @@ class Stitch(object):
         matches_inliers = list(itertools.compress(self.matches, inliers_mask))
         
         return homo_mat, matches_inliers
+    
+    
+    def clusterMatch(self):
+        matches_list = []
+        for i in range(len(self.Img1.desCluster)):
+            des1 = self.Img1.desClusterdesCluster[i]
+            des2 = self.Img2.desClusterdesCluster[i]
+
+            bf = cv.BFMatcher()
+
+            match = bf.knnMatch(des1, des2, k=3)
+
+            matchFilter = []
+            for m, _, n in match:
+                if m.distance < 0.9 * n.distance:
+                    matchFilter.append(m)
+            matches_list.append(matchFilter)
+        return matches_list
+    
     
     def featureIntegrate(self, matches_list):
         # Define the variables

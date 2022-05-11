@@ -11,7 +11,6 @@ This submission consists of various methods for video stitching from multi-camer
 ## Files Description
     .
     ├── Result                        # Folder for Animation and Image Demonstrations
-    │ 
     ├── stitch
     |      ├─── __init__.py
     |      ├─── ImageStitch.py        # Define the Image and Stitch class
@@ -19,6 +18,7 @@ This submission consists of various methods for video stitching from multi-camer
     |      └─── utils.py              # Basic functions for stitching
     |
     ├── feature_extraction_test.py    # Image Preprocessing and Feature Extraction
+    ├── feature_matching_test.py      # Feature Matching and Inliers Estimation
     ├── panorama_test.py              # Generate panorama image for one frame
     ├── PositioningSystem_Test.py     # Test Script for Visualizing the Positioning System on Hard-Coded Points
     ├── stitch_custom.py              # Script for Real-time Video Stitching using generalized stitching function with stitching params input
@@ -27,7 +27,8 @@ This submission consists of various methods for video stitching from multi-camer
     ├── LICENSE
     └── README.md
 
-- `feature_extraction_test.py` - Apply Histogram Equalization for image preprocessing, then extract the SIFT, BRISK and orb features from image for comparison
+- `feature_extraction_test.py` - Apply Histogram Equalization for image preprocessing, then extract the SIFT, BRISK and ORB features from image for comparison
+- `feature_matching_test.py` - Apply Brute-Force Matching and KNN Matching methods for feature matching from two images, then apply RANSAC to estimate the Inlier Matches
 - `panorama_test.py` - Stitch the new image with input stitching combination, using Perspective Transform to stitch the left whole area and the right whole area
 - `ImageStitch.py` - Define the `Image` class which combines properties and functions for feature processing on one image, and `Stitch` class which combines properties and functions for matches and features on a pair of images
 - `stitch_custom.py` - Given the undistortion videos of multiple cameras, utilize the estimated homography parameters generated from `panorama_test.py` to stitch the image of every frame to create a panorama video
@@ -35,11 +36,19 @@ This submission consists of various methods for video stitching from multi-camer
 - `PositioningSystem_Test.py` - Test the positoning system of three farms by visualizing the panorama results of position transformation from each camera
 
 ## Usage
-- Video Stitching Test: Stitch the input videos to generate a panorama video:
+- Image Feature Extraction Test: Extract three kinds of features from the input image and visualize the result
+```
+    $ python feature_extraction_test.py
+```
+- Feature Matching Test: Match the features with BF/KNN methods. Select suitable matching method based on the Inliers Result
+```
+    $ python feature_matching_test.py
+```
+- Video Stitching Test: Stitch the input videos to generate a panorama video
 ```
     $ python stitch_custom.py -ivid /PATH/TO/VIDEO/GROUP -hpp /PATH/TO/HOMO/PARAMS/FILE -spp /PATH/TO/STITCH/PARAMS/FILE --farm_name FARM_NAME
 ```
-- Image Stitching Test: Stitch the images at the same frame from all cameras to generate a panorama image:
+- Image Stitching Test: Stitch the images at the same frame from all cameras to generate a panorama image
 ```
     $ python panorama_test.py
 ```

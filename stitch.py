@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 import utils
 from feature_extraction_test import Image
-import image_match_test as match_utils
+import feature_matching_test as match_utils
 
 # Define the draw parameters for matching visualization
 draw_params = dict(matchColor = (0,255,0),
