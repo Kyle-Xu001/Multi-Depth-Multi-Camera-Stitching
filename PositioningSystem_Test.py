@@ -1,10 +1,8 @@
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-from torch import _batch_norm_impl_index
-import PositioningSystem as ps
-import transform
-from utils import getParams
+from stitch import getParams
+from stitch import getPos, getPos_box_array
 from stitch_custom import stitchImages
 
 
@@ -68,7 +66,7 @@ def getPosMatrix(img_ID, homo_params):
 
 def box2obb(box, ID, trans_params):
     '''Testing Function for transforming local boxes into global boxes'''
-    obb = ps.getPos_box_array(ID, box, trans_params)
+    obb = getPos_box_array(ID, box, trans_params)
     
     obb = obb[0:4,:]
     obb = np.row_stack((obb, obb[0,:]))
@@ -166,7 +164,7 @@ if __name__ == '__main__':
     pts_global = []
     
     for pt in pts:
-        pt_global = ps.getPos(pt[0],pt[1],trans_params)
+        pt_global = getPos(pt[0],pt[1],trans_params)
         pts_global.append([pt_global[0], pt_global[1]])
         
     pts_global = np.array(pts_global)
@@ -224,8 +222,8 @@ if __name__ == '__main__':
     boxes_03 = [[530, 400, 840, 400, 830, 555, 520, 550]]
     
     '''Test: Boxes Array in global image'''
-    obb = ps.getPos_box_array('lamp01',boxes_01, trans_params)
-    obb_ = ps.getPos_box_array('lamp03',boxes_03, trans_params)
+    obb = getPos_box_array('lamp01',boxes_01, trans_params)
+    obb_ = getPos_box_array('lamp03',boxes_03, trans_params)
     
     obb1 = obb[0:4,:]
     obb1 = np.row_stack((obb1, obb1[0,:]))
@@ -238,7 +236,7 @@ if __name__ == '__main__':
     pts_global = []
     
     for pt in pts:
-        pt_global = ps.getPos(pt[0],pt[1],trans_params)
+        pt_global = getPos(pt[0],pt[1],trans_params)
         pts_global.append([pt_global[0], pt_global[1]])
     
     pts_global = np.array(pts_global)
@@ -296,8 +294,8 @@ if __name__ == '__main__':
     boxes_03 = [[435, 240, 747, 249, 743, 336, 433, 334]]
     
     '''Test: Boxes Array in global image'''
-    obb = ps.getPos_box_array('lamp01',boxes_01, trans_params)
-    obb_ = ps.getPos_box_array('lamp03',boxes_03, trans_params)
+    obb = getPos_box_array('lamp01',boxes_01, trans_params)
+    obb_ = getPos_box_array('lamp03',boxes_03, trans_params)
     
     obb1 = obb[0:4,:]
     obb1 = np.row_stack((obb1, obb1[0,:]))
@@ -313,7 +311,7 @@ if __name__ == '__main__':
     pts_global = []
     
     for pt in pts:
-        pt_global = ps.getPos(pt[0],pt[1],trans_params)
+        pt_global = getPos(pt[0],pt[1],trans_params)
         pts_global.append([pt_global[0], pt_global[1]])
     
     pts_global = np.array(pts_global)

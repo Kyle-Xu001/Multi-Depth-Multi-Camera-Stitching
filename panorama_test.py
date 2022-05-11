@@ -3,9 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import transform
-import ImageStitch
+import stitch.ImageStitch as ImageStitch
 import undistortion
-from ImageStitch import Stitch
+from stitch.ImageStitch import Stitch
 
 
 # Define the main function

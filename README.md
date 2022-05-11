@@ -10,19 +10,24 @@ This submission consists of various methods for video stitching from multi-camer
 
 ## Files Description
     .
-    ├── Result                    # Folder for Animation and Image Demonstrations
+    ├── Result                        # Folder for Animation and Image Demonstrations
     │ 
-    ├── panorama_test.py          # Generate panorama image for one frame
-    ├── ImageStitch.py            # Define the Image and Stitch class
-    ├── PositioningSystem.py      # Transform Function for Points or Boxes from Local Image to Global Image
-    ├── PositioningSystem_Test.py # Test Script for Visualizing the Positioning System on Hard-Coded Points
-    ├── stitch_custom.py          # Script for Real-time Video Stitching using generalized stitching function with stitching params input
-    ├── stitch_custom_old.py      # Script for Real-time Video Stitching using different functions for each farm
-    ├── utils.py                  # Basic functions for stitching
+    ├── stitch
+    |      ├─── __init__.py
+    |      ├─── ImageStitch.py        # Define the Image and Stitch class
+    |      ├─── PositioningSystem.py  # Transformation Function from Local Image to Global Image
+    |      └─── utils.py              # Basic functions for stitching
+    |
+    ├── feature_extraction_test.py    # Image Preprocessing and Feature Extraction
+    ├── panorama_test.py              # Generate panorama image for one frame
+    ├── PositioningSystem_Test.py     # Test Script for Visualizing the Positioning System on Hard-Coded Points
+    ├── stitch_custom.py              # Script for Real-time Video Stitching using generalized stitching function with stitching params input
+    ├── stitch_custom_old.py          # Script for Real-time Video Stitching using different functions for each farm
     ├── .gitignore
     ├── LICENSE
     └── README.md
 
+- `feature_extraction_test.py` - Apply Histogram Equalization for image preprocessing, then extract the SIFT, BRISK and orb features from image for comparison
 - `panorama_test.py` - Stitch the new image with input stitching combination, using Perspective Transform to stitch the left whole area and the right whole area
 - `ImageStitch.py` - Define the `Image` class which combines properties and functions for feature processing on one image, and `Stitch` class which combines properties and functions for matches and features on a pair of images
 - `stitch_custom.py` - Given the undistortion videos of multiple cameras, utilize the estimated homography parameters generated from `panorama_test.py` to stitch the image of every frame to create a panorama video

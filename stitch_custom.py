@@ -9,9 +9,9 @@ This is the test of new function `stitchImages` based on the stitch_custom.py
 import cv2
 import os
 import argparse
-import ImageStitch
+import stitch.ImageStitch as ImageStitch
 import numpy as np
-from utils import getParams
+from stitch import getParams
 from pathlib import Path
 from vid_sync import VideoSynchronizer
 import matplotlib.pyplot as plt

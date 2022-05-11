@@ -1,23 +1,22 @@
 import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
-import utils
-from ImageStitch import Image
+
+from stitch import utils
+from stitch import Image
 
 
 if __name__ == '__main__':
     '''This script is used for feature extraction from each image'''
     # Load exmaple image
-    img = cv.imread("dataset/img_left_551_3.jpg")
-    #mg = np.rot90(img,1) # Rotate the image to get better visualization
+    img = cv.imread("dataset/Mathe/lamp_15_Mathe.PNG")
+    img = np.rot90(img,1) # Rotate the image to get better visualization
     
     Img = Image(img)
     Img_copy = Image(img)
     
-    img_ = utils.equalizeHist_old(Img.img)
+    img_ = utils.equalizeHist_old(img)
     Img_ = Image(img_)
-
-
 
     # show the original image and equalhist image
     plt.figure(1)
@@ -27,7 +26,7 @@ if __name__ == '__main__':
     plt.axis('off')
 
     plt.subplot(1, 3, 2)
-    plt.imshow(cv.cvtColor(Img.img, cv.COLOR_BGR2RGB))
+    plt.imshow(cv.cvtColor(Img_.img, cv.COLOR_BGR2RGB))
     plt.title("(b) RGB Equalized Image")
     plt.axis('off')
     

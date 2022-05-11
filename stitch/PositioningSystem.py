@@ -29,6 +29,7 @@ def getPos_box(ID, obb, trans_params):
     # Get the Translation Parameters for specific Lamp ID
     trans_param = trans_params[ID]["param"]
     trans_compensate = np.array(trans_params[ID]["transition"])
+    trans_flip = trans_params[ID]["flip"]
     
     # Change the shape of position of the point
     obb = np.asarray(obb,dtype='float64')
@@ -39,6 +40,9 @@ def getPos_box(ID, obb, trans_params):
     obb_transform = obb_transform.reshape(obb.shape[1:])
     obb_transform = obb_transform - trans_compensate
     
+    if trans_flip:
+        obb_transform[:,1] = obb_transform[:,1]*-1
+        
     return obb_transform
 
 

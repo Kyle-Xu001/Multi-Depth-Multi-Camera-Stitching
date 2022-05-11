@@ -7,7 +7,7 @@ Created on Thu Apr 7 10:41:05 2022
 import cv2
 import os
 import argparse
-import ImageStitch
+import stitch.ImageStitch as ImageStitch
 import numpy as np
 from utils import getParams
 from pathlib import Path

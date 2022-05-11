@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import utils
-from ImageStitch import Stitch
+from stitch.ImageStitch import Stitch
 import image_match_test as match_utils
 import feature_mapping
 

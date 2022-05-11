@@ -1,8 +1,7 @@
 import itertools
 import numpy as np
 import cv2 as cv
-
-import utils
+from . import utils
 
 '''
 IMAGE Class: 
@@ -20,10 +19,10 @@ class Image(object):
         self.desCluster = None
         
         # Equalize the YUV channels histogram
-        self.equalizeHist()
+        #self.equalizeHist()
         
         # Extract the features from image and update the feature property
-        self.findFeatures('sift')
+        kps,des = self.findFeatures('sift')
         print("\nInitial Successfullys")
         
     def equalizeHist(self):
@@ -37,6 +36,8 @@ class Image(object):
         self.kps = kps
         self.des = des
         self.nfeatures = len(kps)
+        
+        return kps, des
         
     # Select features in the target region (single region)
     def featureFilter(self, mask):
