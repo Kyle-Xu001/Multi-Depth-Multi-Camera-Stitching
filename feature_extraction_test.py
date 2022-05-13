@@ -2,8 +2,7 @@ import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 
-from stitch import utils
-from stitch import Image
+from stitch import utils, Image
 
 
 if __name__ == '__main__':

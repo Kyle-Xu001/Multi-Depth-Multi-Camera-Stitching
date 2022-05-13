@@ -3,7 +3,7 @@
 *.png
 *.json
 *.mp4
-result/
+Result/
 dataset/
 calib_params_Mathe/
 calib_params_Arie/

@@ -17,7 +17,7 @@ self.desCluster : Cluster List of Descriptors [list of np.array]
 '''
 class Image(object):
     # Initialization for the Image object
-    def __init__(self, img, nfeatures=0):
+    def __init__(self, img, nfeatures=0, method = 'sift'):
         self.img = img
         self.nfeatures = nfeatures
         self.kps = None # Position of Total Features 
@@ -29,7 +29,7 @@ class Image(object):
         self.equalizeHist()
         
         # Extract the features from image and update the feature property
-        kps, des = self.findFeatures('sift')
+        kps, des = self.findFeatures(method)
         print("\nInitial Successfullys")
         
     def equalizeHist(self):
@@ -99,34 +99,30 @@ class Stitch(object):
         self.Img1.featureCluster(masks1)
         self.Img2.featureCluster(masks2)
     
-    def homoEstimate(self):
-        # Define the matches based on two images
-        matches_list = self.clusterMatch()
-
-        # Combine the features in one lists from each cluster
-        self.featureIntegrate(matches_list)
-        
+    def homoEstimate(self):      
         homo_mat, inliers_mask = utils.findHomography(self.matches, self.Img1.kps, self.Img2.kps)
         matches_inliers = list(itertools.compress(self.matches, inliers_mask))
         
         return homo_mat, matches_inliers
     
     
-    def clusterMatch(self):
+    def clusterMatch(self, method, knn=False):
         matches_list = []
         for i in range(len(self.Img1.desCluster)):
-            des1 = self.Img1.desClusterdesCluster[i]
-            des2 = self.Img2.desClusterdesCluster[i]
+            des1 = self.Img1.desCluster[i]
+            des2 = self.Img2.desCluster[i]
 
-            bf = cv.BFMatcher()
+            # bf = cv.BFMatcher()
 
-            match = bf.knnMatch(des1, des2, k=3)
+            # match = bf.knnMatch(des1, des2, k=3)
 
-            matchFilter = []
-            for m, _, n in match:
-                if m.distance < 0.9 * n.distance:
-                    matchFilter.append(m)
-            matches_list.append(matchFilter)
+            # matchFilter = []
+            # for m, _, n in match:
+            #     if m.distance < 0.9 * n.distance:
+            #         matchFilter.append(m)
+            
+            matches = utils.featureMatch(des1, des2, method, knn)
+            matches_list.append(matches)
         return matches_list
     
     

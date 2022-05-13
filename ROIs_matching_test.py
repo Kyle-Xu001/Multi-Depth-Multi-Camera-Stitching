@@ -1,0 +1,119 @@
+import numpy as np
+import cv2 as cv
+import matplotlib.pyplot as plt
+
+from stitch import Stitch
+
+if __name__ == '__main__':
+    '''This script will be tested for multiple ROIs'''
+    
+    draw_params = dict(matchColor = (0,255,0),
+                   singlePointColor = (255,0,0),
+                   flags = cv.DrawMatchesFlags_DEFAULT)
+
+    # Manual Set Range of Interests
+    ROIs1 = np.array([[350, 200,760, 450],
+                      [350, 450,760, 750],
+                      [350, 750,760,1050],
+                      [350,1050,760,1350]])
+    ROIs2 = np.array([[  0, 200,400, 450],
+                      [  0, 450,400, 750],
+                      [  0, 750,400,1050],
+                      [  0,1050,400,1350]])
+    
+    # load the matching images
+    img1 = cv.imread("dataset/Mathe/lamp_15_Mathe.PNG")
+    img2 = cv.imread("dataset/Mathe/lamp_14_Mathe.PNG")
+
+    img1 = np.rot90(img1,1) 
+    img2 = np.rot90(img2,1)
+    
+    '''SIFT MATCHING WITHOUT KNN'''
+    # Initialize the Stitch Class
+    stitch_sift = Stitch(img1, img2)
+    stitch_sift.featureExtract(ROIs1, ROIs2)
+    
+    # Define the matches based on two images
+    matches_list = stitch_sift.clusterMatch('sift', knn=False)
+    
+    # Combine the features in one lists from each cluster
+    stitch_sift.featureIntegrate(matches_list)
+    _, matches_inliers_sift = stitch_sift.homoEstimate()
+    
+    
+    '''SIFT MATCHING WITH KNN'''
+    # Initialize the Stitch Class
+    stitch_sift_knn = Stitch(img1, img2)
+    stitch_sift_knn.featureExtract(ROIs1, ROIs2)
+    
+    # Define the matches based on two images
+    matches_list = stitch_sift_knn.clusterMatch('sift', knn=True)
+    
+    # Combine the features in one lists from each cluster
+    stitch_sift_knn.featureIntegrate(matches_list)
+    _, matches_inliers_sift_knn = stitch_sift_knn.homoEstimate()
+    
+    
+    '''BRISK MATCHING WITHOUT KNN'''
+    # Initialize the Stitch Class
+    stitch_brisk = Stitch(img1, img2)
+    
+    # Update the image features
+    stitch_brisk.Img1.findFeatures('brisk')
+    stitch_brisk.Img2.findFeatures('brisk')
+    stitch_brisk.featureExtract(ROIs1, ROIs2)
+    
+    # Define the matches based on two images
+    matches_list = stitch_brisk.clusterMatch('brisk', knn=False)
+    
+    # Combine the features in one lists from each cluster
+    stitch_brisk.featureIntegrate(matches_list)
+    _, matches_inliers_brisk = stitch_brisk.homoEstimate()
+
+    '''BRISK MATCHING WITH KNN'''
+    # Initialize the Stitch Class
+    stitch_brisk_knn = Stitch(img1, img2)
+    
+    # Update the image features
+    stitch_brisk_knn.Img1.findFeatures('brisk')
+    stitch_brisk_knn.Img2.findFeatures('brisk')
+    stitch_brisk_knn.featureExtract(ROIs1, ROIs2)
+    
+    # Define the matches based on two images
+    matches_list = stitch_brisk_knn.clusterMatch('brisk', knn=True)
+    
+    # Combine the features in one lists from each cluster
+    stitch_brisk_knn.featureIntegrate(matches_list)
+    _, matches_inliers_brisk_knn = stitch_brisk_knn.homoEstimate()
+    
+    
+    '''Draw the Inliers'''
+    img_inliners_sift = cv.drawMatches(stitch_sift.Img1.img, stitch_sift.Img1.kps, stitch_sift.Img2.img, stitch_sift.Img2.kps, matches_inliers_sift, None, **draw_params)
+    img_inliners_sift_knn = cv.drawMatches(stitch_sift_knn.Img1.img, stitch_sift_knn.Img1.kps, stitch_sift_knn.Img2.img, stitch_sift_knn.Img2.kps, matches_inliers_sift_knn, None, **draw_params)
+    img_inliners_brisk = cv.drawMatches(stitch_brisk.Img1.img, stitch_brisk.Img1.kps, stitch_brisk.Img2.img, stitch_brisk.Img2.kps, matches_inliers_brisk, None, **draw_params)
+    img_inliners_brisk_knn = cv.drawMatches(stitch_brisk_knn.Img1.img, stitch_brisk_knn.Img1.kps, stitch_brisk_knn.Img2.img, stitch_brisk_knn.Img2.kps, matches_inliers_brisk_knn, None, **draw_params)  
+    
+    plt.figure(1)
+    plt.subplot(2,2,1)
+    plt.title("Brute Force Matching on SIFT Features\n(# of Inliners: %d)" %(len(matches_inliers_sift)))
+    plt.imshow(cv.cvtColor(img_inliners_sift, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    
+    plt.subplot(2,2,2)
+    plt.title("Brute Force KNN Matching on SIFT Features\n(# of Inliners: %d)" %(len(matches_inliers_sift_knn)))
+    plt.imshow(cv.cvtColor(img_inliners_sift_knn, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    
+    plt.subplot(2,2,3)
+    plt.title("Brute Force Matching on BRISK Features\n(# of Inliners: %d)" %(len(matches_inliers_brisk)))
+    plt.imshow(cv.cvtColor(img_inliners_brisk, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    
+    plt.subplot(2,2,4)
+    plt.title("Brute Force KNN Matching on BRISK Features\n(# of Inliners: %d)" %(len(matches_inliers_brisk_knn)))
+    plt.imshow(cv.cvtColor(img_inliners_brisk_knn, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    
+    plt.show()
+
+    plt.axis('off')
