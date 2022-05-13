@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 import transform
 import stitch.ImageStitch as ImageStitch
-import undistortion
 from stitch.ImageStitch import Stitch
 
 
@@ -339,11 +338,11 @@ if __name__ == '__main__':
     calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Mathe"
 
     # Calculate the mapping matrix
-    img1, _, _ = undistortion.undistort(img1_, lamp_id1, calib_dir)
-    img2, _, _ = undistortion.undistort(img2_, lamp_id2, calib_dir)
-    img3, _, _ = undistortion.undistort(img3_, lamp_id3, calib_dir)
-    img4, _, _ = undistortion.undistort(img4_, lamp_id4, calib_dir)
-    img5, _, _ = undistortion.undistort(img5_, lamp_id5, calib_dir)
+    img1, _, _ = undistortion_mapping_test.undistort(img1_, lamp_id1, calib_dir)
+    img2, _, _ = undistortion_mapping_test.undistort(img2_, lamp_id2, calib_dir)
+    img3, _, _ = undistortion_mapping_test.undistort(img3_, lamp_id3, calib_dir)
+    img4, _, _ = undistortion_mapping_test.undistort(img4_, lamp_id4, calib_dir)
+    img5, _, _ = undistortion_mapping_test.undistort(img5_, lamp_id5, calib_dir)
 
     # Keep the img5 as background image, stitch from left to right
     img1 = cv.flip(img1, 0)

@@ -5,7 +5,7 @@
 This submission consists of various methods for video stitching from multi-cameras to generate a real-time overview panorama video. 
 
 <div align=center>
-<img src="https://github.com/Kyle-Xu001/Multi-Depth-Multi-Camera-Stitching/blob/main/Result/panaroma.gif" controls="controls" muted="muted"/>
+<img src="https://github.com/Kyle-Xu001/Multi-Depth-Multi-Camera-Stitching/blob/main/result/panaroma.gif" controls="controls" muted="muted"/>
 </div>
 
 ## Files Description
@@ -46,7 +46,7 @@ This submission consists of various methods for video stitching from multi-camer
 ```
     $ python feature_matching_test.py
 ```
-- ROIs Matching Test: Match the features within corresponding areas. The number of inliers has increased due to the seperate ROI processing
+- ROIs Matching Test: Match the features within corresponding areas. The number of inliers has increased due to the separate ROI processing
 ```
     $ python ROIs_matching_test.py
 ```

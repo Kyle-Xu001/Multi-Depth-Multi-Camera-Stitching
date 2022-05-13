@@ -4,6 +4,7 @@ import cv2 as cv
 import math
 import matplotlib.pyplot as plt
 
+
 '''Image Class Functions'''
 
 def equalizeHist(img):
@@ -108,33 +109,34 @@ def matchFilter(matches, invalid_index1, invalid_index2):
 
     return new_matches
 
+# Visualize the matching of each individual area
+def drawMatch(Img1, Img2, matches, params):
+    
+    numCluster = len(matches)
 
-def drawMatch(Img1, kpsCluster1, Img2, kpsCluster2, matches, params):
-    numCluster = len(kpsCluster1)
-
+    plt.figure(0)
+    
     # Get the num of columns to show the inmages
     if numCluster % 2 == 0:
         imageNum = int(numCluster/2)
         for i in range(numCluster):
-            plt.figure(0)
             plt.subplot(2, imageNum, i+1)
             plt.title('Feature Matching in Area %d' % (i+1))
             img_match = cv.drawMatches(
-                Img1.img, kpsCluster1[i], Img2.img, kpsCluster2[i], matches[i], None, **params)
+                Img1.img, Img1.kps, Img2.img, Img2.kps, matches[i], None, **params)
             plt.axis('off')
             plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
     else:
-        imageNum = (numCluster+1)/2
+        imageNum = numCluster
         for i in range(numCluster):
-            plt.figure(0)
-            plt.subplot(imageNum, 2, i+1)
+            plt.subplot(imageNum, 1, i+1)
             plt.title('Feature Matching in Area %d' % (i+1))
             img_match = cv.drawMatches(
-                Img1.img, kpsCluster1[i], Img2.img, kpsCluster2[i], matches[i], None, **params)
+                Img1.img, Img1.kps, Img2.img, Img2.kps, matches[i], None, **params)
             plt.axis('off')
             plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
 
-# Check if the matching inliers are correct
+    plt.show()
 
 
 def inlierChecker(Img1, kps1, Img2, kps2, inliers, params, num):
@@ -242,3 +244,4 @@ def getParams(params_path):
         params = json.load(f)
         
     return params
+

@@ -1,7 +1,7 @@
 from time import *
 import numpy as np
 import cv2 as cv
-import math
+
 
 
 def feature_map(map1, map2, features):
@@ -9,9 +9,7 @@ def feature_map(map1, map2, features):
     pts_undistorted = np.zeros_like(features)
     num = [] # which means the number of potential position each feature has
     invalid_index = [] # define the features that should be ignored
-    
-    #features = features[:100]
-    
+        
     # Calculate the time (to be more efficient)
     begin_time = time()
     

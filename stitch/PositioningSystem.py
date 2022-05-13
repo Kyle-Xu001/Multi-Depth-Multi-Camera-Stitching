@@ -87,5 +87,4 @@ def projectToFloor_box(box):
     test[:,0] = box[:,0] + xintercept + xcoef*box[:,0]
     test[:,1] = box[:,1] + yintercept + ycoef*box[:,1]
 
-        
     return test

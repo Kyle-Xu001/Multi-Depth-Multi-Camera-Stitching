@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
-import undistortion
+import undistortion_mapping_test
 import argparse
 import cv2 as cv
 
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     # Undistorted the oringal image
     calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Mathe"
     lamp_id = 'lamp07'
-    image, _, _ = undistortion.undistort(image, lamp_id, calib_dir)
+    image, _, _ = undistortion_mapping_test.undistort(image, lamp_id, calib_dir)
     
     #image = cv.rotate(image,cv.ROTATE_90_COUNTERCLOCKWISE)
     
