@@ -19,7 +19,7 @@ This submission consists of various methods for video stitching from multi-camer
     |
     ├── feature_extraction_test.py    # Image Preprocessing and Feature Extraction
     ├── feature_matching_test.py      # Feature Matching and Inliers Estimation
-    ├── ROIs_matching_test.py         # Feature Matching within corresponding ROIs
+    ├── ROIs_matching_test.py         # Feature Matching within multiple corresponding ROIs
     ├── panorama_test.py              # Generate panorama image for one frame
     ├── PositioningSystem_Test.py     # Test Script for Visualizing the Positioning System on Hard-Coded Points
     ├── stitch_custom.py              # Script for Real-time Video Stitching using generalized stitching function with stitching params input

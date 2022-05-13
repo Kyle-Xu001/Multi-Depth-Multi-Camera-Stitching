@@ -123,7 +123,7 @@ def drawMatch(Img1, Img2, matches, params):
             plt.subplot(2, imageNum, i+1)
             plt.title('Feature Matching in Area %d' % (i+1))
             img_match = cv.drawMatches(
-                Img1.img, Img1.kps, Img2.img, Img2.kps, matches[i], None, **params)
+                Img1.img, Img1.kpsCluster[i], Img2.img, Img2.kpsCluster[i], matches[i], None, **params)
             plt.axis('off')
             plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
     else:
@@ -132,11 +132,9 @@ def drawMatch(Img1, Img2, matches, params):
             plt.subplot(imageNum, 1, i+1)
             plt.title('Feature Matching in Area %d' % (i+1))
             img_match = cv.drawMatches(
-                Img1.img, Img1.kps, Img2.img, Img2.kps, matches[i], None, **params)
+                Img1.img, Img1.kpsCluster[i], Img2.img, Img2.kpsCluster[i], matches[i], None, **params)
             plt.axis('off')
             plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
-
-    plt.show()
 
 
 def inlierChecker(Img1, kps1, Img2, kps2, inliers, params, num):

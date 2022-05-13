@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
-import transform
+from stitch import stitch.transform as transform
 import stitch.ImageStitch as ImageStitch
 from stitch.ImageStitch import Stitch
 

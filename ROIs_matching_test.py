@@ -11,15 +11,15 @@ if __name__ == '__main__':
                    singlePointColor = (255,0,0),
                    flags = cv.DrawMatchesFlags_DEFAULT)
 
-    # Manual Set Range of Interests
-    ROIs1 = np.array([[350, 200,760, 450],
-                      [350, 450,760, 750],
-                      [350, 750,760,1050],
-                      [350,1050,760,1350]])
-    ROIs2 = np.array([[  0, 200,400, 450],
-                      [  0, 450,400, 750],
-                      [  0, 750,400,1050],
-                      [  0,1050,400,1350]])
+    # # Manual Set Range of Interests
+    # ROIs1 = np.array([[350, 200,760, 450],
+    #                   [350, 450,760, 750],
+    #                   [350, 750,760,1050],
+    #                   [350,1050,760,1350]])
+    # ROIs2 = np.array([[  0, 200,400, 450],
+    #                   [  0, 450,400, 750],
+    #                   [  0, 750,400,1050],
+    #                   [  0,1050,400,1350]])
     
     # load the matching images
     img1 = cv.imread("dataset/Mathe/lamp_15_Mathe.PNG")
@@ -27,6 +27,17 @@ if __name__ == '__main__':
 
     img1 = np.rot90(img1,1) 
     img2 = np.rot90(img2,1)
+    
+    # Manually define the ROI to locate the area for corresponding images
+    ROIs1 = cv.selectROIs("select the area", img1)
+    ROIs2 = cv.selectROIs("select the area", img2)
+
+    for i in range(len(ROIs1)):
+        ROIs1[i, 2] = ROIs1[i, 0] + ROIs1[i, 2]
+        ROIs1[i, 3] = ROIs1[i, 1] + ROIs1[i, 3]
+        ROIs2[i, 2] = ROIs2[i, 0] + ROIs2[i, 2]
+        ROIs2[i, 3] = ROIs2[i, 1] + ROIs2[i, 3]
+        
     
     '''SIFT MATCHING WITHOUT KNN'''
     # Initialize the Stitch Class

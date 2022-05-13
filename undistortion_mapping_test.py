@@ -8,17 +8,18 @@ from stitch import Stitch, utils, undistort, feature_map, simpleStitch
     
 if __name__ =='__main__':
     # Define the Operating Camera
-    lamp_id1 = 'lamp15'
-    lamp_id2 = 'lamp14'
+    lamp_id1 = 'lamp18'
+    lamp_id2 = 'lamp17'
     
     # Load the Original Distorted Images
-    img1_ = cv.imread("dataset/lamp1415-lamp16/lamp_15_123114.PNG")
-    img2_ = cv.imread("dataset/lamp1415-lamp16/lamp_14_123114.PNG")
+    img1_ = cv.imread("dataset/lamp14151617-lamp18/lamp_18_012313.PNG")
+    img2_ = cv.imread("dataset/lamp14151617-lamp18/lamp_17_012313.PNG")
     
     # The stitch order need to be flipped to be keep the right image unchanged
     #img1_ = cv.flip(img1_, 0)
     #img2_ = cv.flip(img2_, 0)
 
+    '''Calibrate the Original Image for Undistortion'''
     # Enter the direction of the parameters
     calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Mathe"
     
@@ -45,8 +46,8 @@ if __name__ =='__main__':
     plt.title('(d) Undistorted Image [%s]'%(lamp_id2))
     plt.axis('off')
     
-    plt.show()
     
+    '''Select Range of Interest for each Image'''
     # Define the draw parameters for matching visualization
     draw_params = dict(matchColor = (0,255,0),
                     singlePointColor = (0,0,255),
@@ -66,20 +67,13 @@ if __name__ =='__main__':
         ROIs2[i, 2] = ROIs2[i, 0] + ROIs2[i, 2]
         ROIs2[i, 3] = ROIs2[i, 1] + ROIs2[i, 3]
     
-    
+    '''Matching Features within Corresponding Areas'''
     # Initialize the object
     stitches = Stitch(img1, img2)
     stitches.featureExtract(ROIs1, ROIs2)
     
     # Define the matches based on two images
-    matches_list = stitches.clusterMatch('sift', knn=True)
-    
-    # Combine the features in one lists from each cluster
-    stitches.featureIntegrate(matches_list)
-    
-    # Match the features with corresponding clusters in each image
-    homo_mat, matches_inliers = stitches.homoEstimate()
-
+    matches_list = stitches.clusterMatch('sift', knn=True)    
 
     # Show the number of matches
     matchNum = 0
@@ -90,7 +84,12 @@ if __name__ =='__main__':
 
     # draw the matches in each cluster
     utils.drawMatch(stitches.Img1,stitches.Img2,matches_list,draw_params)
-         
+    
+    # Combine the features in one lists from each cluster
+    stitches.featureIntegrate(matches_list)
+
+    
+    '''Mapping the Original Features into Undistortion Image'''
     # Filter the invalid matches and transform the features
     pts1 = cv.KeyPoint_convert(stitches.Img1.kps)
     pts2 = cv.KeyPoint_convert(stitches.Img2.kps)
@@ -129,7 +128,6 @@ if __name__ =='__main__':
     plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
     plt.axis('off')
     plt.show()
-    
     
     
     '''

@@ -12,10 +12,6 @@ if __name__ == '__main__':
     draw_params = dict(matchColor = (0,255,0),
                    singlePointColor = (255,0,0),
                    flags = cv.DrawMatchesFlags_DEFAULT)
-
-    # Manual Set Range of Interests
-    ROIs1 = np.array([[350,150,760,1300]])
-    ROIs2 = np.array([[0,150,400,1300]])
     
     # load the matching images
     img1 = cv.imread("dataset/Mathe/lamp_15_Mathe.PNG")
@@ -28,7 +24,17 @@ if __name__ == '__main__':
     Img1 = Image(img1)
     Img2 = Image(img2)
 
+    # Manually define the ROI to locate the area for corresponding images
+    ROIs1 = cv.selectROIs("select the area", img1)
+    ROIs2 = cv.selectROIs("select the area", img2)
 
+    for i in range(len(ROIs1)):
+        ROIs1[i, 2] = ROIs1[i, 0] + ROIs1[i, 2]
+        ROIs1[i, 3] = ROIs1[i, 1] + ROIs1[i, 3]
+        ROIs2[i, 2] = ROIs2[i, 0] + ROIs2[i, 2]
+        ROIs2[i, 3] = ROIs2[i, 1] + ROIs2[i, 3]
+        
+        
     '''SIFT Features Matching Comparison'''
     # Find SIFT features of matching images
     kps1_sift, dps1_sift = Img1.kps, Img1.des
@@ -135,5 +141,3 @@ if __name__ == '__main__':
     plt.axis('off')
     
     plt.show()
-
-    plt.axis('off')
