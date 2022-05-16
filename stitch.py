@@ -18,6 +18,10 @@ img2 = cv.imread("dataset/Mathe/lamp_17_Mathe.PNG")
 #img1 = np.rot90(img1,1) 
 #img2 = np.rot90(img2,1)
 
+# The stitch order need to be flipped to be keep the right image unchanged
+#img1_ = cv.flip(img1_, 0)
+#img2_ = cv.flip(img2_, 0)
+
 # Manually define the ROI to locate the area for corresponding images
 ROIs1 = cv.selectROIs("select the area", img1)
 ROIs2 = cv.selectROIs("select the area", img2)
