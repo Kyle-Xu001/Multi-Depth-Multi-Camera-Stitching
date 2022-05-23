@@ -66,7 +66,7 @@ def stitchImages(imgs, homo_params, stitch_params, farm_name):
     panorama = np.zeros((panorama_size[0],panorama_size[1],3),dtype = np.uint8)
     
     # Extract the stitch parameters
-    stitch_params =  stitch_params[farm_name]
+    stitch_params =  stitch_params["farm"]
 
     for image in stitch_params:
         for item in stitch_params[image]:

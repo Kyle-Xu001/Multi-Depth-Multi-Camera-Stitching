@@ -184,7 +184,7 @@ def simpleStitch(img1, img2, homo_mat):
 
     # Combine the image on one super image
     high_y = np.min(posVerts[:, 1])
-    img_transform[high_y:high_y, :, :] = 0
+    img_transform[high_y:high_y + 50, :, :] = 0
     img_super[img_transform > 0] = 0
 
     img_stitch = img_transform + img_super
