@@ -27,7 +27,7 @@ def getPos_box(ID, obb, trans_params):
     '''transform the single box to the panorama image'''
     '''ABANDONED'''
     # Get the Translation Parameters for specific Lamp ID
-    trans_param = trans_params[ID]["param"]
+    trans_param = np.array(trans_params[ID]["param"]).reshape(-1, 3)
     trans_compensate = np.array(trans_params[ID]["transition"])
     trans_flip = trans_params[ID]["flip"]
     

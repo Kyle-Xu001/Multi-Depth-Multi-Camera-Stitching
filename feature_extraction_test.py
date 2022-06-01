@@ -6,6 +6,10 @@ from stitch import utils, Image
 
 
 if __name__ == '__main__':
+    a = np.array([[0,0,0,0,0],
+                  [1,1,1,1,1]])
+    print(a)
+    print(a.tolist())
     '''This script is used for feature extraction from each image'''
     # Load exmaple image
     img = cv.imread("dataset/Mathe/lamp_15_Mathe.PNG")
