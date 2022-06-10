@@ -190,3 +190,35 @@ def simpleStitch(img1, img2, homo_mat):
     img_stitch = img_transform + img_super
 
     return img_stitch
+
+def alphablend(img1, img2, homo_mat,trim_len=0,alpha = 0.5):
+    # Get the position of vertices
+    posVerts = utils.transformVerts(img_size=np.array(
+        [img2.shape[1], img2.shape[0]]), homo_mat=homo_mat)
+
+    x_min = posVerts[:, 0].min()
+    x_max = posVerts[:, 0].max()
+    y_min = posVerts[:, 1].min()
+    y_max = posVerts[:, 1].max()
+    # print("x_min: %d, x_max: %d y_min: %d, y_max: %d" %
+    #       (x_min, x_max, y_min, y_max))
+
+    # Define the size of the result image
+    stitch_size = (x_max, y_max)
+
+    homo_mat_ = np.eye(3)
+    img_super = cv.warpPerspective(
+        img1, homo_mat_, stitch_size, borderValue=(0, 0, 0))
+    img_transform = cv.warpPerspective(
+        img2, homo_mat, stitch_size, borderValue=(0, 0, 0))
+    
+    beta = (1.0 - alpha)
+    
+    high_y = np.min(posVerts[:,1])
+    img_transform[high_y:high_y+trim_len,:,:] = (alpha *  img_transform[high_y:high_y+trim_len,:,:]).astype(np.uint8)
+    
+    img_transform[img_super>0] = ((beta) * img_transform[img_super>0]).astype(np.uint8)
+    img_super[img_transform > 0] =  ((alpha) * img_super[img_transform > 0]).astype(np.uint8)
+    super_img = cv.addWeighted(img_super, 1, img_transform, 1, 0.0)
+    
+    return super_img

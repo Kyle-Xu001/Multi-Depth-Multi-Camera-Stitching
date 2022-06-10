@@ -95,7 +95,7 @@ def stitchImages(imgs, homo_params, stitch_params, farm_name):
             '''Based on different stitch type, img will be processed in different ways'''
             # Stitch two images into one image
             if stitch_type == 'stitch':
-                img_stitch = ImageStitch.simpleStitch(img, img2, homo_params[item])
+                img_stitch = ImageStitch.alphablend(img, img2, homo_params[item])
             
             # Warping one image based on perspective
             elif stitch_type == 'warp':                

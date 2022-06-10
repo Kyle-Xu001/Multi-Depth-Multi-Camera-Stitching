@@ -19,6 +19,14 @@ def uniform_blend(img1, img2):
 
     return result
 
+def simple_stitch(img1, img2):
+    img1[0:450, :, :] = 0
+    img2[img1 > 0] = 0
+
+    img_stitch = img1 + img2
+    
+    return img_stitch
+
 def final_size(src_img, dst_img, project_H):
     """
     get the size of stretched (stitched) image

@@ -16,6 +16,9 @@ if __name__ == '__main__':
     img = np.rot90(img,1) # Rotate the image to get better visualization
     
     Img = Image(img)
+    Img.equalizeHist()
+    
+    
     Img_copy = Image(img)
     
     img_ = utils.equalizeHist_old(img)
