@@ -3,6 +3,8 @@
 *.png
 *.json
 *.mp4
+*.pyc
+.idea
 Result/
 dataset/
 calib_params_Mathe/

@@ -9,12 +9,12 @@ from stitch import Stitch, utils, undistort, feature_map, simpleStitch, alphable
 if __name__ == '__main__':
     
     # Define the Operating Camera
-    lamp_id1 = 'lamp01'
-    lamp_id2 = 'lamp02'
+    lamp_id1 = 'lamp02'
+    lamp_id2 = 'lamp03'
     
     # Load the Original Distorted Images
-    img1_ = cv.imread("dataset/Arie/lamp_01.PNG")
-    img2_ = cv.imread("dataset/Arie/lamp_02.PNG")
+    img1_ = cv.imread("dataset/Arie/lamp_02.PNG")
+    img2_ = cv.imread("dataset/Arie/lamp_03.PNG")
     
     
     '''Calibrate the Original Image for Undistortion'''

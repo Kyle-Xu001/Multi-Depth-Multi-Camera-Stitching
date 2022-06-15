@@ -93,11 +93,11 @@ if __name__ == '__main__':
 
     
     
-    mesh_size = 100
+    mesh_size = 50
     
     # Define the shape of undistortion images
-    ori_h, ori_w, _ = img2.shape
-    dst_h, dst_w, _ = img1.shape
+    ori_h, ori_w, _ = img1.shape
+    dst_h, dst_w, _ = img2.shape
     
     # Transfer the inlier points into np.array
     final_src = X1_ok.T[:,:2]
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     stitcher = Apap([final_w, final_h], [offset_x, offset_y])
     
     # local homography estimating
-    local_homography, local_weight = stitcher.local_homography(final_src, final_dst, vertices)
+    local_homography, local_weight = stitcher.local_homography(final_dst, final_src, vertices)
     
     # local warping
     warped_img = stitcher.local_warp(img2, local_homography, mesh)
