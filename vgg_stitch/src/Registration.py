@@ -127,6 +127,7 @@ class CNN(object):
         assert M == N
         
         matchPlot(IX,IY,X,Y)
+        print("Prematches Number: ", cnt)
         plt.show()
 
 

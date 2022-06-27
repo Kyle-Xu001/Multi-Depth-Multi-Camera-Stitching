@@ -1,11 +1,10 @@
-*.JPG
-*.PNG
-*.png
-*.json
 *.mp4
 *.pyc
-.idea
-Result/
+*.idea
+*.npy
+result/result/
+result/result_fake/
+params/
 dataset/
 calib_params_Mathe/
 calib_params_Arie/

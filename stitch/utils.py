@@ -61,7 +61,7 @@ def findFeatures(img, method=None):
     elif method == 'brisk':
         descriptor = cv.BRISK_create()
     elif method == 'orb':
-        descriptor = cv.ORB_create(nfeatures=1500, nlevels=8, edgeThreshold=3)
+        descriptor = cv.ORB_create(nfeatures=5000, nlevels=8, edgeThreshold=3)
 
     kps, des = descriptor.detectAndCompute(img, None)
 

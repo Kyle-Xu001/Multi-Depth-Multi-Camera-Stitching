@@ -5,8 +5,8 @@ from utils.utils import *
 import cv2
 
 # designate image path here
-IX_path = 'img/2a.PNG'
-IY_path = 'img/2b.PNG'
+IX_path = 'vgg_stitch/img/2a.PNG'
+IY_path = 'vgg_stitch/img/2b.PNG'
 
 IX = cv2.imread(IX_path)
 IY = cv2.imread(IY_path)
@@ -18,7 +18,9 @@ reg = Registration.CNN()
 
 #register
 X, Y, Z, X_ = reg.register(IX, IY)
-
+print(X)
+print(Y)
+print(X.shape==Y.shape)
 #generate regsitered image using TPS
 registered = tps_warp(Y, Z, IY, IX.shape)
 cb = checkboard(IX, registered, 11)

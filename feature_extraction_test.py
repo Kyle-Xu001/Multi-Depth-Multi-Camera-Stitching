@@ -6,28 +6,30 @@ from stitch import utils, Image
 
 
 if __name__ == '__main__':
-    a = np.array([[0,0,0,0,0],
-                  [1,1,1,1,1]])
-    print(a)
-    print(a.tolist())
     '''This script is used for feature extraction from each image'''
     # Load exmaple image
-    img = cv.imread("dataset/Mathe/lamp_15_Mathe.PNG")
-    img = np.rot90(img,1) # Rotate the image to get better visualization
+    img = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
+    #img = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
+    #img = cv.imread("dataset/example_image/park/1.jpg")
+    
+    #img = np.rot90(img,1) # Rotate the image to get better visualization
     
     Img = Image(img)
-    Img.equalizeHist()
     
-    
+    # Original Image
     Img_copy = Image(img)
     
+    # Equalized Image
+    Img.equalizeHist()
+    
+    # Old_Equalized Image
     img_ = utils.equalizeHist_old(img)
     Img_ = Image(img_)
 
     # show the original image and equalhist image
-    plt.figure(1)
+    fig = plt.figure(1)
     plt.subplot(1, 3, 1)
-    plt.imshow(cv.cvtColor(Img.img, cv.COLOR_BGR2RGB))
+    plt.imshow(cv.cvtColor(Img_copy.img, cv.COLOR_BGR2RGB))
     plt.title("(a) Original Image")
     plt.axis('off')
 
@@ -41,8 +43,9 @@ if __name__ == '__main__':
     plt.imshow(cv.cvtColor(Img.img, cv.COLOR_BGR2RGB))
     plt.title("(c) YUV Equalized Image")
     plt.axis('off')
-    plt.show()
     
+    fig.tight_layout()
+    plt.show()
     
     # Extract the features from image
     kps_sift, dps_sift = Img.findFeatures('sift')
@@ -50,7 +53,7 @@ if __name__ == '__main__':
     kps_orb, dps_orb = Img.findFeatures('orb')
     # show the original image and equalhist image
     
-    plt.figure(2)
+    fig1 = plt.figure(2)
     plt.subplot(1, 3, 1)
     img_kps_sift = cv.drawKeypoints(Img.img, kps_sift, None,(0,255,0), flags=cv.DRAW_MATCHES_FLAGS_DEFAULT)
     plt.imshow(cv.cvtColor(img_kps_sift, cv.COLOR_BGR2RGB))
@@ -72,7 +75,7 @@ if __name__ == '__main__':
 
 
     # Compare the different equlization methods for feature extraction
-    plt.figure(3)
+    fig2 = plt.figure(3)
     kps_sift_origin, dps_sift_origin = Img_copy.findFeatures('sift')
     kps_sift_old, dps_sift_old = Img_.findFeatures('sift')
     
@@ -120,4 +123,7 @@ if __name__ == '__main__':
     plt.imshow(cv.cvtColor(img_kps_brisk, cv.COLOR_BGR2RGB))
     plt.title("(f) BRISK Features for YUV Equalize (#: %d)" %(num_brisk_yuv))
     plt.axis('off')
+    
+    fig1.tight_layout()
+    fig2.tight_layout()
     plt.show()

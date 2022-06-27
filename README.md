@@ -39,9 +39,15 @@ This submission consists of various methods for video stitching from multi-camer
 
 ## Usage
 - Image Feature Extraction Test: Extract three kinds of features from the input image and visualize the result
-```
+```bash
     $ python feature_extraction_test.py
 ```
+<div align="center">
+<img src="result/feature_extraction.png" width="400" height="225"/>
+<br/>
+Figure 1  Feature Extraction Comparison
+</div>
+
 - Feature Matching Test: Match the features with BF/KNN methods. Select suitable matching method based on the Inliers Result
 ```
     $ python feature_matching_test.py
