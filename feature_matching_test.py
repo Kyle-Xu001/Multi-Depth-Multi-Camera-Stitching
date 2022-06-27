@@ -14,19 +14,25 @@ if __name__ == '__main__':
                    flags = cv.DrawMatchesFlags_DEFAULT)
     
     # load the matching images
-    img1 = cv.imread("dataset/Mathe/lamp_15_Mathe.PNG")
-    img2 = cv.imread("dataset/Mathe/lamp_14_Mathe.PNG")
+    #img1 = cv.imread("dataset/Arie/lamp_02_Arie.PNG")
+    #img2 = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
+    img1 = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
+    img2 = cv.imread("dataset/example_image/APAP-railtracks/2.JPG")
+    #img1 = cv.imread("dataset/example_image/NISwGSP-denny/denny02.jpg")
+    #img2 = cv.imread("dataset/example_image/NISwGSP-denny/denny03.jpg")
 
-    img1 = np.rot90(img1,1) 
-    img2 = np.rot90(img2,1)
+    #img1 = np.rot90(img1,1) 
+    #img2 = np.rot90(img2,1)
     
     # Initialize the Stitch Class
     Img1 = Image(img1)
     Img2 = Image(img2)
 
     # Manually define the ROI to locate the area for corresponding images
-    ROIs1 = cv.selectROIs("select the area", img1)
-    ROIs2 = cv.selectROIs("select the area", img2)
+    cv.namedWindow("Area Selection", cv.WINDOW_NORMAL)
+    cv.resizeWindow("Area Selection", 800, 600)
+    ROIs1 = cv.selectROIs("Area Selection", img1)
+    ROIs2 = cv.selectROIs("Area Selection", img2)
 
     for i in range(len(ROIs1)):
         ROIs1[i, 2] = ROIs1[i, 0] + ROIs1[i, 2]

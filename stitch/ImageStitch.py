@@ -111,15 +111,6 @@ class Stitch(object):
         for i in range(len(self.Img1.desCluster)):
             des1 = self.Img1.desCluster[i]
             des2 = self.Img2.desCluster[i]
-
-            # bf = cv.BFMatcher()
-
-            # match = bf.knnMatch(des1, des2, k=3)
-
-            # matchFilter = []
-            # for m, _, n in match:
-            #     if m.distance < 0.9 * n.distance:
-            #         matchFilter.append(m)
             
             matches = utils.featureMatch(des1, des2, method, knn)
             matches_list.append(matches)

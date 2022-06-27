@@ -86,7 +86,7 @@ def featureMatch(des1, des2, method, knn=False):
 
         matches_good = []
         for m,_,n in matches:
-            if m.distance < 0.8*n.distance:
+            if m.distance < 0.9*n.distance:
                 matches_good.append(m)
     return matches_good
 

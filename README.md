@@ -5,7 +5,7 @@
 This submission consists of various methods for video stitching from multi-cameras to generate a real-time overview panorama video. 
 
 <div align=center>
-<img src="https://github.com/Kyle-Xu001/Multi-Depth-Multi-Camera-Stitching/blob/main/result/panaroma.gif" controls="controls" muted="muted"/>
+<img src="result/panaroma.gif" controls="controls" muted="muted"/>
 </div>
 
 ## Files Description
@@ -38,20 +38,28 @@ This submission consists of various methods for video stitching from multi-camer
 - `PositioningSystem_Test.py` - Test the positoning system of three farms by visualizing the panorama results of position transformation from each camera
 
 ## Usage
+### Feature Extraction
 - Image Feature Extraction Test: Extract three kinds of features from the input image and visualize the result
 ```bash
     $ python feature_extraction_test.py
 ```
 <div align="center">
-<img src="result/feature_extraction.png" width="400" height="225"/>
+<img src="result/feature_extraction.png" width="450" height="275"/>
 <br/>
 Figure 1  Feature Extraction Comparison
 </div>
 
+### Feature Matching
 - Feature Matching Test: Match the features with BF/KNN methods. Select suitable matching method based on the Inliers Result
-```
+```bash
     $ python feature_matching_test.py
 ```
+<div align="center">
+<img src="result/feature_matching.png" width="450" height="250"/>
+<br/>
+Figure 2  Inlier Matches with BF/KNN Matching Methods 
+</div>
+
 - ROIs Matching Test: Match the features within corresponding areas. The number of inliers has increased because of the Separate Region Processing
 ```
     $ python ROIs_matching_test.py
