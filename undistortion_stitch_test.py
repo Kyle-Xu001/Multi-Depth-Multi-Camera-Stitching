@@ -8,12 +8,12 @@ from stitch import Stitch, utils, undistort, feature_map, simpleStitch
     
 if __name__ =='__main__':
     # Define the Operating Camera
-    lamp_id1 = 'lamp18'
-    lamp_id2 = 'lamp17'
+    lamp_id1 = 'lamp02'
+    lamp_id2 = 'lamp01'
     
     # Load the Original Distorted Images
-    img1_ = cv.imread("dataset/lamp14151617-lamp18/lamp_18_012313.PNG")
-    img2_ = cv.imread("dataset/lamp14151617-lamp18/lamp_17_012313.PNG")
+    img1_ = cv.imread("dataset/Arie/lamp_02.PNG")
+    img2_ = cv.imread("dataset/Arie/lamp_01.PNG")
     
     # The stitch order need to be flipped to be keep the right image unchanged
     #img1_ = cv.flip(img1_, 0)
@@ -21,7 +21,7 @@ if __name__ =='__main__':
 
     '''Calibrate the Original Image for Undistortion'''
     # Enter the direction of the parameters
-    calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/calib_params_Mathe"
+    calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/params/calib_params_Arie"
     
     # Calculate the mapping matrix
     img_undistort1,map1_1,map2_1 = undistort(img1_,lamp_id1,calib_dir)
