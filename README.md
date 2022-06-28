@@ -35,7 +35,7 @@ This submission consists of various methods for video stitching from multi-camer
 
 - `ROIs_matching_test.py` - Apply Brute-Force Matching and KNN Matching methods for features within the target corresponding Range of Interests(ROIs). The filtered features in one region can only match to the specific region in another image. Match multiple corresponding areas separately for two images, then apply RANSAC to estimate the Inlier Matches
 
-- `undistortion_stitch_test.py` - The features generated from the calibrated images may be unreal due to image stretching or compression. This script makes use of the initial features from original fisheye images to estimate the homography matrix, then perform the image stitching on undistortion images after calibration
+- `undistortion_stitch_test.py` - The features generated from the calibrated images may be unreal due to image stretching or compression in undistortion process. This script makes use of the initial features from original fisheye images to estimate the homography matrix, then perform the image stitching on undistortion images
 
 - `panorama_test.py` - Stitch the new image with input stitching combination, using Perspective Transform to stitch the left whole area and the right whole area
 
@@ -70,30 +70,26 @@ Figure 1  Feature Extraction Comparison
 Figure 2  Inlier Matches with BF/KNN Matching Methods 
 </div>
 
-- ROIs Matching Test: Match the features within corresponding areas to avoid wrong matches across different regions. The number of inliers has slightly increased because of the Separate Region Processing
+- ROIs Matching Test: Match the features within corresponding areas to avoid wrong matches across different regions. The number of inliers has slightly increased as a result of the Separate Region Processing
 ```bash
     $ python ROIs_matching_test.py
 ```
-<div align="center">
-<img src="result/ROI_feature_matching.png" width="450" height="250"/>
-<br/>
-Figure 3  Increased Inlier Matches by ROIs corresponding Matching 
-</div>
 
 ### Image Stitching
-- Undistortion Stitch Test: Stitch Images using the homography matrix estimated by their original features
+- Undistortion Stitch Test: Stitch Images using original features to estimate homography matrix
 ```bash
     $ python undistortion_stitch_test.py
 ```
 <div align="center">
-<img src="result/ROI_feature_matching.png" width="450" height="250"/>
+<img src="result/distorted_ROI.png" width="400" height="200"/>
 <br/>
-Figure 4  Increased Inlier Matches by ROIs corresponding Matching 
+Figure 3  Increased Inlier Matches by ROIs corresponding Matching on Original Images
 </div>
 
-> This module requires original fisheye images and its calibration parameter for undistortion process.
+> This module requires original fisheye images and camera calibration parameter for undistortion process.
 
 ### Video Stitching
+
 - Video Stitching Test: Stitch the input videos to generate a panorama video
 ```
     $ python stitch_custom.py -ivid /PATH/TO/VIDEO/GROUP -hpp /PATH/TO/HOMO/PARAMS/FILE -spp /PATH/TO/STITCH/PARAMS/FILE --farm_name FARM_NAME

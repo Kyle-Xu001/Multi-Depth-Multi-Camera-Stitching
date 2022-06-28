@@ -83,8 +83,9 @@ if __name__ == '__main__':
     for homo_param in homo_params:
         homo_params[homo_param] = np.array(homo_params[homo_param]).reshape(-1, 3)
     
+    getPosMatrix("lamp07",homo_params)
      # Define the stitching arguments
-    stitch_params = getParams("params/stitch_params_Mathe.json")
+    stitch_params = getParams("params/stitch_params_Mathe_new.json")
     
     # Define the translation parameters
     trans_params = getParams("params/trans_params_Mathe.json")
