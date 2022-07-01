@@ -33,7 +33,7 @@ This submission consists of various methods for video stitching from multi-camer
 
 - `feature_matching_test.py` - Apply Brute-Force Matching and KNN Matching methods for all features from two images, then apply RANSAC to estimate the Inlier Matches
 
-- `ROIs_matching_test.py` - Apply Brute-Force Matching and KNN Matching methods for features within the target corresponding Range of Interests(ROIs). The filtered features in one region can only match to the specific region in another image. Match multiple corresponding areas separately for two images, then apply RANSAC to estimate the Inlier Matches
+- `ROIs_matching_test.py` - Apply Brute-Force Matching and KNN Matching methods for features between corresponding Range of Interests(ROIs). The filtered features in one region can only match to the specific region in another image. Match multiple corresponding areas separately for two images, then apply RANSAC to estimate the Inlier Matches
 
 - `undistortion_stitch_test.py` - The features generated from the calibrated images may be unreal due to image stretching or compression in undistortion process. This script makes use of the initial features from original fisheye images to estimate the homography matrix, then perform the image stitching on undistortion images
 
@@ -54,7 +54,7 @@ This submission consists of various methods for video stitching from multi-camer
     $ python feature_extraction_test.py
 ```
 <div align="center">
-<img src="result/feature_extraction.png" width="450" height="275"/>
+<img src="result/feature_extraction.png" width="450" height="250"/>
 <br/>
 Figure 1  Feature Extraction Comparison
 </div>
@@ -65,15 +65,20 @@ Figure 1  Feature Extraction Comparison
     $ python feature_matching_test.py
 ```
 <div align="center">
-<img src="result/feature_matching.png" width="450" height="250"/>
+<img src="result/feature_matching.png" width="450" height="225"/>
 <br/>
-Figure 2  Inlier Matches with BF/KNN Matching Methods 
+Figure 2  Inlier Matches with BF/KNN Matching Methods for All Features 
 </div>
 
-- ROIs Matching Test: Match the features within corresponding areas to avoid wrong matches across different regions. The number of inliers has slightly increased as a result of the Separate Region Processing
+- ROIs Matching Test: Match the features within corresponding areas to avoid wrong matches across different regions. As a result of the Separate Region Processing, false matches and computation time will be effectively reduced, and correct matching inliers will be slightly increased.
 ```bash
     $ python ROIs_matching_test.py
 ```
+<div align="center">
+<img src="result/ROIs.png" width="450" height="200"/>
+<br/>
+Figure 3  Inlier Matches with corresponding ROI Mathcing for Selected Features
+</div>
 
 ### Image Stitching
 - Undistortion Stitch Test: Stitch Images using original features to estimate homography matrix
@@ -83,10 +88,10 @@ Figure 2  Inlier Matches with BF/KNN Matching Methods
 <div align="center">
 <img src="result/distorted_ROI.png" width="400" height="200"/>
 <br/>
-Figure 3  Increased Inlier Matches by ROIs corresponding Matching on Original Images
+Figure 4  Increased Inlier Matches by ROIs corresponding Matching on Original Images
 </div>
 
-> This module requires original fisheye images and camera calibration parameter for undistortion process.
+> This module requires original fisheye images and camera calibration parameters for undistortion process.
 
 ### Video Stitching
 

@@ -11,6 +11,7 @@ import os
 import argparse
 import stitch.ImageStitch as ImageStitch
 import numpy as np
+import time
 from stitch import getParams
 from pathlib import Path
 from vid_sync import VideoSynchronizer
@@ -58,7 +59,7 @@ def stitchImages(imgs, homo_params, stitch_params, farm_name):
     
     :return  img_stitch: stitching image of two images
     '''
-    
+    T1 = time.time()
     # Initialize the size of the panorama image (for visualization)
     panorama_size = (stitch_params["panorama_size"][0], stitch_params["panorama_size"][1])
     
@@ -124,7 +125,8 @@ def stitchImages(imgs, homo_params, stitch_params, farm_name):
                 panorama_pos = param["value"][0]
                 stitch_pos = param["value"][1]
                 panorama[panorama_pos[0]:panorama_pos[1], panorama_pos[2]:panorama_pos[3],:] = img[stitch_pos[0]:stitch_pos[1], stitch_pos[2]:stitch_pos[3],:]
-           
+    T2 = time.time()
+    print("Stitch Images Time:",(T2-T1)*1000)
     return panorama
 
 

@@ -26,32 +26,12 @@ if __name__ == '__main__':
     
     # Initialize the Stitch Class
     Img1 = Image(img1)
-    Img2 = Image(img2)
-
-    # Manually define the ROI to locate the area for corresponding images
-    cv.namedWindow("Area Selection", cv.WINDOW_NORMAL)
-    cv.resizeWindow("Area Selection", 800, 600)
-    ROIs1 = cv.selectROIs("Area Selection", img1)
-    ROIs2 = cv.selectROIs("Area Selection", img2)
-
-    for i in range(len(ROIs1)):
-        ROIs1[i, 2] = ROIs1[i, 0] + ROIs1[i, 2]
-        ROIs1[i, 3] = ROIs1[i, 1] + ROIs1[i, 3]
-        ROIs2[i, 2] = ROIs2[i, 0] + ROIs2[i, 2]
-        ROIs2[i, 3] = ROIs2[i, 1] + ROIs2[i, 3]
-        
-        
+    Img2 = Image(img2)       
+    
     '''SIFT Features Matching Comparison'''
     # Find SIFT features of matching images
-    kps1_sift, dps1_sift = Img1.kps, Img1.des
-    kps2_sift, dps2_sift = Img2.kps, Img2.des
-    
-    # Filter the Features
-    masks1 = utils.getMaskPointsInROIs(kps1_sift, ROIs1)
-    masks2 = utils.getMaskPointsInROIs(kps2_sift, ROIs2)
-    
-    kps1_filter, des1_filter = Img1.featureFilter(masks1[0])
-    kps2_filter, des2_filter = Img2.featureFilter(masks2[0])
+    kps1_filter, des1_filter = Img1.kps, Img1.des
+    kps2_filter, des2_filter = Img2.kps, Img2.des
     
 
     # BFMatches(des1_filter, des2_filter)
@@ -63,18 +43,10 @@ if __name__ == '__main__':
     img_sift_knn = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches_sift_knn[:300],None,**draw_params)
   
     
-    
     '''BRISK Features Matching Comparison'''
     # Extract the BRISK features
-    kps1_brisk, dps1_brisk = Img1.findFeatures('brisk')
-    kps2_brisk, dps2_brisk = Img2.findFeatures('brisk')
-    
-    # Filter the Features
-    mask1_brisk = utils.getMaskPointsInROIs(kps1_brisk,ROIs1)
-    kps1_filter_, des1_filter_ = Img1.featureFilter(mask1_brisk[0])
-
-    mask2_brisk = utils.getMaskPointsInROIs(kps2_brisk,ROIs2)
-    kps2_filter_, des2_filter_ = Img2.featureFilter(mask2_brisk[0])
+    kps1_filter_, des1_filter_ = Img1.findFeatures('brisk')
+    kps2_filter_, des2_filter_ = Img2.findFeatures('brisk')
     
     # BFMatches(des1_filter, des2_filter)
     matches_brisk = utils.featureMatch(des1_filter_, des2_filter_, 'brisk')

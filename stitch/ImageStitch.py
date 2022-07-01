@@ -150,7 +150,23 @@ class Stitch(object):
         self.Img1.kps = kps1
         self.Img2.kps = kps2
         self.matches = matchInt
+
+def remapStitch(img1, img2, u,v,map_x, map_y,mask):
+    # x_range = np.arange(0, stitch_size[0]+1)
+    # y_range = np.arange(0, stitch_size[1]+1)
+    # u, v = np.meshgrid(x_range, y_range)
+    # u = np.float32(u)
+    # v = np.float32(v)
+    img_super = cv.remap(img1, u, v, cv.INTER_LINEAR)
+    img_transform = cv.remap(img2, map_x, map_y, cv.INTER_LINEAR)
     
+    #img_transform[high_y:high_y + 200, :, :] = 0
+    #img_super[mask] = 0
+    img_transform[:600, :, :] = 0
+    img_super[600:, :, :] = 0
+
+    img_stitch = img_transform + img_super
+    return img_stitch
 
 def simpleStitch(img1, img2, homo_mat):
     # Get the position of vertices
@@ -169,9 +185,9 @@ def simpleStitch(img1, img2, homo_mat):
 
     homo_mat_ = np.eye(3)
     img_super = cv.warpPerspective(
-        img1, homo_mat_, stitch_size, borderValue=(0, 0, 0))
+        img1, homo_mat_, stitch_size)
     img_transform = cv.warpPerspective(
-        img2, homo_mat, stitch_size, borderValue=(0, 0, 0))
+        img2, homo_mat, stitch_size)
 
     
     # Combine the image on one super image
