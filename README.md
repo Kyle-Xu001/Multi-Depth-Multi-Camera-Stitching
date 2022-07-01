@@ -54,7 +54,7 @@ This submission consists of various methods for video stitching from multi-camer
     $ python feature_extraction_test.py
 ```
 <div align="center">
-<img src="result/feature_extraction.png" width="450" height="250"/>
+<img src="result/feature_extraction.png" width="600" height="350"/>
 <br/>
 Figure 1  Feature Extraction Comparison
 </div>
@@ -65,7 +65,7 @@ Figure 1  Feature Extraction Comparison
     $ python feature_matching_test.py
 ```
 <div align="center">
-<img src="result/feature_matching.png" width="450" height="225"/>
+<img src="result/feature_matching.png" width="450" height="240"/>
 <br/>
 Figure 2  Inlier Matches with BF/KNN Matching Methods for All Features 
 </div>
@@ -75,7 +75,7 @@ Figure 2  Inlier Matches with BF/KNN Matching Methods for All Features
     $ python ROIs_matching_test.py
 ```
 <div align="center">
-<img src="result/ROIs.png" width="450" height="200"/>
+<img src="result/ROIs.png" width="450" height="250"/>
 <br/>
 Figure 3  Inlier Matches with corresponding ROI Mathcing for Selected Features
 </div>
@@ -88,7 +88,7 @@ Figure 3  Inlier Matches with corresponding ROI Mathcing for Selected Features
 <div align="center">
 <img src="result/distorted_ROI.png" width="400" height="200"/>
 <br/>
-Figure 4  Increased Inlier Matches by ROIs corresponding Matching on Original Images
+Figure 4  Increased Inlier Matches by ROIs corresponding Matching on Original Fisheye Images
 </div>
 
 > This module requires original fisheye images and camera calibration parameters for undistortion process.
