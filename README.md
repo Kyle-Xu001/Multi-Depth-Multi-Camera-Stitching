@@ -24,7 +24,8 @@ This submission consists of various methods for video stitching from multi-camer
     ├── PositioningSystem_Test.py     # Test Script for Visualizing the Positioning System on Hard-Coded Points
     ├── stitch_custom.py              # Script for Real-time Video Stitching using generalized stitching function with stitching params input
     ├── stitch_custom_old.py          # Script for Real-time Video Stitching using different functions for each farm
-    ├── undistortion_stitch_test.py   # Stitch Images using their original features 
+    ├── stitch.py                     # Directly Stitch Images (Classic Method)
+    ├── undistortion_stitch_test.py   # Stitch Images using features before undistortion 
     ├── .gitignore
     ├── LICENSE
     └── README.md
@@ -34,6 +35,8 @@ This submission consists of various methods for video stitching from multi-camer
 - `feature_matching_test.py` - Apply Brute-Force Matching and KNN Matching methods for all features from two images, then apply RANSAC to estimate the Inlier Matches
 
 - `ROIs_matching_test.py` - Apply Brute-Force Matching and KNN Matching methods for features between corresponding Range of Interests(ROIs). The filtered features in one region can only match to the specific region in another image. Match multiple corresponding areas separately for two images, then apply RANSAC to estimate the Inlier Matches
+
+- `stitch.py` - Directly perform image stitching using a homography matrix estimated by matching inliers.
 
 - `undistortion_stitch_test.py` - The features generated from the calibrated images may be unreal due to image stretching or compression in undistortion process. This script makes use of the initial features from original fisheye images to estimate the homography matrix, then perform the image stitching on undistortion images
 
@@ -49,46 +52,57 @@ This submission consists of various methods for video stitching from multi-camer
 
 ## Usage
 ### Feature Extraction
-- Image Feature Extraction Test: Extract three kinds of features from the input image and visualize the result
+- **Image Feature Extraction Test**: Extract three kinds of features from the input image and visualize the result
 ```bash
     $ python feature_extraction_test.py
 ```
 <div align="center">
-<img src="result/feature_extraction.png" width="600" height="350"/>
+<img src="result/feature_extraction.png" width="500" height="300"/>
 <br/>
 Figure 1  Feature Extraction Comparison
 </div>
 
 ### Feature Matching
-- Feature Matching Test: Match the features with BF/KNN methods. Select suitable matching method based on the Inliers Result
+- **Feature Matching Test**: Match the features with BF/KNN methods. Select suitable matching method based on the Inliers Result
 ```bash
     $ python feature_matching_test.py
 ```
-<div align="center">
-<img src="result/feature_matching.png" width="450" height="240"/>
-<br/>
-Figure 2  Inlier Matches with BF/KNN Matching Methods for All Features 
-</div>
+</br>
 
-- ROIs Matching Test: Match the features within corresponding areas to avoid wrong matches across different regions. As a result of the Separate Region Processing, false matches and computation time will be effectively reduced, and correct matching inliers will be slightly increased.
+- **ROIs Matching Test**: Match the features within corresponding areas to avoid wrong matches across different regions. As a result of the Separate Region Processing, false matches and computation time will be effectively reduced, and the number of correct matching inliers will increase.
 ```bash
     $ python ROIs_matching_test.py
 ```
 <div align="center">
-<img src="result/ROIs.png" width="450" height="250"/>
+<img src="result/feature_matching.png" width="375" height="250"/>
+<img src="result/ROIs.png" width="375" height="250"/>
 <br/>
-Figure 3  Inlier Matches with corresponding ROI Mathcing for Selected Features
+Figure 2 (Left): Inlier Matches from All Features 
+
+Figure 3 (Right): Inlier Matches with corresponding ROI Matching
+
 </div>
 
 ### Image Stitching
-- Undistortion Stitch Test: Stitch Images using original features to estimate homography matrix
+- **Direct Stitch Test**: Extract the SIFT features within ROIs from input images and match the corresponding ROIs' features between candidate images. Then perform image stitching using a homography matrix estimated by the output matching inliers.
+```bash
+    $ python stitch.py
+```
+<div align="center">
+<img src="result/stitch_example.png" width="350" height="200"/>
+<br/>
+Figure 4  Stitched Example Image
+</div>
+</br>
+
+- **Undistortion Stitch Test**: Stitch Images using original real features to estimate homography matrix
 ```bash
     $ python undistortion_stitch_test.py
 ```
 <div align="center">
 <img src="result/distorted_ROI.png" width="400" height="200"/>
 <br/>
-Figure 4  Increased Inlier Matches by ROIs corresponding Matching on Original Fisheye Images
+Figure 5  Increased Inlier Matches by ROIs corresponding Matching on Original Fisheye Images
 </div>
 
 > This module requires original fisheye images and camera calibration parameters for undistortion process.

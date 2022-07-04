@@ -4,9 +4,10 @@
 *.npy
 result/result/
 result/result_fake/
+result/dataset_result/
 params/
 dataset/
 calib_params_Mathe/
 calib_params_Arie/
-calib_params_office_farm/
+calib_params_office_farm/   
 __pycache__/

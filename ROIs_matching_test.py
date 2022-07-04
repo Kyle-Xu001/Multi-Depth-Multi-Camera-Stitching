@@ -2,7 +2,8 @@ import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 
-from stitch import Stitch
+from stitch import utils,Stitch
+import stitch
 
 if __name__ == '__main__':
     '''This script will be tested for multiple ROIs'''
@@ -12,15 +13,15 @@ if __name__ == '__main__':
                    flags = cv.DrawMatchesFlags_DEFAULT)
     
     # load the matching images
-    #img1 = cv.imread("dataset/Arie/lamp_02_Arie.PNG")
-    #img2 = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
-    img1 = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
-    img2 = cv.imread("dataset/example_image/APAP-railtracks/2.JPG")
+    img1 = cv.imread("dataset/Arie/lamp_02_Arie.PNG")
+    img2 = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
+    # img1 = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
+    # img2 = cv.imread("dataset/example_image/APAP-railtracks/2.JPG")
     #img1 = cv.imread("dataset/example_image/NISwGSP-denny/denny02.jpg")
     #img2 = cv.imread("dataset/example_image/NISwGSP-denny/denny03.jpg")
 
-    #img1 = np.rot90(img1,1) 
-    #img2 = np.rot90(img2,1)
+    img1 = np.rot90(img1,1) 
+    img2 = np.rot90(img2,1)
     
     # Manually define the ROI to locate the area for corresponding images
     cv.namedWindow("Area Selection", cv.WINDOW_NORMAL)
@@ -55,6 +56,9 @@ if __name__ == '__main__':
     
     # Define the matches based on two images
     matches_list = stitch_sift_knn.clusterMatch('sift', knn=True)
+    
+    # draw the matches in each cluster
+    utils.drawMatch(stitch_sift.Img1,stitch_sift.Img2,matches_list,draw_params)
     
     # Combine the features in one lists from each cluster
     stitch_sift_knn.featureIntegrate(matches_list)
