@@ -9,10 +9,10 @@ if __name__ == '__main__':
     '''This script is used for feature extraction from each image'''
     # Load exmaple image
     img = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
-    img = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
-    #img = cv.imread("dataset/example_image/park/1.jpg")
+    # img = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
+    # img = cv.imread("dataset/example_image/park/1.jpg")
     
-    #img = np.rot90(img,1) # Rotate the image to get better visualization
+    # img = np.rot90(img,1) # Rotate the image to get better visualization
     
     Img = Image(img)
     

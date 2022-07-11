@@ -18,9 +18,7 @@ reg = Registration.CNN()
 
 #register
 X, Y, Z, X_ = reg.register(IX, IY)
-print(X)
-print(Y)
-print(X.shape==Y.shape)
+
 #generate regsitered image using TPS
 registered = tps_warp(Y, Z, IY, IX.shape)
 cb = checkboard(IX, registered, 11)

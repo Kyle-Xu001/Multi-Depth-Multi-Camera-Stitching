@@ -116,7 +116,7 @@ class CNN(object):
 
         C = C_all[np.where(quality >= tau_max)]
         cnt = C.shape[0]
-
+        
         # select prematched feature points
         X, Y = X[C[:, 1]], Y[C[:, 0]]
         PD = PD[np.repeat(np.reshape(C[:, 1], [cnt, 1]), cnt, axis=1),

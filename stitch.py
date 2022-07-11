@@ -1,7 +1,6 @@
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-
 from stitch import utils, Stitch, simpleStitch
 
 '''This script is used for stitching two undistortion images with basic workflow'''
@@ -12,10 +11,10 @@ draw_params = dict(matchColor = (0,255,0),
                    flags = cv.DrawMatchesFlags_DEFAULT)
 
 # load the matching images
-# img1 = cv.imread("dataset/Arie/lamp_02_Arie.PNG")
-# img2 = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
-img1 = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
-img2 = cv.imread("dataset/example_image/APAP-railtracks/2.JPG")
+img1 = cv.imread("dataset/Mathe/lamp_02_Arie.PNG")
+img2 = cv.imread("dataset/Mathe/lamp_01_Arie.PNG")
+# img1 = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
+# img2 = cv.imread("dataset/example_image/APAP-railtracks/2.JPG")
 #img1 = cv.imread("dataset/example_image/NISwGSP-denny/denny02.jpg")
 #img2 = cv.imread("dataset/example_image/NISwGSP-denny/denny03.jpg")
 
@@ -104,7 +103,40 @@ plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
 plt.axis('off')
 plt.show()
 
+'''Test the TPS transform method'''
+Y = []
+X = []
+new_matches = []
+for i in range(40):
+# for i in range(5):
+    Y.append(stitch.Img2.kps[matches_inliers[4*i].trainIdx])
+    X.append(stitch.Img1.kps[matches_inliers[4*i].queryIdx])
+    new_matches.append(cv.DMatch(i, i, 0))
+Y = cv.KeyPoint_convert(Y)
+X = cv.KeyPoint_convert(X)
 
+Y = np.asarray(Y)
+Y = Y.reshape([1,-1,2])
+X = np.asarray(X)
+X = X.reshape([1,-1,2])
+Y = cv.perspectiveTransform(Y, homo_mat)
+
+homo_mat_ = np.eye(3)
+img_super = cv.warpPerspective(img1, homo_mat_, (img_stitch.shape[1],img_stitch.shape[0]))
+img_transform = cv.warpPerspective(img2, homo_mat, (img_stitch.shape[1],img_stitch.shape[0]))
+
+print(Y-X)
+tps = cv.createThinPlateSplineShapeTransformer()
+tps.estimateTransformation(Y, X, new_matches)
+print(tps.applyTransformation(Y))
+img_transform=tps.warpImage(img_transform)
+img_super[img_transform > 0] = 0
+img_transform= img_transform + img_super
+
+plt.figure(4)
+plt.imshow(cv.cvtColor(img_transform, cv.COLOR_BGR2RGB))
+plt.axis('off')
+plt.show()
 
 '''
 Print the parameters of homography matrix

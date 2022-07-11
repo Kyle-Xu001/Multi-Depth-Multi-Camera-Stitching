@@ -52,7 +52,7 @@ This submission consists of various methods for video stitching from multi-camer
 
 ## Usage
 ### Feature Extraction
-- **Image Feature Extraction Test**: Extract three kinds of features from the input image and visualize the result
+- **Image Feature Extraction Test**: Extract different kinds of features from the input image and visualize the result
 ```bash
     $ python feature_extraction_test.py
 ```
@@ -79,7 +79,7 @@ Figure 1  Feature Extraction Comparison
 <br/>
 Figure 2 (Left): Inlier Matches from All Features 
 
-Figure 3 (Right): Inlier Matches with corresponding ROI Matching
+Figure 3 (Right): Inlier Matches with Corresponding ROI Matching
 
 </div>
 
@@ -100,7 +100,7 @@ Figure 4  Stitched Example Image
     $ python undistortion_stitch_test.py
 ```
 <div align="center">
-<img src="result/distorted_ROI.png" width="400" height="200"/>
+<img src="result/distorted_ROI.png" width="425" height="225"/>
 <br/>
 Figure 5  Increased Inlier Matches by ROIs corresponding Matching on Original Fisheye Images
 </div>

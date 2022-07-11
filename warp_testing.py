@@ -34,7 +34,7 @@ print(mask)
 
 T1 = time.time()
 for i in range(100):
-    img_stitch = simpleStitch(img1, img2, homo_mat,mask)
+    img_stitch = simpleStitch(img1, img2, homo_mat)
 T2 = time.time()
 cv.imshow("stitch",img_stitch)
 
@@ -54,10 +54,10 @@ map_y = (homo_mat[1,0]*u + homo_mat[1,1]*v + homo_mat[1,2])/z_
 
 T3 = time.time()
 for i in range(100):
-    img_stitch = remapStitch(img1,img2,u,v,map_x,map_y,mask)
+    img_stitch = remapStitch(img1,img2,u,v,map_x,map_y)
 T4 = time.time()
 cv.imshow("warped",img_stitch)
-cv.waitKey(0)
+#cv.waitKey(0)
 print("simpleStitch:",(T2-T1)*10)
 print("remapStitch:",(T4-T3)*10)
 

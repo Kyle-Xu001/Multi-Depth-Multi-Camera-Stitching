@@ -1,6 +1,7 @@
 import itertools
 import numpy as np
 import cv2 as cv
+from scipy.interpolate import Rbf
 from . import utils
 
 '''
@@ -151,7 +152,7 @@ class Stitch(object):
         self.Img2.kps = kps2
         self.matches = matchInt
 
-def remapStitch(img1, img2, u,v,map_x, map_y,mask):
+def remapStitch(img1, img2, u,v,map_x, map_y):
     # x_range = np.arange(0, stitch_size[0]+1)
     # y_range = np.arange(0, stitch_size[1]+1)
     # u, v = np.meshgrid(x_range, y_range)
