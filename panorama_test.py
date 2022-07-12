@@ -1,33 +1,166 @@
+import os
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
 from stitch import transform
-import stitch.ImageStitch as ImageStitch
-from stitch.ImageStitch import Stitch
+from stitch import utils, Stitch, simpleStitch
 
+pts = []
+dst = []
 
+def select_pts(event,x,y,flags,param):
+    if event == cv.EVENT_LBUTTONDOWN:
+        global pts
+        cv.circle(img_stitch_,(x,y),15,(200,155,0),-1)
+        pts.append([x,y])
+
+def select_dst(event,x,y,flags,param):
+    if event == cv.EVENT_LBUTTONDOWN:
+        global dst
+        cv.circle(img_stitch_,(x,y),15,(0,200,155),-1)
+        dst.append([x,y])
+        
 # Define the main function
 if __name__ == '__main__':
     # Define the draw parameters for matching visualization
     draw_params = dict(matchColor=(0, 255, 0),
                        singlePointColor=(0, 0, 255),
                        flags=cv.DrawMatchesFlags_DEFAULT)
-    # '''
-    # Stitch the Arie Farm from lamp01 to lamp05
+    '''
+    Stitch Multiple Images for NISwGSP-denny dataset
     
-    # Generate estimated homography matrix using matches between corresponding features in ROIs.
-    # Directly apply homography matrix to stitch all frames
-    # --------------------
+    Generate estimated homography matrix using matches between corresponding features in separate ROIs.
+    Directly apply homography matrix to stitch all frames
+    --------------------
     
-    # :param  img1_~img5_: original distorted images from each frame
-    # :type  img1_~img5_: nparray (768*1152*3)
+    :param  img1~img15: original undistorted images 
+    :type  img1_~img15_: nparray
     
-    # :param  homo_mat: homography matrix generated from feature estimation, using for image transformation
-    # :type  homo_mat: nparray (3*3)
+    :param  homo_mat: homography matrix generated from feature estimation, using for image transformation
+    :type  homo_mat: nparray (3*3)
     
-    # :return  img_stitch: stitching image of lamp14 to lamp18
-    # '''
+    :return  img_stitch: stitched image for 15 images
+    '''
+    # Load the folder path
+    path = "dataset/example_image/APAP-conssite"
+    files= os.listdir(path)
+    keys = []
+    for file in files:
+        if not os.path.isdir(file):
+            keys.append(file)
+    keys = sorted(keys)
+    
+    # Load all the images from right to the left
+    imgs = {}
+    for key in keys:
+        imgs[key] = cv.imread(path+'/'+key)
+
+    num_images = len(keys)
+
+    for i in range(num_images):
+        img2 = imgs[keys[i+1]]
+        if i == 0:
+            img1 = imgs[keys[i]]
+        else:
+            cv.namedWindow("Area Cutting", cv.WINDOW_NORMAL)
+            cv.resizeWindow("Area Cutting", 1960, 1080)
+            ROI = cv.selectROIs("Area Cutting", img_stitch)
+            img1 = img_stitch[ROI[0,1]:ROI[0,1]+ROI[0,3],ROI[0,0]:ROI[0,0]+ROI[0,2],:]
+            cv.imwrite("img_stitch.png",img1)
+        
+        # Manually define the ROI to locate the area for corresponding images
+        cv.namedWindow("Area Selection", cv.WINDOW_NORMAL)
+        cv.resizeWindow("Area Selection", 1960, 1080)
+        ROIs1 = cv.selectROIs("Area Selection", img1)
+        ROIs2 = cv.selectROIs("Area Selection", img2)
+
+        for i in range(len(ROIs1)):
+            ROIs1[i, 2] = ROIs1[i, 0] + ROIs1[i, 2]
+            ROIs1[i, 3] = ROIs1[i, 1] + ROIs1[i, 3]
+            ROIs2[i, 2] = ROIs2[i, 0] + ROIs2[i, 2]
+            ROIs2[i, 3] = ROIs2[i, 1] + ROIs2[i, 3]
+            
+        # Initialize the object
+        stitch = Stitch(img1, img2)
+        stitch.featureExtract(ROIs1, ROIs2)
+
+
+        '''Match the Corresponding Features'''
+        # Define the matches based on two images
+        matches_list = stitch.clusterMatch('sift', knn=True)
+
+        # Show the number of matches
+        matchNum = 0
+        for i in range(len(matches_list)):
+            matchNum += len(matches_list[i])
+            print("-- Number of original matches in each area", len(matches_list[i]))
+        print("Number of original total matches: ", matchNum)
+
+        # Combine the features in one lists from each cluster
+        stitch.featureIntegrate(matches_list)
+        
+        '''
+        Find the parameters for homography matrix
+        '''
+        # Calculate the homography matrix for image transformation
+        homo_mat, matches_inliers = stitch.homoEstimate()
+        img_inliers = cv.drawMatches(img1,stitch.Img1.kps,img2,stitch.Img2.kps,matches_inliers,None,**draw_params)
+        
+        plt.figure(1)
+        plt.imshow(cv.cvtColor(img_inliers, cv.COLOR_BGR2RGB))
+        plt.title("Inlier Matches for Total Selected Area")
+        plt.axis('off')
+
+        '''
+        Stitch the Images
+        '''
+        img_stitch = simpleStitch(img1, img2, homo_mat)
+        img_stitch_ = img_stitch.copy()
+        cv.namedWindow("Point Selection", cv.WINDOW_NORMAL)
+        cv.resizeWindow("Point Selection", 1960, 1080)
+        cv.setMouseCallback('Point Selection',select_pts)
+        while(1):
+            cv.imshow('Point Selection',img_stitch_)
+            if cv.waitKey(20) & 0xFF == 27:
+                break
+        cv.setMouseCallback('Point Selection',select_dst)
+        while(1):
+            cv.imshow('Point Selection',img_stitch_)
+            if cv.waitKey(20) & 0xFF == 27:
+                break
+        print(img_stitch.shape)
+        pts = np.array(pts,dtype="float32")
+        dst = np.array(dst,dtype="float32")
+        cv.destroyAllWindows()
+        if pts.shape[0] == 4 and dst.shape[0] ==4:
+            img_stitch = transform.four_point_transform(img_stitch, pts, dst)
+        else:
+            img_stitch = img_stitch
+        
+        pts = []
+        dst = []
+
+        plt.figure(2)
+        plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
+        plt.axis('off')
+        plt.show()
+
+    '''
+    Stitch the Arie Farm from lamp01 to lamp05
+    
+    Generate estimated homography matrix using matches between corresponding features in ROIs.
+    Directly apply homography matrix to stitch all frames
+    --------------------
+    
+    :param  img1_~img5_: original distorted images from each frame
+    :type  img1_~img5_: nparray (768*1152*3)
+    
+    :param  homo_mat: homography matrix generated from feature estimation, using for image transformation
+    :type  homo_mat: nparray (3*3)
+    
+    :return  img_stitch: stitching image of lamp14 to lamp18
+    '''
     
     # # load the initial images and corresponding homo matrix
     # img1_ = cv.imread("dataset/office_farm/lamp_01.PNG")

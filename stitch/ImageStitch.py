@@ -152,7 +152,7 @@ class Stitch(object):
         self.Img2.kps = kps2
         self.matches = matchInt
 
-def remapStitch(img1, img2, u,v,map_x, map_y):
+def remapStitch(img1, img2, u, v, map_x, map_y):
     # x_range = np.arange(0, stitch_size[0]+1)
     # y_range = np.arange(0, stitch_size[1]+1)
     # u, v = np.meshgrid(x_range, y_range)
@@ -178,13 +178,20 @@ def simpleStitch(img1, img2, homo_mat):
     x_max = posVerts[:, 0].max()
     y_min = posVerts[:, 1].min()
     y_max = posVerts[:, 1].max()
-    # print("x_min: %d, x_max: %d y_min: %d, y_max: %d" %
-    #       (x_min, x_max, y_min, y_max))
+    print("x_min: %d, x_max: %d y_min: %d, y_max: %d" %
+          (x_min, x_max, y_min, y_max))
 
     # Define the size of the result image
-    stitch_size = (x_max, y_max)
-
+    offset = np.minimum(np.abs(y_min), img2.shape[0])
+    width = np.maximum(np.abs(x_max-x_min), x_max)
+    height = np.maximum(np.abs(y_max-y_min), y_max)
+    stitch_size = (width, height)
+    translation = np.array([[0,0,0],
+                            [0,0,offset],
+                            [0,0,0]])
     homo_mat_ = np.eye(3)
+    homo_mat = homo_mat + translation
+    homo_mat_ = homo_mat_ +translation
     img_super = cv.warpPerspective(
         img1, homo_mat_, stitch_size)
     img_transform = cv.warpPerspective(

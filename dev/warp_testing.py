@@ -4,8 +4,8 @@ import numpy as np
 from stitch import remapStitch, simpleStitch
 from stitch.utils import transformVerts
 
-img1 = cv.imread("dataset/Arie/lamp_02_Arie.PNG")
-img2 = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
+img1 = cv.imread("../dataset/Arie/lamp_02_Arie.PNG")
+img2 = cv.imread("../dataset/Arie/lamp_01_Arie.PNG")
 
 homo_mat = np.array([
         1.1244483061556527, 0.020214811271289677, 39.9989392156668,

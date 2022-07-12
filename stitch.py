@@ -1,8 +1,23 @@
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-from stitch import utils, Stitch, simpleStitch
+from stitch import utils, Stitch, simpleStitch, transform
 
+pts = []
+dst = []
+
+# def select_pts(event,x,y,flags,param):
+#     if event == cv.EVENT_LBUTTONDOWN:
+#         global pts
+#         cv.circle(img1_,(x,y),15,(200,155,0),-1)
+#         pts.append([x,y])
+
+# def select_dst(event,x,y,flags,param):
+#     if event == cv.EVENT_LBUTTONDOWN:
+#         global dst
+#         cv.circle(img1_,(x,y),15,(0,200,155),-1)
+#         dst.append([x,y])
+        
 '''This script is used for stitching two undistortion images with basic workflow'''
 
 # Define the draw parameters for matching visualization
@@ -11,19 +26,21 @@ draw_params = dict(matchColor = (0,255,0),
                    flags = cv.DrawMatchesFlags_DEFAULT)
 
 # load the matching images
-img1 = cv.imread("dataset/Mathe/lamp_02_Arie.PNG")
-img2 = cv.imread("dataset/Mathe/lamp_01_Arie.PNG")
+img1 = cv.imread("dataset/Arie/lamp_02_Arie.PNG")
+img2 = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
 # img1 = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
 # img2 = cv.imread("dataset/example_image/APAP-railtracks/2.JPG")
-#img1 = cv.imread("dataset/example_image/NISwGSP-denny/denny02.jpg")
-#img2 = cv.imread("dataset/example_image/NISwGSP-denny/denny03.jpg")
+# img1 = cv.imread("dataset/example_image/NISwGSP-denny/denny04.jpg")
+# img2 = cv.imread("dataset/example_image/NISwGSP-denny/denny14.jpg")
+# img1 = cv.imread("img_stitch1.png")
+#img2 = cv.imread("img3.png")
 
-#img1 = np.rot90(img1,1) 
-#img2 = np.rot90(img2,1)
+# img1 = np.rot90(img1,1) 
+# img2 = np.rot90(img2,1)
 
 # The stitch order need to be flipped to be keep the right image unchanged
-#img1_ = cv.flip(img1_, 0)
-#img2_ = cv.flip(img2_, 0)
+# img1 = cv.flip(img1, 1)
+# img2 = cv.flip(img2, 1)
 
 '''Extract Features within Interested Regions'''
 # Manually define the ROI to locate the area for corresponding images
@@ -97,9 +114,13 @@ plt.axis('off')
 Stitch the Images
 '''
 img_stitch = simpleStitch(img1, img2, homo_mat)
-
-plt.figure(3)
-plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
+# cv.namedWindow("Area Cutting", cv.WINDOW_NORMAL)
+# cv.resizeWindow("Area Cutting", 1960, 1080)
+# ROI = cv.selectROIs("Area Cutting", img_stitch)
+# img_stitch = img_stitch[ROI[0,1]:ROI[0,1]+ROI[0,3],ROI[0,0]:ROI[0,0]+ROI[0,2],:]
+# cv.imwrite("img_stitch.png",img_stitch)
+# plt.figure(3)
+# plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
 plt.axis('off')
 plt.show()
 
@@ -133,11 +154,11 @@ img_transform=tps.warpImage(img_transform)
 img_super[img_transform > 0] = 0
 img_transform= img_transform + img_super
 
-plt.figure(4)
+plt.figure(2)
 plt.imshow(cv.cvtColor(img_transform, cv.COLOR_BGR2RGB))
+plt.title("Inlier Matches for Total Selected Area")
 plt.axis('off')
 plt.show()
-
 '''
 Print the parameters of homography matrix
 '''
