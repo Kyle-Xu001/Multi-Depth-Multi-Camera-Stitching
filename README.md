@@ -8,6 +8,12 @@ This repository consists of various methods for video stitching from multi-camer
 <img src="result/panaroma.gif" controls="controls" muted="muted"/>
 </div>
 
+## TO DO:
+1. Multi-Stitching Improvement
+2. Video Stitching Improvement/ Data visualization
+3. VGG-16 matching improvement
+4. APAP/seamdriven deployment
+
 ## Files Description
 ```
 .
@@ -16,32 +22,32 @@ This repository consists of various methods for video stitching from multi-camer
 |    ├─── ImageStitch.py        # Define the Image and Stitch class
 |    ├─── PositioningSystem.py  # Transformation Function from Local to Global Image
 |    └─── utils.py              # Basic functions for stitching
-├── scripts
-|    ├─── feature_extraction_test.py    # Image Preprocessing and Feature Extraction
-|    ├─── feature_matching_test.py      # Feature Matching and Inliers Estimation
-|    ├─── ROIs_matching_test.py         # Feature Matching within corresponding ROIs
-|    ├─── stitch.py                     # Directly Stitch Images (Classic Method)
-|    └─── utils.py              # Basic functions for stitching
+├── src
+|    ├─── test_feature_extraction.py    # Image Preprocessing and Feature Extraction
+|    ├─── test_feature_matching.py      # Feature Matching and Inliers Estimation
+|    ├─── test_ROIs_matching.py         # Feature Matching within corresponding ROIs
+|    ├─── test_undistortion_stitch.py   # Stitch using features before undistortion
+|    └─── test_stitch.py                # Directly Stitch Images (Classic Method)
 | 
 ├── panorama_test.py              # Multiple Stitching for Panorama Image
 ├── PositioningSystem_Test.py     # Test Script for Visualizing the Positioning System on Hard-Coded Points
 ├── stitch_custom.py              # Script for Real-time Video Stitching using generalized stitching function with stitching params input
 ├── stitch_custom_old.py          # Script for Real-time Video Stitching using different functions for each farm
-├── undistortion_stitch_test.py   # Stitch Images using original features before undistortion 
+├── main.sh
 ├── .gitignore
 ├── LICENSE
 └── README.md
 ```
 
-- `feature_extraction_test.py` - Apply Histogram Equalization for image preprocessing, then extract the SIFT, BRISK and ORB features from the image for comparison
+- `test_feature_extraction.py` - Apply Histogram Equalization for image preprocessing, then extract the SIFT, BRISK and ORB features from the image for comparison
 
-- `feature_matching_test.py` - Apply Brute-Force Matching and KNN Matching methods for all features from two images, then apply RANSAC to estimate the Inlier Matches
+- `test_feature_matching.py` - Apply Brute-Force Matching and KNN Matching methods for all features from two images, then apply RANSAC to estimate the Inlier Matches
 
-- `ROIs_matching_test.py` - Apply Brute-Force Matching and KNN Matching methods for features between corresponding Range of Interests(ROIs). The filtered features in one region can only match to the specific region in another image. Match multiple corresponding areas separately for two images, then apply RANSAC to estimate the Inlier Matches
+- `test_ROIs_matching.py` - Apply Brute-Force Matching and KNN Matching methods for features between corresponding Range of Interests(ROIs). The filtered features in one region can only match to the specific region in another image. Match multiple corresponding areas separately for two images, then apply RANSAC to estimate the Inlier Matches
 
-- `stitch.py` - Directly perform image stitching using a homography matrix estimated by matching inliers.
+- `test_stitch.py` - Directly perform image stitching using a homography matrix estimated by matching inliers.
 
-- `undistortion_stitch_test.py` - The features generated from the calibrated images may be unreal due to image stretching or compression in undistortion process. This script makes use of the initial features from original fisheye images to estimate the homography matrix, then perform the image stitching on undistortion images
+- `test_undistortion_stitch.py` - The features generated from the calibrated images may be unreal due to image stretching or compression in undistortion process. This script makes use of the initial features from original fisheye images to estimate the homography matrix, then perform the image stitching on undistortion images
 
 - `panorama_test.py` - Stitch the new input image with the stitched image from the last step, and perform Perspective Transform to correct the output stitched image for better visualization
 
@@ -57,7 +63,7 @@ This repository consists of various methods for video stitching from multi-camer
 ### Feature Extraction
 - **Image Feature Extraction Test**: Extract various features (SIFT, BRISK, ORB) from input images and visualize results
     ```bash
-    $ ./main.sh -t feature_extraction $INPUT_IMAGE
+    $ ./main.sh -t feature_extraction -img1 $INPUT_IMAGE
     ```
 <div align="center">
 <img src="result/feature_extraction.png" width="500" height="300"/>
@@ -98,18 +104,11 @@ Figure 4  Exmaple Stitched Image
 </div>
 </br>
 
-- **Undistortion Stitching Test**: Stitch Undistorted Images using their original real features to estimate homography matrix
-```bash
-    $ python undistortion_stitch_test.py
-```
-<div align="center">
-<img src="result/distorted_ROI.png" width="425" height="225"/>
-<br/>
-Figure 5  Increased Matching Inliers by ROIs corresponding Matching on Original Distorted Images
-</div>
-<br/>
-
-> This module requires original distorted images and camera calibration parameters for undistortion stitchingprocess.
+- **Undistortion Stitching Test**: Stitch Undistorted Images using their original real features to estimate homography matrix (Expensive Computation)
+    ```bash
+    $ python3 src/undistortion_stitch_test.py
+    ```
+    > This module requires original distorted images and camera calibration parameters for undistortion stitchingprocess.
 
 <br/>
 

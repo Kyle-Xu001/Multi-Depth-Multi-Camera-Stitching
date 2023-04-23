@@ -118,7 +118,7 @@ if __name__ == '__main__':
     img_inliners_brisk = cv.drawMatches(stitch_brisk.Img1.img, stitch_brisk.Img1.kps, stitch_brisk.Img2.img, stitch_brisk.Img2.kps, matches_inliers_brisk, None, **draw_params)
     img_inliners_brisk_knn = cv.drawMatches(stitch_brisk_knn.Img1.img, stitch_brisk_knn.Img1.kps, stitch_brisk_knn.Img2.img, stitch_brisk_knn.Img2.kps, matches_inliers_brisk_knn, None, **draw_params)  
     
-    plt.figure(1)
+    fig = plt.figure(figsize=(15,10))
     plt.subplot(2,2,1)
     plt.title("Brute Force Matching on SIFT Features\n(# of Inliners: %d)" %(len(matches_inliers_sift)))
     plt.imshow(cv.cvtColor(img_inliners_sift, cv.COLOR_BGR2RGB))
@@ -142,3 +142,4 @@ if __name__ == '__main__':
     plt.show()
 
     plt.axis('off')
+    fig.tight_layout()

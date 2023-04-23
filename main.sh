@@ -32,14 +32,14 @@ done
 
 if [[ $TYPE == "feature_extraction" ]];
 then
-     python3 src/feature_extraction_test.py --img $IMG1 #--rotate
+     python3 src/test_feature_extraction.py --img $IMG1 #--rotate
 elif [[ $TYPE == "feature_matching" ]];
 then
-     python3 src/feature_matching_test.py --img1 $IMG1 --img2 $IMG2 #--rotate
+     python3 src/test_feature_matching.py --img1 $IMG1 --img2 $IMG2 #--rotate
 elif [[ $TYPE == "roi_matching" ]];
 then
-     python3 src/ROIs_matching_test.py --img1 $IMG1 --img2 $IMG2 #--rotate
+     python3 src/test_ROIs_matching.py --img1 $IMG1 --img2 $IMG2 #--rotate
 elif [[ $TYPE == "stitch" ]];
 then
-     python3 src/stitch.py --img1 $IMG1 --img2 $IMG2 #--rotate
+     python3 src/test_stitch.py --img1 $IMG1 --img2 $IMG2 #--rotate
 fi

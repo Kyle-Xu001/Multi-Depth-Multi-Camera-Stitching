@@ -40,8 +40,8 @@ if __name__ == '__main__':
     img_ = utils.equalizeHist_old(img)
     Img_ = Image(img_)
 
-    # show the original image and equalhist image
-    fig = plt.figure(1)
+    # show the original image and equal-histogram image
+    fig = plt.figure(figsize=(15, 10))
     plt.subplot(1, 3, 1)
     plt.imshow(cv.cvtColor(Img_copy.img, cv.COLOR_BGR2RGB))
     plt.title("(a) Original Image")
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     kps_orb, dps_orb = Img.findFeatures('orb')
     # show the original image and equalhist image
     
-    fig1 = plt.figure(2)
+    fig1 = plt.figure(figsize=(15, 10))
     plt.subplot(1, 3, 1)
     img_kps_sift = cv.drawKeypoints(Img.img, kps_sift, None,(0,255,0), flags=cv.DRAW_MATCHES_FLAGS_DEFAULT)
     plt.imshow(cv.cvtColor(img_kps_sift, cv.COLOR_BGR2RGB))
@@ -87,9 +87,8 @@ if __name__ == '__main__':
     plt.axis('off')
 
 
-
     # Compare the different equlization methods for feature extraction
-    fig2 = plt.figure(3)
+    fig2 = plt.figure(figsize=(15, 10))
     kps_sift_origin, dps_sift_origin = Img_copy.findFeatures('sift')
     kps_sift_old, dps_sift_old = Img_.findFeatures('sift')
     

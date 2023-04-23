@@ -26,7 +26,7 @@ if __name__ =='__main__':
 
     '''Calibrate the Original Image for Undistortion'''
     # Enter the direction of the parameters
-    calib_dir = "/home/cxu-lely/kyle-xu001/Multi-Depth-Multi-Camera-Stitching/params/calib_params_Arie"
+    calib_dir = "params/calib_params_Arie"
     
     # Calculate the mapping matrix
     img_undistort1,map1_1,map2_1 = undistort(img1_,lamp_id1,calib_dir)
@@ -103,7 +103,6 @@ if __name__ =='__main__':
     features2, invalid_index2 = feature_map(map1_2, map2_2, pts2)
     
     matches = utils.matchFilter(stitches.matches, invalid_index1, invalid_index2)    
-    
     
     
     '''

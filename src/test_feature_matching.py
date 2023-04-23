@@ -70,7 +70,7 @@ if __name__ == '__main__':
     
     
     '''Visualize the Feature Matching Result'''
-    plt.figure(1)
+    fig1 = plt.figure(figsize=(15, 10))
     plt.subplot(2,2,1)
     plt.title("Brute Force Matching on SIFT Features\n(# of Matches: %d)" %(len(matches_sift)))
     plt.imshow(cv.cvtColor(img_sift, cv.COLOR_BGR2RGB))
@@ -90,6 +90,7 @@ if __name__ == '__main__':
     plt.title("Brute Force KNN Matching on BRISK Features\n(# of Matches: %d)" %(len(matches_brisk_knn)))
     plt.imshow(cv.cvtColor(img_brisk_knn, cv.COLOR_BGR2RGB))
     plt.axis('off')
+    fig1.tight_layout()
     plt.show()
     
 
@@ -110,7 +111,7 @@ if __name__ == '__main__':
     img_inliners_brisk = cv.drawMatches(Img1.img,kps1_filter_,Img2.img,kps2_filter_,matches_inliers_brisk,None,**draw_params)
     img_inliners_brisk_knn = cv.drawMatches(Img1.img,kps1_filter_,Img2.img,kps2_filter_,matches_inliers_brisk_knn,None,**draw_params)    
     
-    plt.figure(2)
+    fig2 = plt.figure(figsize=(15, 10))
     plt.subplot(2,2,1)
     plt.title("Brute Force Matching on SIFT Features\n(# of Inliners: %d)" %(len(matches_inliers_sift)))
     plt.imshow(cv.cvtColor(img_inliners_sift, cv.COLOR_BGR2RGB))
@@ -131,4 +132,5 @@ if __name__ == '__main__':
     plt.imshow(cv.cvtColor(img_inliners_brisk_knn, cv.COLOR_BGR2RGB))
     plt.axis('off')
     
+    fig2.tight_layout()
     plt.show()

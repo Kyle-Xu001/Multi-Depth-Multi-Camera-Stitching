@@ -41,7 +41,7 @@ if __name__ == '__main__':
         img2 = np.rot90(img2,1)
 
     # The stitch order need to be flipped to be keep the right image unchanged
-    if argparse.flip:
+    if args.flip:
         img1 = cv.flip(img1, 1)
         img2 = cv.flip(img2, 1)
 
@@ -51,7 +51,8 @@ if __name__ == '__main__':
     cv.resizeWindow("Area Selection", 800, 600)
     ROIs1 = cv.selectROIs("Area Selection", img1)
     ROIs2 = cv.selectROIs("Area Selection", img2)
-
+    cv.destroyAllWindows()
+    
     for i in range(len(ROIs1)):
         ROIs1[i, 2] = ROIs1[i, 0] + ROIs1[i, 2]
         ROIs1[i, 3] = ROIs1[i, 1] + ROIs1[i, 3]
@@ -82,7 +83,8 @@ if __name__ == '__main__':
     stitch.featureIntegrate(matches_list)
 
     # Visualize the total matches
-    plt.figure(1)
+    fig1 = plt.figure(figsize=(15, 10))
+    fig1.tight_layout()
     img_match = cv.drawMatches(img1,stitch.Img1.kps,img2,stitch.Img2.kps,stitch.matches,None,**draw_params)
     plt.imshow(cv.cvtColor(img_match, cv.COLOR_BGR2RGB))
     plt.title("Feature Matching for Total Selected Area")
@@ -99,7 +101,8 @@ if __name__ == '__main__':
     print("\nNumber of inlier matches: ", len(matches_inliers),"\n")
 
 
-    plt.figure(2)
+    fig2 = plt.figure(figsize=(15, 10))
+    fig2.tight_layout()
     plt.imshow(cv.cvtColor(img_inliers, cv.COLOR_BGR2RGB))
     plt.title("Inlier Matches for Total Selected Area")
     plt.axis('off')
@@ -115,10 +118,12 @@ if __name__ == '__main__':
     Stitch the Images
     '''
     img_stitch = simpleStitch(img1, img2, homo_mat)
-    plt.figure(3)
+    fig3 = plt.figure(figsize=(15, 10))
+    fig3.tight_layout()
     plt.imshow(cv.cvtColor(img_stitch, cv.COLOR_BGR2RGB))
     plt.axis('off')
     plt.show()
+    
 
 
     '''

@@ -47,14 +47,15 @@ if __name__ == '__main__':
     files= os.listdir(path)
     keys = []
     for file in files:
-        if not os.path.isdir(file):
+        if not os.path.isdir(file) and not '.mat' in file:
             keys.append(file)
     keys = sorted(keys)
     
     # Load all the images from right to the left
     imgs = {}
     for key in keys:
-        imgs[key] = cv.imread(path+'/'+key)
+        img = cv.imread(path+'/'+key)
+        imgs[key] = cv.resize(img,(960,720))
 
     num_images = len(keys)
 
@@ -129,7 +130,6 @@ if __name__ == '__main__':
             cv.imshow('Point Selection',img_stitch_)
             if cv.waitKey(20) & 0xFF == 27:
                 break
-        print(img_stitch.shape)
         pts = np.array(pts,dtype="float32")
         dst = np.array(dst,dtype="float32")
         cv.destroyAllWindows()
