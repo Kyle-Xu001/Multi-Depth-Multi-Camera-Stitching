@@ -1,18 +1,32 @@
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
+
+import argparse
 import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 
 from stitch import utils, Image
 
-
 if __name__ == '__main__':
-    '''This script is used for feature extraction from each image'''
+    """
+    This script is used for feature extraction testing.
+    """
+    # Define parser arguments
+    parser = argparse.ArgumentParser(description="Image Stitching")
+    parser.add_argument("--img", type=str)
+    parser.add_argument("--rotate", action="store_true" , help="Rotate the image to get better visualization")
+    args, _ = parser.parse_known_args()
+    
     # Load exmaple image
-    img = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
+    img = cv.imread(args.img)
+    # img = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
     # img = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
     # img = cv.imread("dataset/example_image/park/1.jpg")
     
-    # img = np.rot90(img,1) # Rotate the image to get better visualization
+    if bool(args.rotate):
+        img = np.rot90(img,1) # Rotate the image to get better visualization
     
     Img = Image(img)
     

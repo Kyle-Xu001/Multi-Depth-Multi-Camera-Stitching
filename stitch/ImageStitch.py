@@ -31,7 +31,7 @@ class Image(object):
         
         # Extract the features from image and update the feature property
         kps, des = self.findFeatures(method)
-        print("\nInitial Successfullys")
+        print("\nInitial Successfully!")
         
     def equalizeHist(self):
         self.img = utils.equalizeHist(self.img)        

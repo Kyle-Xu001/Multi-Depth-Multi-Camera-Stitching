@@ -1,28 +1,42 @@
-import matplotlib.pyplot as plt
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
+
+import argparse
+import itertools
 import numpy as np
 import cv2 as cv
-import itertools
+import matplotlib.pyplot as plt
 
 from stitch import Image, utils
 
 
 if __name__ == '__main__':
     '''This script will be tested for feature matching'''
+    # Define parser arguments
+    parser = argparse.ArgumentParser(description="Image Stitching")
+    parser.add_argument("--img1", type=str)
+    parser.add_argument("--img2", type=str)
+    parser.add_argument("--rotate", action="store_true", help="Rotate the image to get better visualization")
+    args, _ = parser.parse_known_args()
     
     draw_params = dict(matchColor = (0,255,0),
                    singlePointColor = (255,0,0),
                    flags = cv.DrawMatchesFlags_DEFAULT)
     
     # load the matching images
-    #img1 = cv.imread("dataset/Arie/lamp_02_Arie.PNG")
-    #img2 = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
-    img1 = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
-    img2 = cv.imread("dataset/example_image/APAP-railtracks/2.JPG")
+    img1 = cv.imread(args.img1)
+    img2 = cv.imread(args.img2)
+    # img1 = cv.imread("dataset/Arie/lamp_02_Arie.PNG")
+    # img2 = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
+    #img1 = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
+    #img2 = cv.imread("dataset/example_image/APAP-railtracks/2.JPG")
     #img1 = cv.imread("dataset/example_image/NISwGSP-denny/denny02.jpg")
     #img2 = cv.imread("dataset/example_image/NISwGSP-denny/denny03.jpg")
 
-    #img1 = np.rot90(img1,1) 
-    #img2 = np.rot90(img2,1)
+    if args.rotate:
+        img1 = np.rot90(img1,1)
+        img2 = np.rot90(img2,1)
     
     # Initialize the Stitch Class
     Img1 = Image(img1)
@@ -39,9 +53,8 @@ if __name__ == '__main__':
     matches_sift_knn = utils.featureMatch(des1_filter, des2_filter, 'sift', knn=True)
     
 
-    img_sift = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches_sift[:300],None,**draw_params)
-    img_sift_knn = cv.drawMatches(Img1.img,kps1_filter,Img2.img,kps2_filter,matches_sift_knn[:300],None,**draw_params)
-  
+    img_sift = cv.drawMatches(Img1.img, kps1_filter, Img2.img, kps2_filter, matches_sift[:300],None,**draw_params)
+    img_sift_knn = cv.drawMatches(Img1.img, kps1_filter, Img2.img, kps2_filter, matches_sift_knn[:300],None,**draw_params)
     
     '''BRISK Features Matching Comparison'''
     # Extract the BRISK features

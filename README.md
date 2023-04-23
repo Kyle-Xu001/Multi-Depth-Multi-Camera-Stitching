@@ -49,30 +49,30 @@ This submission consists of various methods for video stitching from multi-camer
 - `PositioningSystem.py` - Define the function for point transformation and box transformation based on the `trans_params.json` files. It transforms the local coordinates of individual camera to the global coordinates.
 
 - `PositioningSystem_Test.py` - Test the positoning system of three farms by visualizing the panorama results of position transformation from each camera
-
+----
 ## Usage
 ### Feature Extraction
-- **Image Feature Extraction Test**: Extract different kinds of features from the input image and visualize the result
-```bash
-    $ python feature_extraction_test.py
-```
+- **Image Feature Extraction Test**: Extract various features (SIFT, BRISK, ORB) from input images and visualize results
+    ```bash
+    $ ./main.sh -t feature_extraction
+    ```
 <div align="center">
 <img src="result/feature_extraction.png" width="500" height="300"/>
 <br/>
-Figure 1  Feature Extraction Comparison
+Figure 1: Feature Extraction Comparison
 </div>
 
 ### Feature Matching
 - **Feature Matching Test**: Match the features with BF/KNN methods. Select suitable matching method based on the Inliers Result
-```bash
-    $ python feature_matching_test.py
-```
+    ```bash
+    $ ./main.sh -t feature_matching
+    ```
 </br>
 
 - **ROIs Matching Test**: Match the features within corresponding areas to avoid wrong matches across different regions. As a result of the Separate Region Processing, false matches and computation time will be effectively reduced, and the number of correct matching inliers will increase.
-```bash
+    ```bash
     $ python ROIs_matching_test.py
-```
+    ```
 <div align="center">
 <img src="result/feature_matching.png" width="375" height="250"/>
 <img src="result/ROIs.png" width="375" height="250"/>
