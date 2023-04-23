@@ -1,3 +1,8 @@
+import os
+import sys
+import argparse
+sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
+
 import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
@@ -7,21 +12,30 @@ import stitch
 
 if __name__ == '__main__':
     '''This script will be tested for multiple ROIs'''
+    # Define parser arguments
+    parser = argparse.ArgumentParser(description="Image Stitching")
+    parser.add_argument("--img1", type=str)
+    parser.add_argument("--img2", type=str)
+    parser.add_argument("--rotate", action="store_true", help="Rotate the image to get better visualization")
+    args, _ = parser.parse_known_args()
     
     draw_params = dict(matchColor = (0,255,0),
                    singlePointColor = (255,0,0),
                    flags = cv.DrawMatchesFlags_DEFAULT)
     
     # load the matching images
-    img1 = cv.imread("dataset/Arie/lamp_02_Arie.PNG")
-    img2 = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
+    img1 = cv.imread(args.img1)
+    img2 = cv.imread(args.img2)
+    # img1 = cv.imread("dataset/Arie/lamp_02_Arie.PNG")
+    # img2 = cv.imread("dataset/Arie/lamp_01_Arie.PNG")
     # img1 = cv.imread("dataset/example_image/APAP-railtracks/1.JPG")
     # img2 = cv.imread("dataset/example_image/APAP-railtracks/2.JPG")
-    #img1 = cv.imread("dataset/example_image/NISwGSP-denny/denny02.jpg")
-    #img2 = cv.imread("dataset/example_image/NISwGSP-denny/denny03.jpg")
+    # img1 = cv.imread("dataset/example_image/NISwGSP-denny/denny02.jpg")
+    # img2 = cv.imread("dataset/example_image/NISwGSP-denny/denny03.jpg")
 
-    img1 = np.rot90(img1,1) 
-    img2 = np.rot90(img2,1)
+    if args.rotate:
+        img1 = np.rot90(img1,1) 
+        img2 = np.rot90(img2,1)
     
     # Manually define the ROI to locate the area for corresponding images
     cv.namedWindow("Area Selection", cv.WINDOW_NORMAL)

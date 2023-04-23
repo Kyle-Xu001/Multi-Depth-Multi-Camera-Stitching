@@ -36,4 +36,10 @@ then
 elif [[ $TYPE == "feature_matching" ]];
 then
      python3 src/feature_matching_test.py --img1 $IMG1 --img2 $IMG2 #--rotate
+elif [[ $TYPE == "roi_matching" ]];
+then
+     python3 src/ROIs_matching_test.py --img1 $IMG1 --img2 $IMG2 #--rotate
+elif [[ $TYPE == "stitch" ]];
+then
+     python3 src/stitch.py --img1 $IMG1 --img2 $IMG2 #--rotate
 fi

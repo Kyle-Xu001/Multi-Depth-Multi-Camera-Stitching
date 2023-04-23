@@ -1,10 +1,10 @@
 import os
 import sys
+import argparse
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
-import argparse
-import numpy as np
 import cv2 as cv
+import numpy as np
 import matplotlib.pyplot as plt
 
 from stitch import utils, Image

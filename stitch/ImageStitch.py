@@ -80,7 +80,7 @@ class Image(object):
         self.desCluster = desCluster
 
 
- 
+
 '''
 STITCH CLASS: 
 Define the related features and matches between a pair of images 
@@ -190,8 +190,8 @@ def simpleStitch(img1, img2, homo_mat):
                             [0,0,offset],
                             [0,0,0]])
     homo_mat_ = np.eye(3)
-    homo_mat = homo_mat + translation
-    homo_mat_ = homo_mat_ +translation
+    homo_mat  = homo_mat  + translation
+    homo_mat_ = homo_mat_ + translation
     img_super = cv.warpPerspective(
         img1, homo_mat_, stitch_size)
     img_transform = cv.warpPerspective(

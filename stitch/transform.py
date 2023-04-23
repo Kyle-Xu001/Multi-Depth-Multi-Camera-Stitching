@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
-import undistortion_stitch_test
+import scripts.undistortion_stitch_test as undistortion_stitch_test
 import argparse
 import cv2 as cv
 
