@@ -1,0 +1,76 @@
+{
+    "panorama_size":
+    [
+        2300,
+        1300
+    ],
+    "farm":
+    {
+        "Img_Stitch":
+        {
+            "lamp02-lamp01":
+            {
+                "type": "stitch",
+                "flip": 0,
+                "member":
+                [
+                    "lamp02",
+                    "lamp01"
+                ]
+            },
+            "lamp03-lamp02":
+            {
+                "type": "stitch",
+                "flip": 0,
+                "member":
+                [
+                    "lamp03",
+                    "img_stitch"
+                ]
+            },
+            "lamp04-lamp03":
+            {
+                "type": "stitch",
+                "flip": 0,
+                "member":
+                [
+                    "lamp04",
+                    "img_stitch"
+                ]
+            },
+            "lamp05-lamp04":
+            {
+                "type": "stitch",
+                "flip": 0,
+                "member":
+                [
+                    "lamp05",
+                    "img_stitch"
+                ]
+            },
+            "image-transition":
+            {
+                "type": "output",
+                "flip":0,
+                "member":
+                [
+                    "img_stitch"
+                ],
+                "value":                [
+                    [
+                        0,
+                        2300,
+                        0,
+                        1300
+                    ],
+                    [
+                        0,
+                        2300,
+                        0,
+                        1300
+                    ]
+                ]
+            }
+        }
+    }
+}
